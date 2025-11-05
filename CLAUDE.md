@@ -13,7 +13,7 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 
 ## User Preferences
 
-**Autonomous Workflow Execution**: When the user invokes documented workflows (like `/init`, `/compact`, custom commands), **ALWAYS execute the complete workflow autonomously** without asking ANY questions:
+**Autonomous Workflow Execution**: When the user invokes documented workflows (like `/init`, `/sum`, custom commands), **ALWAYS execute the complete workflow autonomously** without asking ANY questions:
 
 - ✅ **DO**: Execute ALL steps automatically including git init, GitHub repo creation, and backup integration
 - ✅ **DO**: Create files, symlinks, run git operations, push to GitHub
@@ -42,7 +42,7 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 ├── GEMINI.md           # Symlink → CLAUDE.md (for Google Gemini)
 ├── AGENTS.md           # Symlink → CLAUDE.md (for other AI assistants)
 ├── commands/           # Global slash commands (available in all projects)
-│   ├── compact.md      # Archive + compact documentation
+│   ├── sum.md          # Summarize/archive documentation
 │   └── log.md          # Document session changes
 ├── docs/               # Detailed documentation
 │   ├── projects.md     # All active projects overview
@@ -57,13 +57,13 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 
 ## Global Slash Commands
 
-### `/compact` - Archive & Compress
+### `/sum` - Summarize & Archive
 
-Archives changelog history and creates lean documentation files.
+Summarizes and archives changelog history, creating lean documentation files.
 
 **Usage**: Run monthly or when docs get too large
 ```bash
-/compact
+/sum
 # → Archives to backups/CLAUDE-[timestamp].md
 # → Creates clean version without old changelogs
 ```
@@ -192,12 +192,12 @@ vim CLAUDE.md
 # → GEMINI.md and AGENTS.md automatically reflect changes via symlinks
 ```
 
-**Manual Compacting**:
+**Manual Summarizing**:
 ```bash
 # When docs get too large:
-/compact
+/sum
 # → Archives: backups/CLAUDE-[timestamp].md
-# → Compacts: CLAUDE.md (removes old changelogs)
+# → Summarizes: CLAUDE.md (removes old changelogs)
 ```
 
 ## Setting Up a New Project
@@ -248,7 +248,7 @@ For detailed troubleshooting, see **[docs/troubleshooting.md](docs/troubleshooti
 
 **Commands not found**:
 ```bash
-ls ~/.claude/commands/  # Should show compact.md
+ls ~/.claude/commands/  # Should show sum.md and log.md
 ```
 
 **Symlinks broken**:

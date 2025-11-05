@@ -1,6 +1,6 @@
 # /log - Document Session Changes
 
-You are helping the user document changes made during this Claude Code session.
+You are autonomously documenting what **you (Claude)** did during this session.
 
 ## Context
 
@@ -10,24 +10,28 @@ The user has a multi-layered documentation system:
 - **Global ~/.claude/docs/projects.md** - Detailed descriptions of all projects
 - Each project should be cross-referenced so global Claude knows what each project needs
 
+**Important**: This command is for documenting **Claude's changes**, not the user's manual work. The user documents their own changes. You document what you did.
+
 ## Your Task
 
-1. **Analyze what was done this session**
+1. **Analyze what YOU did this session**
    - Review git changes if in a git repo: `git status`, `git diff`
-   - Consider what files were created, modified, or discussed
-   - Identify the nature of changes (features, fixes, configuration, documentation)
+   - Recall what files YOU created, modified, or deleted
+   - Consider bash commands YOU ran
+   - Identify the nature of YOUR changes (features, fixes, configuration, documentation)
 
 2. **Determine current project context**
    - Identify which project we're in (e.g., ~/scripts, ~/projects/nvimConfig)
    - Check if a CLAUDE.md exists in the current directory
    - Identify the project name for global docs reference
 
-3. **Ask user for input** (be concise)
-   Ask the user 1-2 focused questions:
-   - "What's the main accomplishment or change from this session?"
-   - If unclear: "Any important context or impact to document?"
-
-   Keep this brief - the user wants quick logging, not an interview.
+3. **NO questions - autonomous summary**
+   DO NOT ask the user what changed. You know what you did.
+   Autonomously summarize based on:
+   - Files you wrote/edited
+   - Commands you ran
+   - Problems you solved
+   - Features you implemented
 
 4. **Update Project CLAUDE.md** (if it exists)
    Add a detailed changelog entry following this format:
@@ -70,10 +74,17 @@ The user has a multi-layered documentation system:
 
    For minor project updates, just updating docs/projects.md is sufficient.
 
-7. **Summary for user**
-   After updating files, show the user:
+7. **Auto-commit documentation changes**
+   After updating files:
+   - Stage all documentation changes (project and global)
+   - Create commit with message: "docs: [Brief summary of session]"
+   - Push to remote
+   - Show user summary of what was documented and committed
+
+8. **Summary for user**
+   After documenting and committing, show:
    ```
-   📝 Documentation updated:
+   📝 Session documented and committed:
 
    Local changes:
    - ~/path/to/project/CLAUDE.md - Added changelog entry
@@ -81,15 +92,17 @@ The user has a multi-layered documentation system:
    Global changes:
    - ~/.claude/docs/projects.md - Updated [project-name] section
 
-   Would you like me to commit these documentation changes? (yes/no)
+   Committed as: "docs: [Brief summary]"
+   Pushed to: origin/master
    ```
 
 ## Important Guidelines
 
-**Be concise:**
-- Don't ask unnecessary questions - infer from context when possible
+**Be autonomous:**
+- NO questions - you know what you did during the session
+- Summarize YOUR work (files created/edited, commands run, problems solved)
 - Keep changelog entries focused on impact, not implementation details
-- User wants quick logging, not extensive documentation sessions
+- User wants quick, accurate logging of Claude's work
 
 **Cross-reference:**
 - Link between project and global docs where relevant
@@ -101,9 +114,10 @@ The user has a multi-layered documentation system:
 - Include date in all changelog entries
 
 **Git integration:**
-- If user says yes to commit, create a commit with both project and global doc updates
-- Use commit message: "docs: Document session changes - [brief summary]"
-- Don't auto-commit without asking
+- Auto-commit all documentation changes (project + global)
+- Use commit message format: "docs: [Brief summary of what Claude did]"
+- Push to remote automatically
+- User can always revert if needed
 
 **Handle edge cases:**
 - If no CLAUDE.md in project: offer to create one (brief)
@@ -113,16 +127,38 @@ The user has a multi-layered documentation system:
 ## Example Workflow
 
 ```
-User runs /log in ~/scripts after adding a new backup repo
+User runs /log in ~/scripts
+
+You (autonomous):
+1. Check git status - see dotfiles_backup.sh was modified
+2. Recall: I added "Claude Global" to REPOS array
+3. Write to ~/scripts/CLAUDE.md:
+   ### 2025-11-05 - Added Claude Global to Automated Backups
+   **Changes:**
+   - Added ~/.claude to REPOS array (line 14)
+   - Now backing up 6 repositories hourly
+   ...
+4. Update ~/.claude/docs/projects.md scripts section:
+   **Last Updated:** 2025-11-05
+   **Recent Changes:** Added Claude Global config to backup system
+5. Stage, commit, and push:
+   git add ~/scripts/CLAUDE.md ~/.claude/docs/projects.md
+   git commit -m "docs: Add Claude Global to automated backups"
+   git push
+6. Show summary to user
+```
+
+**Another example** - working in ~/.claude directory:
+```
+User runs /log in ~/.claude after creating /log command
 
 You:
-1. Check git status - sees dotfiles_backup.sh was modified
-2. Ask: "What was the main change? (I see dotfiles_backup.sh was updated)"
-3. User: "Added Claude Global to automated backups"
-4. Update ~/scripts/CLAUDE.md with detailed entry
-5. Update ~/.claude/docs/projects.md scripts section
-6. Show summary and ask about commit
-7. If yes: commit both changes with appropriate message
+1. See new files: commands/log.md, docs/project-logs/README.md
+2. See modified: CLAUDE.md
+3. Write to ~/.claude/CLAUDE.md changelog (it documents itself)
+4. Update docs/projects.md if needed
+5. Commit: "docs: Created /log command for autonomous session documentation"
+6. Push and show summary
 ```
 
 Now proceed with logging this session's changes.

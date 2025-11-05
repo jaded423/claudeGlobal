@@ -98,24 +98,24 @@ Configures Claude Code's status line based on your shell PS1 prompt.
 
 ### `/log` - Document Session Changes
 
-**INTERACTIVE** - Documents changes from the current session in both project and global documentation.
+**AUTONOMOUS** - Claude documents what Claude did during the session.
 
 **What it does**:
-1. Analyzes git changes and session context
-2. Asks user 1-2 brief questions about the changes
-3. Updates project CLAUDE.md with detailed changelog entry
-4. Updates `~/.claude/docs/projects.md` with brief summary for the project
-5. Optionally commits documentation changes
+1. Analyzes git changes and recalls what Claude did this session
+2. Autonomously writes detailed changelog to project CLAUDE.md
+3. Updates `~/.claude/docs/projects.md` with brief summary
+4. Auto-commits and pushes documentation changes
 
-**Usage**: Run at the end of a session to document what was accomplished
+**Usage**: Run at the end of a session to document Claude's work
 ```bash
 /log
-# → Analyzes changes
-# → Asks for brief summary
+# → Claude analyzes what IT changed
 # → Updates project CLAUDE.md (detailed)
 # → Updates global docs/projects.md (brief)
-# → Offers to commit changes
+# → Commits and pushes automatically
 ```
+
+**Use case**: This documents **Claude's changes**, not your manual edits. If you make changes yourself, document those yourself. This is for when Claude Code makes changes and you want those changes documented in the appropriate places.
 
 **Documentation layers**:
 - **Project CLAUDE.md** - Detailed changelog with dates, impacts, file references

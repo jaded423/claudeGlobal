@@ -1,0 +1,21 @@
+# Session-specific data (local only)
+debug/
+file-history/
+session-env/
+shell-snapshots/
+todos/
+projects/
+history.jsonl
+statsig/
+
+# Local settings overrides
+settings.local.json
+
+# Backup files
+*.backup
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store

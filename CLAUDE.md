@@ -1,0 +1,319 @@
+# Global Claude Code Documentation System
+
+This file documents the global Claude Code configuration and slash commands available across **all projects**.
+
+## Overview
+
+This directory (`~/.claude/`) contains global configuration and commands that work with Claude Code across any project you're working on - whether it's Python, SQL, JavaScript, Neovim configs, or any other codebase.
+
+**📚 Detailed Documentation**: For comprehensive information, see the `~/.claude/docs/` directory:
+- **[projects.md](docs/projects.md)** - Detailed descriptions of all active projects
+- **[interconnections.md](docs/interconnections.md)** - System dependency map and file movement checklists
+- **[troubleshooting.md](docs/troubleshooting.md)** - Solutions for common issues
+
+## User Preferences
+
+**Autonomous Workflow Execution**: When the user invokes documented workflows (like `/init`, `/compact`, custom commands), **ALWAYS execute the complete workflow autonomously** without asking ANY questions:
+
+- ✅ **DO**: Execute ALL steps automatically including git init, GitHub repo creation, and backup integration
+- ✅ **DO**: Create files, symlinks, run git operations, push to GitHub
+- ❌ **DON'T**: Ask "Should I create CLAUDE.md?" when user typed `/init`
+- ❌ **DON'T**: Ask "Should I create symlinks?" - they're part of `/init` workflow
+- ❌ **DON'T**: Ask "Should I initialize git?" - YES, always initialize
+- ❌ **DON'T**: Ask "Should I create a GitHub remote?" - YES, always create and push
+- ❌ **DON'T**: Request permission for ANY step in a documented workflow
+
+**Rationale**: If the user types `/init`, they know what `/init` does and want the COMPLETE autonomous workflow:
+1. Create CLAUDE.md documentation
+2. Create GEMINI.md and AGENTS.md symlinks
+3. Run `git init` (always, even if not a git repo yet)
+4. Create GitHub remote repository (private)
+5. Push initial commit
+6. Add repo to automated backup system in `~/scripts/dotfiles_backup.sh`
+7. Inform user that hourly backups are now active for this repo
+
+**Exception**: Only ask questions for genuinely ambiguous technical decisions (e.g., "Which authentication method?" when multiple valid approaches exist).
+
+## Directory Structure
+
+```
+~/.claude/
+├── CLAUDE.md           # This file - global documentation (source of truth)
+├── GEMINI.md           # Symlink → CLAUDE.md (for Google Gemini)
+├── AGENTS.md           # Symlink → CLAUDE.md (for other AI assistants)
+├── commands/           # Global slash commands (available in all projects)
+│   └── compact.md      # Archive + compact documentation
+├── docs/               # Detailed documentation (NEW)
+│   ├── projects.md     # All active projects overview
+│   ├── interconnections.md  # System dependency map
+│   └── troubleshooting.md   # Common issues and solutions
+├── agents/             # AI agent definitions
+├── skills/             # Reusable skills
+├── settings.json       # Global Claude Code settings
+└── [other system files]
+```
+
+## Global Slash Commands
+
+### `/compact` - Archive & Compress
+
+Archives changelog history and creates lean documentation files.
+
+**Usage**: Run monthly or when docs get too large
+```bash
+/compact
+# → Archives to backups/CLAUDE-[timestamp].md
+# → Creates clean version without old changelogs
+```
+
+### `/statusline` - Configure Status Line
+
+Configures Claude Code's status line based on your shell PS1 prompt.
+
+**Usage**: After changing your shell prompt configuration
+```bash
+/statusline
+# → Reads ~/.zshrc or ~/.bashrc
+# → Configures Claude Code to match your prompt
+```
+
+### `/init` - Initialize Project Documentation
+
+**FULLY AUTONOMOUS** - Analyzes codebase, creates docs, initializes git, creates GitHub repo, pushes, and adds to automated backups.
+
+**What it does** (all automatically):
+1. Analyzes codebase structure and architecture
+2. Creates CLAUDE.md with project-specific guidance
+3. Creates GEMINI.md and AGENTS.md symlinks
+4. Runs `git init` (if not already a repo)
+5. Commits documentation files
+6. Creates private GitHub repository and pushes
+7. Adds repo to `~/scripts/dotfiles_backup.sh` REPOS array
+8. Commits and pushes updated backup script
+9. Informs user: "✅ Project initialized! GitHub repo created and added to hourly automated backups."
+
+**NO questions asked** - typing `/init` means you want the complete workflow.
+
+## Active Projects Quick Reference
+
+For detailed project information, see **[docs/projects.md](docs/projects.md)**.
+
+**Currently active projects**:
+1. **promptLibrary** - AI prompt engineering library with testing
+2. **nvimConfig** - Neovim configuration (symlinked to `~/.config/nvim`)
+3. **dotfilesPrivate** - ZSH shell config (symlinked to `~/.zshrc`)
+4. **odooReports** - Business automation for Elevated Trading
+5. **scripts** - Automation infrastructure (backup system, email)
+6. **Elevated Vault** - Obsidian knowledge base in Google Drive
+7. **hello-ai** - Test project for `/init` workflow
+
+All projects have hourly automated backups to GitHub.
+
+## System Interconnections
+
+**⚠️ BEFORE MOVING ANY FILES**, consult **[docs/interconnections.md](docs/interconnections.md)**.
+
+**Critical dependencies to be aware of**:
+- **Symlinks**: `~/.config/nvim`, `~/.zshrc`, `~/.p10k.zsh`, `~/scripts`
+- **LaunchAgents**: 3 background jobs (dotfiles backup, email reminder, claude auto)
+- **Crontab**: 2 scheduled tasks (Odoo reports, claude auto reset)
+- **Gmail OAuth**: Shared credentials in `~/projects/odooReports/AR_AP/`
+- **Python 3.13**: Hardcoded paths in 3+ automation scripts
+- **SSH Keys**: Must be in macOS Keychain for automated git push
+
+**Quick check before moving files**:
+```bash
+# What uses this directory/file?
+grep -r "path/to/check" ~/.claude/docs/interconnections.md
+```
+
+## Multi-AI Documentation System
+
+### The Three Files (via Symlinks)
+
+Every project should have these three documentation files in its root:
+
+1. **CLAUDE.md** - Source of truth
+   - Primary documentation file
+   - Updated during development
+   - Contains changelog entries
+
+2. **GEMINI.md** - Symlink to CLAUDE.md
+   - Automatically stays in sync via filesystem symlink
+   - Used when working with Google Gemini AI
+
+3. **AGENTS.md** - Symlink to CLAUDE.md
+   - Automatically stays in sync via filesystem symlink
+   - Used for other AI assistants
+
+**Benefits of Symlinks**:
+- Always in sync - no manual sync commands needed
+- Single source of truth - edit CLAUDE.md only
+- Git-friendly - commit symlinks once, never out of sync
+
+### Workflow
+
+**Regular Development**:
+```bash
+# Just edit CLAUDE.md directly
+vim CLAUDE.md
+# → GEMINI.md and AGENTS.md automatically reflect changes via symlinks
+```
+
+**Manual Compacting**:
+```bash
+# When docs get too large:
+/compact
+# → Archives: backups/CLAUDE-[timestamp].md
+# → Compacts: CLAUDE.md (removes old changelogs)
+```
+
+## Setting Up a New Project
+
+**Recommended: Use `/init` command** - handles everything automatically.
+
+**Manual setup** (if needed):
+```bash
+cd ~/projects/my-new-project
+
+# Create symlinks
+ln -s CLAUDE.md GEMINI.md
+ln -s CLAUDE.md AGENTS.md
+
+# Add to .gitignore
+echo "backups/" >> .gitignore
+
+# Initialize git and create GitHub repo
+git init
+git add .
+git commit -m "Initial commit: Add multi-AI documentation"
+gh repo create my-new-project --private --source=. --remote=origin --push
+```
+
+## Permissions Configuration
+
+Auto-approve specific operations to streamline workflows. Configured in `settings.json`:
+
+**Current auto-approved operations**:
+- **Read files**: `Read(*)`, `cat`, `readlink` - Read anything, anywhere
+- **Search/Discovery**: `Grep(*)`, `Glob(*)`, `find`, `ls`
+- **Cross-project access**: Can read from `~/scripts` and `~/projects`
+- **Symlink creation**: `ln -s` in `~/projects/*` directories
+- **Creating new markdown files**: `Write(*.md)`
+- **Git operations**: `git status`, `git remote`, `git init`, `git add`, `git commit`, `git push`
+- **GitHub repo creation**: `gh repo create` (private repos)
+
+**Still requires approval**:
+- **Editing existing files** - you control all changes
+- **Deleting files or directories**
+- **Other bash commands** not explicitly listed
+
+## Troubleshooting
+
+For detailed troubleshooting, see **[docs/troubleshooting.md](docs/troubleshooting.md)**.
+
+**Quick fixes**:
+
+**Commands not found**:
+```bash
+ls ~/.claude/commands/  # Should show compact.md
+```
+
+**Symlinks broken**:
+```bash
+ls -la | grep -E "(GEMINI|AGENTS).md"
+readlink GEMINI.md  # Should output: CLAUDE.md
+```
+
+**Automation not working**:
+```bash
+launchctl list | grep user  # Check launchd jobs
+crontab -l  # Check cron jobs
+```
+
+## Best Practices
+
+### Changelog Entry Guidelines
+- **Be specific**: Include file paths and line numbers
+- **Explain why**: Not just what changed, but why it matters
+- **Include impact**: How does this affect the project?
+- **Use examples**: Show concrete examples when helpful
+- **Keep it concise**: 3-5 bullet points is usually enough
+
+### Git Workflow
+```bash
+# 1. Make changes to your code
+vim src/api.py
+
+# 2. Document changes in CLAUDE.md
+vim CLAUDE.md
+
+# 3. Commit everything together
+git add .
+git commit -m "feat: Add user authentication"
+git push
+```
+
+### Backup Management
+- Backups live in `backups/` directory (gitignored)
+- Never deleted automatically
+- Can reference historical context anytime
+- Organized by timestamp (YYYY-MM-DD-HH-MM-SS)
+
+## Version History
+
+### November 4, 2025 - Documentation Restructure for Efficiency
+
+**Changes:**
+- **Restructured documentation** to prevent hallucinations and improve efficiency
+- **Created `~/.claude/docs/` directory** for detailed documentation
+- **Extracted detailed sections** into separate files:
+  - `docs/projects.md` - All active project descriptions
+  - `docs/interconnections.md` - System dependency map and movement checklists
+  - `docs/troubleshooting.md` - Common issues and solutions
+- **Compacted main CLAUDE.md** from 1100+ lines to ~300 lines
+- **Added clear references** to detailed docs throughout main file
+- Main file now focuses on: overview, user preferences, slash commands, quick references
+
+**Impact:**
+- Reduced token usage for context loading
+- Easier to scan and find information quickly
+- Less prone to hallucinations with smaller context
+- Detailed information still accessible when needed
+- Better organization for maintaining documentation
+
+**Rationale:**
+Large context files (1000+ lines) increase hallucination risk and make it harder for Claude to focus on relevant information. By splitting into focused documents, each interaction uses only necessary context.
+
+### November 4, 2025 - Comprehensive Auto-Approval Permissions for Frictionless /init
+- Added comprehensive permissions configuration to `settings.json`
+- Auto-approve reading ANY file ANYWHERE
+- Auto-approve all search operations
+- Auto-approve git operations and GitHub repo creation
+- Result: `/init` workflow now COMPLETELY frictionless - zero permission prompts
+
+### November 4, 2025 - User Preferences for Fully Autonomous Execution
+- Added User Preferences section documenting completely autonomous workflow execution
+- `/init` workflow now includes end-to-end automation: from empty directory → documented → version controlled → backed up hourly
+- NO questions asked except for genuinely ambiguous technical decisions
+
+### November 3, 2025 - Major Documentation Expansion
+- Added comprehensive Skills documentation section
+- Added Global Agents documentation
+- Expanded Global Slash Commands section
+- Added Settings Configuration section
+- Enhanced Troubleshooting section
+
+### November 3, 2025 - Switched to Symlinks
+- Removed `/sync-ai-docs` command (no longer needed)
+- Switched from file copying to symlinks for GEMINI.md and AGENTS.md
+- Simplified workflow - no manual sync commands required
+
+## Resources
+
+- [Claude Code Docs](https://docs.claude.com/en/docs/claude-code)
+- [Slash Commands Guide](https://docs.claude.com/en/docs/claude-code/slash-commands)
+- [Project Documentation](https://docs.claude.com/en/docs/claude-code/project-docs)
+- **[Detailed Project Info](docs/projects.md)** - All active projects
+- **[System Interconnections](docs/interconnections.md)** - Dependency map
+- **[Troubleshooting Guide](docs/troubleshooting.md)** - Common issues

@@ -59,17 +59,20 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active business automation
 **Location**: `~/projects/odooReports`
 **Purpose**: Automated daily reporting for Elevated Trading
+**Last Updated**: 2025-11-05
+**Recent Changes**: Refactored credentials management for improved security - removed plaintext API key from crontab, created centralized odoo_credentials.json file
 
 **Key Features**:
 - AR/AP Report: Accounts Receivable/Payable aging (PDF + Excel)
 - Labels Report: Stock inventory tracking (Excel)
 - Gmail OAuth integration for email delivery
 - **Automated execution**: Daily at 9:00 AM weekdays via cron
+- **Secure credentials**: Centralized in gitignored odoo_credentials.json file
 
 **Critical Dependencies**:
 - Python 3.13
 - OAuth credentials in AR_AP/ directory (shared with backup system)
-- Odoo API key in crontab
+- Odoo credentials in `odoo_credentials.json` (gitignored, NOT in crontab)
 - Google Drive sync for report output
 
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`

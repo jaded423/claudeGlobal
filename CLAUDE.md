@@ -42,11 +42,13 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 ├── GEMINI.md           # Symlink → CLAUDE.md (for Google Gemini)
 ├── AGENTS.md           # Symlink → CLAUDE.md (for other AI assistants)
 ├── commands/           # Global slash commands (available in all projects)
-│   └── compact.md      # Archive + compact documentation
-├── docs/               # Detailed documentation (NEW)
+│   ├── compact.md      # Archive + compact documentation
+│   └── log.md          # Document session changes
+├── docs/               # Detailed documentation
 │   ├── projects.md     # All active projects overview
 │   ├── interconnections.md  # System dependency map
-│   └── troubleshooting.md   # Common issues and solutions
+│   ├── troubleshooting.md   # Common issues and solutions
+│   └── project-logs/   # Detailed session logs per project
 ├── agents/             # AI agent definitions
 ├── skills/             # Reusable skills
 ├── settings.json       # Global Claude Code settings
@@ -93,6 +95,34 @@ Configures Claude Code's status line based on your shell PS1 prompt.
 9. Informs user: "✅ Project initialized! GitHub repo created and added to hourly automated backups."
 
 **NO questions asked** - typing `/init` means you want the complete workflow.
+
+### `/log` - Document Session Changes
+
+**INTERACTIVE** - Documents changes from the current session in both project and global documentation.
+
+**What it does**:
+1. Analyzes git changes and session context
+2. Asks user 1-2 brief questions about the changes
+3. Updates project CLAUDE.md with detailed changelog entry
+4. Updates `~/.claude/docs/projects.md` with brief summary for the project
+5. Optionally commits documentation changes
+
+**Usage**: Run at the end of a session to document what was accomplished
+```bash
+/log
+# → Analyzes changes
+# → Asks for brief summary
+# → Updates project CLAUDE.md (detailed)
+# → Updates global docs/projects.md (brief)
+# → Offers to commit changes
+```
+
+**Documentation layers**:
+- **Project CLAUDE.md** - Detailed changelog with dates, impacts, file references
+- **Global docs/projects.md** - Brief "Recent Changes" and "Last Updated" for cross-project awareness
+- **Global CLAUDE.md** - Only updated for major architectural changes
+
+**Philosophy**: Keeps global Claude aware of what each project does and needs, while maintaining detailed history in project docs.
 
 ## Active Projects Quick Reference
 

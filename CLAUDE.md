@@ -292,6 +292,44 @@ git push
 
 ## Version History
 
+### November 5, 2025 - Moved Global Config to Version Control with Automated Backups
+
+**Changes:**
+- **Moved `~/.claude` to `~/projects/.claude`** for version control
+- **Created symlink** `~/.claude` → `~/projects/.claude` (Claude Code continues to work normally)
+- **Merged settings.local.json** - Added `Bash(zsh:*)` permission from pre-existing file
+- **Created .gitignore** - Excludes session data (debug/, file-history/, todos/, projects/)
+- **Initialized git repository** - Tracking essential config files only (15 files)
+- **Created GitHub repository** - Private repo at `github.com/jaded423/claudeGlobal`
+- **Added to automated backups** - Updated `~/scripts/dotfiles_backup.sh` to include Claude Global
+- **Created `/log` command** - Autonomous documentation of Claude's session changes
+- **Created `docs/project-logs/`** - Directory structure for detailed cross-project session logs
+
+**Impact:**
+- Global Claude Code configuration now version controlled and backed up hourly
+- All global documentation, agents, commands, and settings protected
+- `/log` command enables automatic documentation of Claude's work across all projects
+- Symlink approach means zero disruption to Claude Code functionality
+- Now backing up 6 repositories total (added Claude Global to the list)
+
+**Files created:**
+- `.gitignore` - Excludes session-specific data
+- `commands/log.md` - Autonomous session documentation command
+- `docs/project-logs/README.md` - Directory for cross-project logs
+
+**Files modified:**
+- `CLAUDE.md` - Updated directory structure, added `/log` documentation
+- `~/scripts/dotfiles_backup.sh` - Added Claude Global to REPOS array (line 14)
+- `settings.local.json` - Merged `Bash(zsh:*)` permission
+
+**Git/GitHub:**
+- Repository: `github.com/jaded423/claudeGlobal`
+- Initial commit: "Initial commit: Global Claude Code configuration"
+- Subsequent commits: `/log` command creation and updates
+
+**Rationale:**
+Global configuration is critical infrastructure that should be version controlled and backed up. Moving to `~/projects/.claude` with symlink provides best of both worlds: version control + Claude Code compatibility. The `/log` command ensures Claude's work is properly documented across the entire system.
+
 ### November 4, 2025 - Documentation Restructure for Efficiency
 
 **Changes:**

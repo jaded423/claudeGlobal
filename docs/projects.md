@@ -75,6 +75,9 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
+**Last Updated:** 2025-11-05
+**Recent Changes:** Added Claude Global config to automated backup system
+
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
 **Location**: `~/projects/scripts`
@@ -82,18 +85,50 @@ Detailed descriptions of all active projects in your workspace.
 **Purpose**: Centralized automation scripts for backups and notifications
 
 **Key Features**:
-- Dotfiles backup system (backs up 5 repos hourly)
+- Dotfiles backup system (backs up 6 repos hourly)
 - Gmail OAuth email sender (shared credentials with odooReports)
 - Email reminder system (AppleScript + Python)
 - **Automated backup**: Self-backed-up hourly via launchd
 
 **Critical Scripts**:
-- `dotfiles_backup.sh` - Hourly backup of 5 git repositories
+- `dotfiles_backup.sh` - Hourly backup of 6 git repositories
 - `send_gmail_oauth.py` - Reusable Gmail API email sender
 - `email-reminder.scpt` - AppleScript for Gmail notifications
 - `gmail-reminder.py` - Python script for Gmail API queries
 
 **Documentation**: See `~/projects/scripts/CLAUDE.md`
+
+## claudeGlobal
+**Last Updated:** 2025-11-05
+**Recent Changes:** Moved to version control, created /log command, added to automated backups
+
+**Type**: Claude Code global configuration
+**Status**: Active critical infrastructure
+**Location**: `~/projects/.claude`
+**Symlinked to**: `~/.claude`
+**Purpose**: Global configuration for Claude Code across all projects
+
+**Key Features**:
+- Global slash commands: `/compact`, `/log`, `/init`
+- Custom agents: gemini-researcher, orchestrator, security-auditor, ultimate-researcher
+- Documentation system: CLAUDE.md (source), GEMINI.md, AGENTS.md (symlinks)
+- Detailed docs: projects.md, interconnections.md, troubleshooting.md, project-logs/
+- Global settings and permissions configuration
+- **Automated backup**: Hourly via launchd (as of 2025-11-05)
+
+**Critical Functionality**:
+- `/log` command - Autonomous documentation of Claude's session changes
+- `/init` command - Full project setup (docs, git, GitHub, backups)
+- `/compact` command - Archive and compress documentation
+- Cross-project awareness via docs/projects.md
+
+**Version Control**:
+- Repository: `github.com/jaded423/claudeGlobal` (private)
+- Symlink approach: Zero disruption to Claude Code functionality
+- Excludes session data: debug/, file-history/, todos/, projects/
+- Tracks: documentation, commands, agents, skills, settings
+
+**Documentation**: See `~/projects/.claude/CLAUDE.md`
 
 ## Elevated Vault (Obsidian)
 **Type**: Obsidian knowledge base

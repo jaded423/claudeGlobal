@@ -136,6 +136,8 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 5. **scripts** - Automation infrastructure (backup system, email)
 6. **Elevated Vault** - Obsidian knowledge base in Google Drive
 7. **hello-ai** - Test project for `/init` workflow
+8. **n8nDev** - n8n development environment (Docker, port 5678)
+9. **n8nProd** - n8n production environment (Docker, port 5679)
 
 All projects have hourly automated backups to GitHub.
 

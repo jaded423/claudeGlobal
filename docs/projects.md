@@ -164,6 +164,52 @@ Detailed descriptions of all active projects in your workspace.
 
 **Documentation**: See `~/projects/hello-ai/CLAUDE.md`
 
+## n8nDev
+**Type**: Workflow automation (Docker + n8n)
+**Status**: Active development environment
+**Location**: `~/projects/n8nDev`
+**Last Updated**: 2025-11-05
+**Purpose**: Development environment for building and testing n8n workflow automations
+
+**Key Features**:
+- Docker containerized n8n instance (port 5678)
+- Timezone configured (America/Chicago) for scheduled workflows
+- Comprehensive execution logging (keep all for debugging)
+- Safe sandbox for testing before production deployment
+- **Automated backup**: Hourly via launchd
+
+**Recent Changes:** Created complete n8n development infrastructure with Docker, comprehensive documentation, GitHub integration, and hourly automated backups
+
+**Use Cases**:
+- Test workflow automations before production
+- Migrate Python-based reports to visual workflows
+- Primary environment for building odooReports migration
+
+**Documentation**: See `~/projects/n8nDev/CLAUDE.md`
+
+## n8nProd
+**Type**: Workflow automation (Docker + n8n)
+**Status**: Active production environment
+**Location**: `~/projects/n8nProd`
+**Last Updated**: 2025-11-05
+**Purpose**: Production environment for reliable, automated workflow execution
+
+**Key Features**:
+- Docker containerized n8n instance (port 5679)
+- Timezone configured (America/Chicago) for scheduled workflows
+- 14-day execution retention with auto-pruning
+- Separate from dev - can run simultaneously
+- **Automated backup**: Hourly via launchd
+
+**Recent Changes:** Created complete n8n production infrastructure with stricter data management, production-optimized settings, and deployment documentation
+
+**Use Cases**:
+- Run validated automations from n8nDev
+- Replace cron-based Python scripts (odooReports)
+- Business process automation (AR/AP reports, inventory tracking)
+
+**Documentation**: See `~/projects/n8nProd/CLAUDE.md`
+
 ## Other Projects (Not Actively Documented)
 
 ### adv360ProZmk

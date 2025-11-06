@@ -102,8 +102,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/scripts/CLAUDE.md`
 
 ## claudeGlobal
-**Last Updated:** 2025-11-05
-**Recent Changes:** Moved to version control, created /log command, added to automated backups
+**Last Updated:** 2025-11-06
+**Recent Changes:** Removed auto-commit from /log command to reduce commit frequency and improve AI-generated commit messages
 
 **Type**: Claude Code global configuration
 **Status**: Active critical infrastructure
@@ -120,10 +120,11 @@ Detailed descriptions of all active projects in your workspace.
 - **Automated backup**: Hourly via launchd (as of 2025-11-05)
 
 **Critical Functionality**:
-- `/log` command - Autonomous documentation of Claude's session changes
+- `/log` command - Autonomous documentation of Claude's session changes (no auto-commit)
 - `/init` command - Full project setup (docs, git, GitHub, backups)
 - `/compact` command - Archive and compress documentation
 - Cross-project awareness via docs/projects.md
+- Hourly backup with AI-generated commit messages via Claude Haiku
 
 **Version Control**:
 - Repository: `github.com/jaded423/claudeGlobal` (private)
@@ -153,19 +154,6 @@ Detailed descriptions of all active projects in your workspace.
 - Contains sensitive business credentials in `03-areas/business/`
 
 **Documentation**: See vault's internal `CLAUDE.md`
-
-## hello-ai
-**Type**: Test project (Python)
-**Status**: Test/demo project
-**Location**: `~/projects/hello-ai`
-**Purpose**: Validates `/init` workflow functionality
-
-**Key Features**:
-- Recursive hello world implementation
-- Educational recursion example
-- **Automated backup**: Hourly via launchd
-
-**Documentation**: See `~/projects/hello-ai/CLAUDE.md`
 
 ## n8nDev
 **Type**: Workflow automation (Docker + n8n)

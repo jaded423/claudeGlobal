@@ -74,17 +74,10 @@ The user has a multi-layered documentation system:
 
    For minor project updates, just updating docs/projects.md is sufficient.
 
-7. **Auto-commit documentation changes**
-   After updating files:
-   - Stage all documentation changes (project and global)
-   - Create commit with message: "docs: [Brief summary of session]"
-   - Push to remote
-   - Show user summary of what was documented and committed
-
-8. **Summary for user**
-   After documenting and committing, show:
+7. **Summary for user**
+   After updating documentation, show:
    ```
-   📝 Session documented and committed:
+   📝 Session documented:
 
    Local changes:
    - ~/path/to/project/CLAUDE.md - Added changelog entry
@@ -92,8 +85,7 @@ The user has a multi-layered documentation system:
    Global changes:
    - ~/.claude/docs/projects.md - Updated [project-name] section
 
-   Committed as: "docs: [Brief summary]"
-   Pushed to: origin/master
+   Note: Changes saved locally. Your hourly backup will commit with AI-generated message.
    ```
 
 ## Important Guidelines
@@ -113,11 +105,11 @@ The user has a multi-layered documentation system:
 - Always use YYYY-MM-DD format
 - Include date in all changelog entries
 
-**Git integration:**
-- Auto-commit all documentation changes (project + global)
-- Use commit message format: "docs: [Brief summary of what Claude did]"
-- Push to remote automatically
-- User can always revert if needed
+**No auto-commit:**
+- Documentation changes are saved to files only
+- Hourly backup script handles ALL git commits with AI-generated messages
+- This allows multiple sessions' changes to accumulate for better AI context
+- User's backup automation will commit and push automatically
 
 **Handle edge cases:**
 - If no CLAUDE.md in project: offer to create one (brief)
@@ -141,11 +133,7 @@ You (autonomous):
 4. Update ~/.claude/docs/projects.md scripts section:
    **Last Updated:** 2025-11-05
    **Recent Changes:** Added Claude Global config to backup system
-5. Stage, commit, and push:
-   git add ~/scripts/CLAUDE.md ~/.claude/docs/projects.md
-   git commit -m "docs: Add Claude Global to automated backups"
-   git push
-6. Show summary to user
+5. Show summary to user (changes saved, will be committed by hourly backup)
 ```
 
 **Another example** - working in ~/.claude directory:
@@ -157,8 +145,7 @@ You:
 2. See modified: CLAUDE.md
 3. Write to ~/.claude/CLAUDE.md changelog (it documents itself)
 4. Update docs/projects.md if needed
-5. Commit: "docs: Created /log command for autonomous session documentation"
-6. Push and show summary
+5. Show summary (no commit - let hourly backup handle it)
 ```
 
 Now proceed with logging this session's changes.

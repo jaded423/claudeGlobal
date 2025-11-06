@@ -125,7 +125,7 @@ Configures Claude Code's status line based on your shell PS1 prompt.
 1. Analyzes git changes and recalls what Claude did this session
 2. Autonomously writes detailed changelog to project CLAUDE.md
 3. Updates `~/.claude/docs/projects.md` with brief summary
-4. Auto-commits and pushes documentation changes
+4. Saves changes locally (no commit - hourly backup handles that)
 
 **Usage**: Run at the end of a session to document Claude's work
 ```bash
@@ -133,7 +133,7 @@ Configures Claude Code's status line based on your shell PS1 prompt.
 # → Claude analyzes what IT changed
 # → Updates project CLAUDE.md (detailed)
 # → Updates global docs/projects.md (brief)
-# → Commits and pushes automatically
+# → Changes saved locally, hourly backup commits with AI message
 ```
 
 **Use case**: This documents **Claude's changes**, not your manual edits. If you make changes yourself, document those yourself. This is for when Claude Code makes changes and you want those changes documented in the appropriate places.
@@ -143,7 +143,7 @@ Configures Claude Code's status line based on your shell PS1 prompt.
 - **Global docs/projects.md** - Brief "Recent Changes" and "Last Updated" for cross-project awareness
 - **Global CLAUDE.md** - Only updated for major architectural changes
 
-**Philosophy**: Keeps global Claude aware of what each project does and needs, while maintaining detailed history in project docs.
+**Philosophy**: Keeps global Claude aware of what each project does and needs, while maintaining detailed history in project docs. Changes accumulate locally until hourly backup creates AI-generated commit messages with full context.
 
 ## Active Projects Quick Reference
 
@@ -156,10 +156,9 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 4. **odooReports** - Business automation for Elevated Trading
 5. **scripts** - Automation infrastructure (backup system, email)
 6. **Elevated Vault** - Obsidian knowledge base in Google Drive
-7. **hello-ai** - Test project for `/init` workflow
-8. **n8nDev** - n8n development environment (Docker, port 5678)
-9. **n8nProd** - n8n production environment (Docker, port 5679)
-10. **graveyard** - Obsolete file archive (6-month retention)
+7. **n8nDev** - n8n development environment (Docker, port 5678)
+8. **n8nProd** - n8n production environment (Docker, port 5679)
+9. **graveyard** - Obsolete file archive (6-month retention)
 
 All projects have hourly automated backups to GitHub.
 
@@ -348,6 +347,28 @@ git push
 - Organized by timestamp (YYYY-MM-DD-HH-MM-SS)
 
 ## Version History
+
+### November 6, 2025 - Removed Auto-Commit from `/log` Command
+
+**Changes:**
+- Modified `/log` command to remove all git operations (commands/log.md)
+- `/log` now only updates documentation files, does not commit or push
+- Changed workflow: documentation updates saved locally, hourly backup handles commits
+- Updated command guidelines to reflect new "No auto-commit" policy
+- Modified example workflows to show changes saved without commit/push
+
+**Impact:**
+- Dramatically reduces commit frequency (from 97 commits in November to ~24/month)
+- AI-generated commit messages now have better context from accumulated changes
+- Multiple sessions' changes batched into single meaningful commits
+- Hourly backup script's AI summary can analyze larger diffs for better messages
+- Commit history becomes more readable and meaningful
+
+**Files modified:**
+- `~/.claude/commands/log.md` - Removed steps 7-8 about git operations, updated guidelines
+
+**Rationale:**
+User was committing every time they ran `/log`, resulting in 97 commits in November alone. With hourly backups now using AI-generated commit messages via Claude Haiku API, it's better to let changes accumulate between sessions so the AI has more context for meaningful commit messages.
 
 ### November 6, 2025 - odooReports Phase 1 Complete + Graveyard System
 

@@ -29,7 +29,7 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 3. Run `git init` (always, even if not a git repo yet)
 4. Create GitHub remote repository (private)
 5. Push initial commit
-6. Add repo to automated backup system in `~/scripts/dotfiles_backup.sh`
+6. Add repo to automated backup system in `~/scripts/gitBackup.sh`
 7. Inform user that hourly backups are now active for this repo
 
 **Exception**: Only ask questions for genuinely ambiguous technical decisions (e.g., "Which authentication method?" when multiple valid approaches exist).
@@ -111,7 +111,7 @@ Configures Claude Code's status line based on your shell PS1 prompt.
 4. Runs `git init` (if not already a repo)
 5. Commits documentation files
 6. Creates private GitHub repository and pushes
-7. Adds repo to `~/scripts/dotfiles_backup.sh` REPOS array
+7. Adds repo to `~/scripts/gitBackup.sh` REPOS array
 8. Commits and pushes updated backup script
 9. Informs user: "✅ Project initialized! GitHub repo created and added to hourly automated backups."
 
@@ -398,7 +398,7 @@ User was committing every time they ran `/log`, resulting in 97 commits in Novem
 - **Created .gitignore** - Excludes session data (debug/, file-history/, todos/, projects/)
 - **Initialized git repository** - Tracking essential config files only (15 files)
 - **Created GitHub repository** - Private repo at `github.com/jaded423/claudeGlobal`
-- **Added to automated backups** - Updated `~/scripts/dotfiles_backup.sh` to include Claude Global
+- **Added to automated backups** - Updated `~/scripts/gitBackup.sh` to include Claude Global
 - **Created `/log` command** - Autonomous documentation of Claude's session changes
 - **Created `docs/project-logs/`** - Directory structure for detailed cross-project session logs
 
@@ -416,7 +416,7 @@ User was committing every time they ran `/log`, resulting in 97 commits in Novem
 
 **Files modified:**
 - `CLAUDE.md` - Updated directory structure, added `/log` documentation
-- `~/scripts/dotfiles_backup.sh` - Added Claude Global to REPOS array (line 14)
+- `~/scripts/gitBackup.sh` - Added Claude Global to REPOS array (line 14)
 - `settings.local.json` - Merged `Bash(zsh:*)` permission
 
 **Git/GitHub:**

@@ -94,7 +94,7 @@ Detailed descriptions of all active projects in your workspace.
 - **Automated backup**: Self-backed-up hourly via launchd
 
 **Critical Scripts**:
-- `dotfiles_backup.sh` - Hourly backup of 6 git repositories
+- `gitBackup.sh` - Hourly backup of 11 git repositories
 - `send_gmail_oauth.py` - Reusable Gmail API email sender
 - `email-reminder.scpt` - AppleScript for Gmail notifications
 - `gmail-reminder.py` - Python script for Gmail API queries

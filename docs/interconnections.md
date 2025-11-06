@@ -23,9 +23,9 @@ Active Location                     →  Git Repo Location
 
 Three launchd jobs run automatically in the background:
 
-### 1. Dotfiles Backup (`com.user.dotfilesbackup.plist`)
+### 1. Dotfiles Backup (`com.user.gitbackup.plist`)
 **Schedule**: Every hour at minute 0
-**Script**: `/Users/joshuabrown/scripts/dotfiles_backup.sh`
+**Script**: `/Users/joshuabrown/scripts/gitBackup.sh`
 
 **Dependencies**:
 - `~/scripts` symlink → `~/projects/scripts`
@@ -156,7 +156,7 @@ check-all-repos()    → Checks 10 hardcoded repo paths
 Google Drive Desktop app syncs specific paths:
 
 1. **Elevated Vault**: `~/Library/CloudStorage/GoogleDrive-joshua@elevatedtrading.com/My Drive/Elevated Vault`
-   - Backed up hourly via `dotfiles_backup.sh`
+   - Backed up hourly via `gitBackup.sh`
    - 2-second delay before git operations (allows sync to complete)
    - Exponential backoff retry logic (handles file locking)
 
@@ -178,7 +178,7 @@ Google Drive Desktop app syncs specific paths:
 ```
 
 **Used by**:
-1. `dotfiles_backup.sh` (line 34) - for `send_gmail_oauth.py`
+1. `gitBackup.sh` (line 34) - for `send_gmail_oauth.py`
 2. `odooReports/run_all_reports.sh` - for AR/AP and Labels scripts
 3. `odooReports/.odoo_env.sh` - for report execution
 
@@ -200,7 +200,7 @@ Host github.com
 **Added to Keychain**: `ssh-add --apple-use-keychain ~/.ssh/id_ed25519`
 
 **Used by**:
-- `dotfiles_backup.sh` - for hourly git push operations
+- `gitBackup.sh` - for hourly git push operations
 - All manual git operations in projects
 
 **⚠️ Breaking changes**: Removing SSH key from Keychain breaks automated backups
@@ -210,7 +210,7 @@ Host github.com
 Before moving ANY file or directory, check this list:
 
 ### If moving `~/projects/*` directories:
-- [ ] Update `dotfiles_backup.sh` REPOS array (if it's backed up)
+- [ ] Update `gitBackup.sh` REPOS array (if it's backed up)
 - [ ] Update `check-all-repos()` function in `~/.zshrc`
 - [ ] Update any crontab entries referencing the path
 - [ ] Recreate symlinks if they pointed to this directory
@@ -220,7 +220,7 @@ Before moving ANY file or directory, check this list:
 ### If moving `~/scripts` or `~/projects/scripts`:
 - [ ] Update `~/scripts` symlink target
 - [ ] Update all launchd plist files referencing scripts
-- [ ] Update `dotfiles_backup.sh` REPOS array
+- [ ] Update `gitBackup.sh` REPOS array
 - [ ] Update crontab entries
 - [ ] Test launchd jobs after moving: `launchctl list | grep user`
 
@@ -240,19 +240,19 @@ Before moving ANY file or directory, check this list:
 
 ### If moving `~/.config/nvim` or `~/projects/nvimConfig`:
 - [ ] Recreate `~/.config/nvim` symlink to new location
-- [ ] Update `dotfiles_backup.sh` REPOS array
+- [ ] Update `gitBackup.sh` REPOS array
 - [ ] Update `backup-nvim()` function in `~/.zshrc`
 - [ ] Test Neovim loads: `nvim --version && nvim -c "checkhealth"`
 
 ### If moving `~/projects/dotfilesPrivate`:
 - [ ] Recreate `~/.zshrc` symlink to new location
 - [ ] Recreate `~/.p10k.zsh` symlink to new location
-- [ ] Update `dotfiles_backup.sh` REPOS array
+- [ ] Update `gitBackup.sh` REPOS array
 - [ ] Update `backup-dotfiles()` function in `~/.zshrc`
 - [ ] Test shell loads: `source ~/.zshrc`
 
 ### If changing Python version:
-- [ ] Update `dotfiles_backup.sh` Python path
+- [ ] Update `gitBackup.sh` Python path
 - [ ] Update `odooReports/.odoo_env.sh` Python path
 - [ ] Update `odooReports/AR_AP/run.sh` Python path
 - [ ] Update `odooReports/Labels/run.sh` Python path
@@ -271,18 +271,18 @@ Before moving ANY file or directory, check this list:
 - `send_gmail_oauth.py`: Default credentials location
 
 ### What uses Gmail OAuth credentials?
-- `dotfiles_backup.sh` → `send_gmail_oauth.py` → `~/projects/odooReports/AR_AP/credentials.json`
+- `gitBackup.sh` → `send_gmail_oauth.py` → `~/projects/odooReports/AR_AP/credentials.json`
 - `odooReports/AR_AP/ar_ap_pdf_styled.py` → `~/projects/odooReports/AR_AP/credentials.json`
 - `odooReports/Labels/odoo_stock_report.py` → `~/projects/odooReports/Labels/credentials.json`
 - Email reminder: `~/scripts/credentials.json` (separate credentials)
 
 ### What uses Python 3.13?
-- `dotfiles_backup.sh` (email sending)
+- `gitBackup.sh` (email sending)
 - `odooReports/run_all_reports.sh` (AR/AP + Labels reports)
 - `email-reminder.scpt` → `gmail-reminder.py`
 
 ### What uses SSH keys?
-- `dotfiles_backup.sh` (git push to GitHub)
+- `gitBackup.sh` (git push to GitHub)
 - All manual git operations
 
 ### What backs up to GitHub hourly?

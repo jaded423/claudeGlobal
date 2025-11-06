@@ -136,7 +136,7 @@ ls .claude/commands/
 launchctl list | grep dotfiles
 
 # Check system logs
-log show --predicate 'eventMessage contains "dotfiles_backup"' --last 1h
+log show --predicate 'eventMessage contains "git_backup"' --last 1h
 
 # Verify SSH key is in Keychain
 ssh-add -l
@@ -193,7 +193,7 @@ which python3
 python3 --version
 
 # If wrong version, update paths in:
-# - dotfiles_backup.sh
+# - gitBackup.sh
 # - odooReports/.odoo_env.sh
 # - odooReports/AR_AP/run.sh
 # - odooReports/Labels/run.sh
@@ -255,7 +255,7 @@ nvim -c ":FormatEnable"
 
 ```bash
 # Check cron logs
-tail -f /tmp/dotfiles_backup.log
+tail -f /tmp/git_backup.log
 grep CRON /var/log/system.log
 
 # Verify cron job is loaded

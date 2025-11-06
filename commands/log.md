@@ -122,7 +122,7 @@ The user has a multi-layered documentation system:
 User runs /log in ~/scripts
 
 You (autonomous):
-1. Check git status - see dotfiles_backup.sh was modified
+1. Check git status - see gitBackup.sh was modified
 2. Recall: I added "Claude Global" to REPOS array
 3. Write to ~/scripts/CLAUDE.md:
    ### 2025-11-05 - Added Claude Global to Automated Backups

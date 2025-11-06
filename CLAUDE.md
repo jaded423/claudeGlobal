@@ -34,6 +34,27 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 
 **Exception**: Only ask questions for genuinely ambiguous technical decisions (e.g., "Which authentication method?" when multiple valid approaches exist).
 
+**Email Testing Policy**: When testing ANY code that sends emails (across all projects), **ONLY send test emails to joshua@elevatedtrading.com**:
+
+- ✅ **DO**: Comment out all other recipients before testing
+- ✅ **DO**: Add clear TODO comments to uncomment for production
+- ✅ **DO**: Document this in testing sections of project docs
+- ❌ **DON'T**: Send test emails to stakeholders, clients, or CEO
+- ❌ **DON'T**: Send test emails to any production distribution lists
+
+**Example**:
+```python
+# TESTING: Only send to joshua during development/testing
+# TODO: Uncomment all recipients before production deployment
+RECIPIENTS = [
+    # "ceo@company.com",           # Uncomment for production
+    # "stakeholder@company.com",   # Uncomment for production
+    "joshua@elevatedtrading.com"
+]
+```
+
+**Rationale**: Test emails should never reach stakeholders, clients, or executives. Only the developer (joshua) should receive test notifications.
+
 ## Directory Structure
 
 ```
@@ -138,8 +159,42 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 7. **hello-ai** - Test project for `/init` workflow
 8. **n8nDev** - n8n development environment (Docker, port 5678)
 9. **n8nProd** - n8n production environment (Docker, port 5679)
+10. **graveyard** - Obsolete file archive (6-month retention)
 
 All projects have hourly automated backups to GitHub.
+
+## Graveyard - Obsolete File Archive
+
+**Location**: `~/projects/graveyard/`
+
+The graveyard is a holding area for obsolete and questionable files from all projects. Instead of deleting immediately, move files here for 6-month retention, providing a safety net for reference.
+
+**When to use**:
+- Cleaning up project directories
+- Removing outdated test scripts
+- Archiving old configuration files
+- Preserving files "just in case"
+
+**Structure**:
+```
+graveyard/
+├── CLAUDE.md              # Documentation with log
+├── odooReports/           # Files from odooReports project
+├── nvimConfig/            # Files from nvimConfig project
+└── [projectName]/         # Create subdirs per source project
+```
+
+**Usage**:
+```bash
+# Move obsolete files
+mv old_file.py ~/projects/graveyard/projectName/
+
+# Log the move in graveyard/CLAUDE.md
+```
+
+**Deletion policy**: Files older than 6 months can be permanently deleted. User handles manual cleanup.
+
+See `~/projects/graveyard/CLAUDE.md` for full log of archived files.
 
 ## System Interconnections
 

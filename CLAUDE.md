@@ -349,6 +349,25 @@ git push
 
 ## Version History
 
+### November 6, 2025 - odooReports Phase 1 Complete + Graveyard System
+
+**Changes:**
+- Completed Phase 1: Docker containerization for odooReports (hybrid n8n architecture)
+- Created graveyard system at `~/projects/graveyard/` for obsolete file archival (6-month retention)
+- Added global email testing policy: tests only to joshua@elevatedtrading.com
+- Cleaned up odooReports: removed 7 obsolete files, 38 PDF backups, streamlined AR/AP report
+
+**Impact:**
+- odooReports ready for Phase 2 (n8n workflows)
+- Graveyard available for all future project cleanups
+- Email testing policy prevents stakeholder spam across all projects
+- Container uses volume mounts - edit host code, container sees changes instantly
+
+**Files:**
+- `~/projects/graveyard/CLAUDE.md` - Graveyard log and documentation
+- `~/projects/odooReports/Dockerfile`, `docker-compose.yml` - Container setup
+- Updated User Preferences with email testing policy
+
 ### November 5, 2025 - Moved Global Config to Version Control with Automated Backups
 
 **Changes:**

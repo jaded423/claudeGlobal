@@ -105,6 +105,14 @@ Essential commands and quick reference...
 
 **All existing projects already use this pattern**: promptLibrary, nvimConfig, odooReports, scripts, dotfilesPrivate, graveyard, n8nDev, n8nProd.
 
+**File Path References**: When the user references **"my Vault"** or **"the Vault"**, they mean:
+
+```
+/Users/joshuabrown/Library/CloudStorage/GoogleDrive-joshua@elevatedtrading.com/My Drive/Elevated Vault/
+```
+
+This is the Obsidian knowledge base stored in Google Drive. No need to search for it - use this path directly.
+
 ## Directory Structure
 
 ```

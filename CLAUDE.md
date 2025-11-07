@@ -368,7 +368,7 @@ git push
 - `~/.claude/commands/log.md` - Removed steps 7-8 about git operations, updated guidelines
 
 **Rationale:**
-User was committing every time they ran `/log`, resulting in 97 commits in November alone. With hourly backups now using AI-generated commit messages via Claude Haiku API, it's better to let changes accumulate between sessions so the AI has more context for meaningful commit messages.
+User was committing every time they ran `/log`, resulting in 97 commits in November alone. With hourly backups now using AI-generated commit messages via Claude Sonnet API, it's better to let changes accumulate between sessions so the AI has more context for meaningful commit messages.
 
 ### November 6, 2025 - odooReports Phase 1 Complete + Graveyard System
 

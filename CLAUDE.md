@@ -60,6 +60,51 @@ RECIPIENTS = [
 
 **Rationale**: Test emails should never reach stakeholders, clients, or executives. Only the developer (joshua) should receive test notifications.
 
+**Lean CLAUDE.md Structure for `/init`**: When creating project documentation with `/init`, **ALWAYS use the lean structure pattern**:
+
+**Main CLAUDE.md (100-150 lines)**:
+- Overview and purpose (2-3 paragraphs)
+- Directory structure with brief descriptions
+- Quick reference section with essential commands
+- Links to detailed documentation: `**📚 Detailed Documentation**: See the docs/ directory:`
+- Version requirements and dependencies
+- Reference to full changelog: `**Full changelog**: [docs/changelog.md](docs/changelog.md)`
+
+**docs/ subdirectory** with specialized files:
+- **docs/architecture.md** - Technical architecture, design patterns, system components
+- **docs/workflows.md** - Development workflows, common tasks, how-tos
+- **docs/commands.md** - Comprehensive command reference (if project has many commands)
+- **docs/troubleshooting.md** - Common issues and solutions
+- **docs/changelog.md** - Complete version history (ready for `/sum` command)
+
+**Pattern example**:
+```markdown
+# Project Name Documentation
+
+## Overview
+Brief description of what this project is and does.
+
+**📚 Detailed Documentation**: See the `docs/` directory:
+- **[architecture.md](docs/architecture.md)** - Technical design
+- **[workflows.md](docs/workflows.md)** - Development workflows
+- **[changelog.md](docs/changelog.md)** - Version history
+
+## Quick Start
+Essential commands and quick reference...
+
+## Version History
+**Full changelog**: [docs/changelog.md](docs/changelog.md)
+```
+
+**Benefits**:
+- Main file stays manageable (<150 lines)
+- Detailed content organized by topic
+- Easier to maintain and navigate
+- Compatible with `/sum` command for archiving
+- Follows same pattern as global `~/.claude/` docs
+
+**All existing projects already use this pattern**: promptLibrary, nvimConfig, odooReports, scripts, dotfilesPrivate, graveyard, n8nDev, n8nProd.
+
 ## Directory Structure
 
 ```

@@ -2,6 +2,96 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## November 7, 2025 - System-Wide Lean Documentation Structure Refactoring
+
+**Major Changes**: Refactored all project CLAUDE.md files to follow a lean structure pattern with `docs/` subdirectories, establishing a consistent documentation standard across the entire system.
+
+**Projects Refactored** (9 total):
+1. **promptLibrary** - 222 lines → 147 lines main file + 5 docs files
+2. **nvimConfig** - 804 lines → 144 lines main file + 5 docs files
+3. **odooReports** - 789 lines → 257 lines main file + 4 docs files
+4. **scripts** - 445 lines → 128 lines main file + 5 docs files
+5. **dotfilesPrivate** - 239 lines → 93 lines main file + 4 docs files
+6. **graveyard** - 90 lines → 75 lines main file + 1 docs file
+7. **n8nDev** - 400 lines → 98 lines main file + 6 docs files
+8. **n8nProd** - 445 lines → 73 lines main file + 7 docs files
+9. **Global ~/.claude/** - Already using this pattern (template for others)
+
+**New Standard Structure**:
+
+Main CLAUDE.md (100-150 lines):
+- Overview and purpose
+- Directory structure
+- Quick reference with essential commands
+- Links to detailed docs: `**📚 Detailed Documentation**: See docs/`
+- Version requirements
+- Reference to changelog: `**Full changelog**: [docs/changelog.md](docs/changelog.md)`
+
+docs/ subdirectory with specialized files:
+- **architecture.md** - Technical design, system components, implementation details
+- **workflows.md** - Development workflows, common tasks, how-tos
+- **commands.md** - Comprehensive command reference (when applicable)
+- **troubleshooting.md** - Common issues and solutions
+- **changelog.md** - Complete version history (ready for `/sum` archiving)
+- **Additional project-specific files** - integrations.md, configuration.md, backup.md, etc.
+
+**Documentation Added to Global CLAUDE.md**:
+- Added "Lean CLAUDE.md Structure for `/init`" section to User Preferences
+- Includes complete pattern specification with example markdown
+- Documents benefits: manageable size, topic organization, easier maintenance
+- Lists all 9 projects already using this pattern
+
+**Impact**:
+
+Immediate Benefits:
+- **82% average reduction** in main file size (nvimConfig: 804→144 lines)
+- **Consistent navigation** - users know exactly where to find information
+- **Easier maintenance** - smaller, focused files reduce merge conflicts
+- **Better organization** - architecture separate from workflows separate from troubleshooting
+- **Multi-AI compatible** - works seamlessly with CLAUDE.md/GEMINI.md/AGENTS.md symlinks
+
+Long-term Benefits:
+- **Scalability** - projects can grow documentation without bloating main file
+- **`/sum` compatibility** - changelog.md can be archived separately when it gets large
+- **Onboarding** - new developers can quickly scan main file, dive deep as needed
+- **Future `/init`** - all new projects will automatically use this structure
+
+**Files Modified**:
+
+Global Configuration:
+- `~/.claude/CLAUDE.md` - Added lean structure pattern documentation to User Preferences
+
+Project Main Files (refactored to lean structure):
+- `~/projects/promptLibrary/CLAUDE.md`
+- `~/projects/nvimConfig/CLAUDE.md`
+- `~/projects/odooReports/CLAUDE.md`
+- `~/projects/scripts/CLAUDE.md`
+- `~/projects/dotfilesPrivate/CLAUDE.md`
+- `~/projects/graveyard/CLAUDE.md`
+- `~/projects/n8nDev/CLAUDE.md`
+- `~/projects/n8nProd/CLAUDE.md`
+
+New Documentation Files Created (37 total):
+- promptLibrary: docs/architecture.md, workflows.md, changelog.md
+- nvimConfig: docs/architecture.md, commands.md, workflows.md, troubleshooting.md, changelog.md
+- odooReports: docs/architecture.md, workflows.md, troubleshooting.md, changelog.md
+- scripts: docs/architecture.md, configuration.md, workflows.md, troubleshooting.md, changelog.md
+- dotfilesPrivate: docs/architecture.md, workflows.md, troubleshooting.md, changelog.md
+- graveyard: docs/changelog.md
+- n8nDev: docs/architecture.md, commands.md, workflows.md, integrations.md, troubleshooting.md, changelog.md
+- n8nProd: docs/architecture.md, commands.md, workflows.md, integrations.md, backup.md, troubleshooting.md, changelog.md
+
+**Rationale**:
+
+The global `~/.claude/` documentation already used this lean pattern successfully (CLAUDE.md + docs/ subdirectory). Extending this pattern to all projects provides:
+
+1. **Consistency** - Same structure everywhere reduces cognitive load
+2. **Discoverability** - Know where to look for specific information
+3. **Maintainability** - Update individual topics without touching main file
+4. **Future-proofing** - `/init` command now documented to create this structure automatically
+
+**Standard Established**: All future projects initialized with `/init` will automatically follow this lean documentation pattern, preventing the need for future refactoring.
+
 ## November 6, 2025 - Removed Auto-Commit from `/log` Command
 
 **Changes:**

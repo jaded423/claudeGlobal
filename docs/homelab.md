@@ -6,7 +6,7 @@
 **OS:** CachyOS Linux (Arch-based, performance-optimized)
 **Kernel:** 6.17.7-3-cachyos
 **Hardware:** 16GB RAM, 952GB NVMe storage
-**Last Updated:** November 10, 2025
+**Last Updated:** November 10, 2025 (Added monitoring tools and power management config)
 
 ---
 
@@ -21,6 +21,7 @@ The home lab server provides secure remote access, file sharing, and personal in
 - Docker containerization
 - Hyprland desktop environment
 - Google Drive integration (2 accounts)
+- System monitoring (Netdata port 19999, Glances port 61208)
 
 **Access Methods:**
 - **At Home:** Direct LAN access (192.168.1.228) - fastest
@@ -204,7 +205,63 @@ docker images                   # List images
 
 **Setup Script:** `~/setup/install-docker.sh`
 
-### 5. UFW Firewall
+### 5. System Monitoring
+
+**Purpose:** Real-time system monitoring and performance tracking
+
+#### Netdata
+**Port:** 19999
+**Status Check:** `systemctl status netdata`
+**Access:** `http://192.168.1.228:19999` (local network)
+**Features:**
+- Real-time system metrics with beautiful graphs
+- CPU, memory, disk, network monitoring
+- Process tracking
+- Alert capabilities
+- Zero configuration required
+
+**Service Management:**
+```bash
+systemctl status netdata         # Check status
+sudo systemctl restart netdata   # Restart service
+journalctl -u netdata -f         # View logs
+```
+
+#### Glances
+**Port:** 61208 (web mode)
+**Status Check:** `ps aux | grep glances`
+**Access:** `http://192.168.1.228:61208` (web mode)
+**Features:**
+- Lightweight system monitor
+- Terminal and web modes
+- Similar to btop but with web interface option
+- Lower resource usage than Netdata
+- Perfect for Pi/low-power devices
+
+**Usage:**
+```bash
+# Terminal mode (via SSH)
+btop               # Interactive system monitor
+glances            # Terminal mode
+
+# Web server mode
+glances -w --port 61208
+
+# Check battery status
+cat /sys/class/power_supply/BAT*/capacity
+cat /sys/class/power_supply/BAT*/status
+```
+
+**Note:** Due to current network communication issues (see Troubleshooting section), web access may require SSH tunneling:
+```bash
+# From Mac - forward Netdata
+ssh -L 19999:localhost:19999 jaded@192.168.1.228
+
+# From Mac - forward Glances
+ssh -L 61208:localhost:61208 jaded@192.168.1.228
+```
+
+### 6. UFW Firewall
 
 **Purpose:** Network security - deny all except necessary ports
 **Status Check:** `sudo ufw status verbose`
@@ -412,6 +469,15 @@ rclone about elevated:
 **Desktop:** Hyprland (Wayland)
 **Shell:** fish (Oh My Fish)
 
+**Power Management:**
+- Lid close behavior: **ignore** (laptop stays on with lid closed)
+- Configuration: `/etc/systemd/logind.conf`
+- Settings:
+  - `HandleLidSwitch=ignore`
+  - `HandleLidSwitchExternalPower=ignore`
+- Allows server operation in closed, cool location
+- Battery status accessible via: `cat /sys/class/power_supply/BAT*/capacity`
+
 **Package Manager:**
 - pacman (Arch package manager)
 - yay (AUR helper)
@@ -601,6 +667,8 @@ docker-compose up -d            # Recreate with new images
 ---
 
 ## Troubleshooting
+
+**⚠️ Network Communication Issues**: If web services on the server are not accessible from Mac, see **[Network Troubleshooting Guide](/tmp/homelab-network-troubleshooting.md)** for detailed ARP/network diagnostics and solutions.
 
 ### SSH Issues
 

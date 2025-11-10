@@ -44,41 +44,44 @@ else
     echo -e "${GREEN}Already up to date with remote.${NC}"
 fi
 
-# Check for local changes
-if ! git diff --quiet || ! git diff --cached --quiet; then
-    echo -e "${YELLOW}Local changes detected. Committing...${NC}"
+# Check for any changes (tracked or untracked)
+if [ -n "$(git status --porcelain)" ]; then
+    echo -e "${YELLOW}Changes detected. Processing...${NC}"
 
-    # Stage all changes
+    # Stage all changes (including untracked files)
     git add -A
 
-    # Create commit message
-    COMMIT_MSG="[Home Lab Sync] Documentation updates from cachyos-jade"
+    # Check if there are actually changes to commit
+    if ! git diff --cached --quiet; then
+        echo -e "${YELLOW}Committing changes...${NC}"
 
-    # Get list of modified files for detailed message
-    MODIFIED_FILES=$(git diff --cached --name-only | head -5)
-    if [ -n "$MODIFIED_FILES" ]; then
-        COMMIT_MSG="$COMMIT_MSG
+        # Create commit message
+        COMMIT_MSG="[Home Lab Sync] Documentation updates from cachyos-jade"
+
+        # Get list of modified files for detailed message
+        MODIFIED_FILES=$(git diff --cached --name-only | head -5)
+        if [ -n "$MODIFIED_FILES" ]; then
+            COMMIT_MSG="$COMMIT_MSG
 
 Modified files:
 $MODIFIED_FILES"
+        fi
+
+        # Commit changes
+        git commit -m "$COMMIT_MSG"
+
+        echo -e "${GREEN}Changes committed.${NC}"
+
+        # Push to remote
+        echo -e "${YELLOW}Pushing changes to GitHub...${NC}"
+        git push origin master || {
+            echo -e "${RED}Push failed! Will retry on next sync.${NC}"
+            exit 1
+        }
+        echo -e "${GREEN}Changes pushed successfully.${NC}"
+    else
+        echo -e "${GREEN}No changes to commit after staging.${NC}"
     fi
-
-    # Commit changes
-    git commit -m "$COMMIT_MSG"
-
-    echo -e "${GREEN}Changes committed.${NC}"
-
-    # Push to remote
-    echo -e "${YELLOW}Pushing changes to GitHub...${NC}"
-    git push origin master || {
-        echo -e "${RED}Push failed! Will retry on next sync.${NC}"
-        exit 1
-    }
-    echo -e "${GREEN}Changes pushed successfully.${NC}"
-elif git status --porcelain | grep -q "^"; then
-    # Check for untracked files
-    echo -e "${YELLOW}Untracked files detected.${NC}"
-    git status --short
 else
     echo -e "${GREEN}No local changes to sync.${NC}"
 fi

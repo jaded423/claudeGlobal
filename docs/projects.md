@@ -201,6 +201,101 @@ Detailed descriptions of all active projects in your workspace.
 
 **Documentation**: See `~/projects/n8nProd/CLAUDE.md`
 
+## Home Lab - cachyos-jade
+
+**Type**: Linux server infrastructure
+**Status**: Active production server
+**Location**: 192.168.1.228 (local network), accessible via Twingate remotely
+**User**: jaded
+**OS**: CachyOS Linux (Arch-based, performance-optimized)
+**Last Updated**: 2025-11-10
+**Purpose**: Home lab server providing SSH access, file sharing, and personal infrastructure
+
+**Key Services**:
+- **SSH Server** - Remote terminal access (port 22)
+- **Samba File Server** - Cross-platform file sharing (ports 445, 139)
+- **Twingate Connector** - Secure remote access via Zero Trust network
+- **Docker** - Container runtime for Twingate and future services
+- **Hyprland Desktop** - Wayland compositor with Osaka-Jade theme
+- **Google Drive Integration** - Two rclone FUSE mounts (personal + elevated)
+
+**Hardware**:
+- RAM: 16GB (3.6GB used, 11GB available)
+- Storage: 952GB NVMe (2% used, plenty of space)
+- CPU: x86_64
+
+**Access Methods**:
+- **At Home**: Direct LAN access (192.168.1.228) - 60+ MB/s transfers
+- **Remote**: Twingate network (jaded423) - secure tunnel through home upload speed
+
+**SSH Access from Work Mac**:
+```bash
+ssh jaded@192.168.1.228
+```
+
+**Samba Access from Work Mac**:
+```bash
+# Finder: Cmd+K, then:
+smb://192.168.1.228/Shared
+```
+
+**Shared Directories** (via Samba):
+- Music, Pictures, Documents, Videos (symlinked from /home/jaded/)
+
+**Desktop Environment**:
+- Window Manager: Hyprland (Wayland)
+- Theme: Osaka-Jade (dark forest green + jade/teal accents)
+- Status Bar: Waybar
+- Terminals: Kitty & Alacritty (85% opacity)
+- Wallpapers: 3 Osaka-Jade themed backgrounds
+- Shell: fish (Oh My Fish)
+
+**Google Drive Mounts**:
+- Personal: ~/GoogleDrive/ (remote: gdrive)
+- Elevated: ~/elevatedDrive/ (remote: elevated)
+- VFS cache: 24-hour retention, write mode
+- Auto-mount via systemd user services
+
+**Security**:
+- UFW firewall active (deny incoming by default)
+- SSH: Public key auth enabled (work Mac key installed)
+- Samba: User authentication required (no guest access)
+- Twingate: Zero Trust - no ports exposed to internet
+
+**Setup Documentation**:
+- Server-side: ~/README.md (comprehensive setup guide)
+- Setup scripts: ~/setup/ (install scripts, docker-compose, configs)
+- Global docs: ~/.claude/docs/homelab.md (full documentation)
+
+**Service Management**:
+```bash
+# Check all services
+systemctl status sshd smb
+docker ps
+
+# Restart services
+systemctl restart sshd smb
+docker-compose restart
+
+# View logs
+journalctl -u sshd -f
+journalctl -u smb -f
+docker logs -f twingate-connector
+```
+
+**Network Configuration**:
+- Twingate Network: jaded423
+- Admin Console: https://jaded423.twingate.com
+- Resources: SSH (assigned to jaded), File Sharing (assigned to family)
+
+**Future Enhancements**:
+- Additional Docker services (Portainer, monitoring, media server)
+- Automated backups to work Mac
+- CI/CD pipeline
+- Development environment setup
+
+**Documentation**: See **[~/.claude/docs/homelab.md](homelab.md)** for complete documentation
+
 ## Other Projects (Not Actively Documented)
 
 ### adv360ProZmk

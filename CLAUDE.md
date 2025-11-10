@@ -8,6 +8,7 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 
 **📚 Detailed Documentation**: For comprehensive information, see the `~/.claude/docs/` directory:
 - **[projects.md](docs/projects.md)** - Detailed descriptions of all active projects
+- **[homelab.md](docs/homelab.md)** - Home lab server documentation (cachyos-jade @ 192.168.1.228)
 - **[interconnections.md](docs/interconnections.md)** - System dependency map and file movement checklists
 - **[troubleshooting.md](docs/troubleshooting.md)** - Solutions for common issues
 - **[best-practices.md](docs/best-practices.md)** - Documentation and workflow best practices
@@ -125,6 +126,7 @@ This is the Obsidian knowledge base stored in Google Drive. No need to search fo
 │   └── log.md          # Document session changes
 ├── docs/               # Detailed documentation
 │   ├── projects.md     # All active projects overview
+│   ├── homelab.md      # Home lab server documentation
 │   ├── interconnections.md  # System dependency map
 │   ├── troubleshooting.md   # Common issues and solutions
 │   └── project-logs/   # Detailed session logs per project
@@ -217,8 +219,20 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 7. **n8nDev** - n8n development environment (Docker, port 5678)
 8. **n8nProd** - n8n production environment (Docker, port 5679)
 9. **graveyard** - Obsolete file archive (6-month retention)
+10. **Home Lab** - CachyOS Linux server (192.168.1.228) with SSH, Samba, Twingate
 
 All projects have hourly automated backups to GitHub.
+
+## Home Lab - cachyos-jade
+
+**Full documentation**: **[docs/homelab.md](docs/homelab.md)**
+
+**Quick access**:
+- SSH: `ssh jaded@192.168.1.228`
+- Samba: `smb://192.168.1.228/Shared`
+- Services: Twingate, Docker, Hyprland, Google Drive (rclone)
+
+**Key services**: SSH server, Samba file sharing, Twingate secure remote access, Docker, Hyprland desktop (Osaka-Jade theme), Google Drive integration (2 accounts).
 
 ## Graveyard - Obsolete File Archive
 

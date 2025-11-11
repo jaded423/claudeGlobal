@@ -2,7 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(ln:*)",
-      "Bash(ln -s *:/Users/joshuabrown/projects/*)",
+      "Bash(ln -s *:~/projects/*)",
       "Write(*.md)",
       "Read(*)",
       "Grep(*)",
@@ -21,8 +21,8 @@
       "Bash(gh repo view:*)"
     ],
     "additionalDirectories": [
-      "/Users/joshuabrown/scripts",
-      "/Users/joshuabrown/projects"
+      "~/scripts",
+      "~/projects"
     ]
   },
   "statusLine": {

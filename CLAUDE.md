@@ -348,7 +348,7 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 7. **n8nDev** - n8n development environment (Docker, port 5678)
 8. **n8nProd** - n8n production environment (Docker, port 5679)
 9. **graveyard** - Obsolete file archive (6-month retention)
-10. **Home Lab** - CachyOS Linux server (192.168.1.228) with SSH, Samba, Twingate
+10. **Home Lab** - CachyOS Linux server (192.168.1.228) with SSH, Samba, Twingate, Ollama
 
 All projects have hourly automated backups to GitHub.
 
@@ -359,9 +359,9 @@ All projects have hourly automated backups to GitHub.
 **Quick access**:
 - SSH: `ssh jaded@192.168.1.228`
 - Samba: `smb://192.168.1.228/Shared`
-- Services: Twingate, Docker, Hyprland, Google Drive (rclone)
+- Services: Twingate, Docker, Ollama, Hyprland, Google Drive (rclone)
 
-**Key services**: SSH server, Samba file sharing, Twingate secure remote access, Docker, Hyprland desktop (Osaka-Jade theme), Google Drive integration (2 accounts).
+**Key services**: SSH server, Samba file sharing, Twingate secure remote access, Docker, Ollama local LLMs (7 models, GPU-accelerated), Hyprland desktop (Osaka-Jade theme), Google Drive integration (2 accounts).
 
 ## Graveyard - Obsolete File Archive
 

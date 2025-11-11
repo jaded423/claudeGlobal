@@ -6,7 +6,7 @@
 **OS:** CachyOS Linux (Arch-based, performance-optimized)
 **Kernel:** 6.17.7-3-cachyos
 **Hardware:** 16GB RAM, 952GB NVMe storage
-**Last Updated:** November 10, 2025 (Added monitoring tools and power management config)
+**Last Updated:** November 10, 2025 (Added Ollama LLM service, GPU acceleration, optimized RAM/CPU)
 
 ---
 
@@ -19,6 +19,7 @@ The home lab server provides secure remote access, file sharing, and personal in
 - Samba file sharing (ports 445, 139)
 - Twingate secure remote access
 - Docker containerization
+- Ollama local LLM inference (port 11434)
 - Hyprland desktop environment
 - Google Drive integration (2 accounts)
 - System monitoring (Netdata port 19999, Glances port 61208)
@@ -290,6 +291,113 @@ sudo ufw disable                # Disable firewall
 
 **Setup Script:** `~/setup/configure-firewall.sh`
 
+### 7. Ollama (Local LLM Inference)
+
+**Purpose:** Run large language models locally for AI tasks without API costs
+**Port:** 11434 (localhost only)
+**Status Check:** `systemctl status ollama`
+**API Endpoint:** `http://127.0.0.1:11434`
+
+**Installed Models (Total: ~20GB):**
+
+*General Use Models:*
+
+- **`llama3.2:3b`** (2.0GB)
+  - **Best for:** General chat, summarization, Q&A, writing assistance
+  - **Strengths:** Balanced performance, follows instructions well, good at reasoning
+  - **Use when:** You need reliable general-purpose AI without specialized needs
+  - **Speed:** Fast (3B parameters)
+
+- **`phi3.5:3.8b`** (2.2GB)
+  - **Best for:** Mathematical reasoning, logical problems, structured tasks
+  - **Strengths:** Excellent at math/logic, very efficient for its size, low resource usage
+  - **Use when:** Working with calculations, analysis, or need precise reasoning
+  - **Speed:** Fast (3.8B parameters)
+
+- **`qwen2.5:7b`** (4.7GB)
+  - **Best for:** Multilingual tasks, coding help, complex reasoning
+  - **Strengths:** Great with multiple languages, strong coding abilities, high quality responses
+  - **Use when:** Need best balance of quality and speed, working with non-English text
+  - **Speed:** Moderate (7B parameters)
+
+*Coding-Focused Models:*
+
+- **`qwen2.5-coder:7b`** (4.7GB)
+  - **Best for:** Code generation, refactoring, algorithm design, debugging
+  - **Strengths:** Trained specifically on code, understands 80+ languages, excellent at explaining code
+  - **Use when:** Writing new code, converting between languages, understanding complex codebases
+  - **Speed:** Moderate (7B parameters)
+
+- **`deepseek-coder:6.7b`** (3.8GB)
+  - **Best for:** Code completion, filling in code gaps, autocomplete-style suggestions
+  - **Strengths:** Fill-in-the-middle capability, great for IDE-style completions
+  - **Use when:** Need autocomplete suggestions, filling in missing code sections
+  - **Speed:** Moderate (6.7B parameters)
+
+*Ultra-Lightweight Models:*
+
+- **`gemma2:2b`** (1.6GB)
+  - **Best for:** Quick queries, simple tasks, running multiple instances
+  - **Strengths:** Very low resource usage, surprisingly capable for size, fast responses
+  - **Use when:** Testing prompts, simple Q&A, need instant responses, running on low resources
+  - **Speed:** Very fast (2B parameters)
+
+- **`llama3.2:1b`** (1.3GB)
+  - **Best for:** Lightning-fast responses, basic chat, simple classifications
+  - **Strengths:** Smallest model, fastest inference, minimal RAM usage
+  - **Use when:** Need immediate responses, simple yes/no tasks, batch processing many simple queries
+  - **Speed:** Extremely fast (1B parameters)
+
+**Model Selection Guide:**
+- **For coding:** Start with `qwen2.5-coder:7b` (best quality) or `deepseek-coder:6.7b` (good completions)
+- **For general tasks:** Use `qwen2.5:7b` (best quality) or `llama3.2:3b` (faster)
+- **For math/logic:** Use `phi3.5:3.8b`
+- **For speed:** Use `gemma2:2b` or `llama3.2:1b`
+- **For multilingual:** Use `qwen2.5:7b`
+
+**Hardware Acceleration:**
+- GPU: Intel Arc Graphics 130V/140V (integrated)
+- Compute Runtime: Intel compute-runtime with OpenCL
+- CPU Governor: Performance mode (turbo to 4.8GHz)
+
+**Service Management:**
+```bash
+systemctl status ollama           # Check status
+sudo systemctl restart ollama     # Restart service
+journalctl -u ollama -f           # View logs
+```
+
+**Usage:**
+```bash
+# List installed models
+ollama list
+
+# Run a model interactively
+ollama run llama3.2:3b
+ollama run qwen2.5-coder:7b
+
+# Run with API
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.2:3b",
+  "prompt": "Why is the sky blue?"
+}'
+
+# Download new model
+ollama pull modelname:tag
+
+# Remove model to free space
+ollama rm modelname:tag
+```
+
+**Performance Notes:**
+- GPU acceleration enabled for 2-3x faster inference
+- CPU-only mode available as fallback
+- Models run efficiently with 16GB RAM + 22.7GB zram swap
+- Best for: Code generation, text analysis, quick queries
+- Not ideal for: Very large context windows, real-time streaming at scale
+
+**Documentation:** [Ollama Docs](https://github.com/ollama/ollama)
+
 ---
 
 ## Desktop Environment
@@ -448,11 +556,22 @@ rclone about elevated:
 
 ### Hardware
 
-**CPU:** x86_64 (specifics: check `lscpu`)
-**RAM:** 16GB total
-- Used: ~3.6GB
-- Available: ~11GB
-- Swap: 15GB (minimal usage)
+**CPU:** Intel Core Ultra 7 256V (Lunar Lake)
+- Cores: 8 (8 threads)
+- Base: 400MHz
+- Turbo: 4.8GHz
+- Governor: Performance mode (for optimal Ollama performance)
+
+**GPU:** Intel Arc Graphics 130V/140V (integrated)
+- OpenCL support enabled
+- Used for: Ollama LLM acceleration, desktop compositing
+- Compute Runtime: intel-compute-runtime
+
+**RAM:** 16GB DDR5 total
+- Physical: 16GB
+- Swap (zram): 22.7GB (zstd compression, 1.5x RAM)
+- Total effective: ~37GB available
+- Typical usage: 4-6GB used, 10-12GB available
 
 **Storage:**
 - Device: /dev/nvme0n1p2
@@ -778,6 +897,56 @@ systemctl --user restart rclone-elevated.service
 - Monitor cache in logs
 - Large files take time to upload (normal)
 
+### Ollama Issues
+
+**Service not running:**
+```bash
+# Check service status
+systemctl status ollama
+
+# Restart service
+sudo systemctl restart ollama
+
+# View logs
+journalctl -u ollama -f
+```
+
+**Model inference slow:**
+```bash
+# Verify GPU acceleration is active
+lspci | grep -i vga
+
+# Check CPU governor is in performance mode
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+# Monitor resource usage during inference
+htop
+# or
+btop
+```
+
+**Out of memory errors:**
+```bash
+# Check available RAM and swap
+free -h
+
+# Check zram status
+zramctl
+
+# Try smaller model (1b or 2b instead of 7b)
+ollama run llama3.2:1b
+ollama run gemma2:2b
+```
+
+**Model not found:**
+```bash
+# List installed models
+ollama list
+
+# Pull model if missing
+ollama pull modelname:tag
+```
+
 ### Desktop Environment Issues
 
 **Waybar not appearing:**
@@ -931,6 +1100,7 @@ Twingate: jaded423
 ### Service Status Commands
 ```bash
 systemctl status sshd smb              # Check services
+systemctl status ollama                # Check Ollama
 docker ps                              # Check containers
 systemctl --user status rclone-*       # Check Drive mounts
 sudo ufw status                        # Check firewall
@@ -940,6 +1110,7 @@ sudo ufw status                        # Check firewall
 ```bash
 journalctl -u sshd -f                  # SSH logs
 journalctl -u smb -f                   # Samba logs
+journalctl -u ollama -f                # Ollama logs
 docker logs -f twingate-connector      # Twingate logs
 journalctl --user -u rclone-gdrive -f  # Google Drive logs
 ```
@@ -950,5 +1121,6 @@ Setup scripts:     ~/setup/
 Samba share:       /srv/samba/shared/
 Hyprland config:   ~/.config/hypr/
 Google Drives:     ~/GoogleDrive/ and ~/elevatedDrive/
+Ollama models:     /usr/share/ollama/.ollama/models/
 Systemd services:  ~/.config/systemd/user/
 ```

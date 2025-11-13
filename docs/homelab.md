@@ -1,16 +1,52 @@
 # Home Lab Documentation
 
+**Primary Server:** cachyos-jade @ 192.168.1.228
+**Last Updated:** November 13, 2025 (Added complete infrastructure documentation with Pi devices and future expansion plans)
+
+---
+
+## Current Infrastructure Overview
+
+### Active Devices
+
+| Device | IP Address | Purpose | Power Usage | Status |
+|--------|------------|---------|-------------|---------|
+| **CachyOS Laptop** | 192.168.1.228 | Main compute server | 50-100W | ✅ Active |
+| **Raspberry Pi 1 B+** | [Check Pi-hole] | Pi-hole DNS ad-blocking | 2-3W | ✅ Active |
+| **Raspberry Pi 2** | [Unknown] | Magic Mirror display | 3-4W | ✅ Active |
+
+**Total Power:** ~55-107W (~$8-16/month electricity)
+
+### Architecture Diagram
+
+```
+Current Homelab Infrastructure
+│
+├── CachyOS Laptop Server (cachyos-jade) @ 192.168.1.228
+│   ├── Ollama with 7 LLMs (Intel Arc GPU accelerated)
+│   ├── Docker (Twingate connector)
+│   ├── SSH & Samba file sharing
+│   ├── Google Drive mounts (2 accounts)
+│   ├── Hyprland desktop environment
+│   └── 16GB RAM + 22.7GB zram (37GB effective)
+│
+├── Raspberry Pi 1 B+
+│   └── Pi-hole DNS ad-blocking (network-wide protection)
+│
+└── Raspberry Pi 2
+    └── Magic Mirror with touch screen (info dashboard)
+```
+
+---
+
+## CachyOS Server Details
+
 **Server Name:** cachyos-jade
 **Local IP:** 192.168.1.228
 **User:** jaded
 **OS:** CachyOS Linux (Arch-based, performance-optimized)
 **Kernel:** 6.17.7-3-cachyos
-**Hardware:** 16GB RAM, 952GB NVMe storage
-**Last Updated:** November 10, 2025 (Added Ollama LLM service, GPU acceleration, optimized RAM/CPU)
-
----
-
-## Overview
+**Hardware:** 16GB RAM, 952GB NVMe storage, Intel Arc Graphics 130V/140V
 
 The home lab server provides secure remote access, file sharing, and personal infrastructure with both local high-speed access and remote access via Twingate Zero Trust network.
 
@@ -1060,6 +1096,107 @@ hyprctl reload
    - CLAUDE.md with project-specific guidance
    - Automated documentation sync to work Mac
    - Wiki for detailed procedures
+
+---
+
+## Future Expansion Plans
+
+### Phase 2A: Raspberry Pi 5 Consolidation (Next Month - $185)
+
+**Hardware:** Raspberry Pi 5 with 16GB RAM
+**Purpose:** Consolidate and expand lightweight services
+
+**Migration Plan:**
+```
+Raspberry Pi 5 16GB (new)
+├── Services to Migrate:
+│   ├── Pi-hole DNS (from Pi 1 B+)
+│   └── Magic Mirror (from Pi 2)
+│
+└── New Services to Add:
+    ├── Uptime Kuma (monitoring)
+    ├── Homepage dashboard
+    ├── Home Assistant (optional)
+    └── Wireguard VPN server
+```
+
+**Old Pi Repurposing:**
+- **Pi 1 B+:** Sensor node, backup DNS, or retire (512MB RAM limited)
+- **Pi 2:** Testing environment or IoT gateway
+
+### Phase 2B: Storage Server (3-6 Months - $200-300)
+
+**Hardware:** Dell Precision T3600 or HP Z420 Tower
+**Purpose:** NAS and backup infrastructure
+
+**Configuration:**
+- 2-3x 4TB HDDs (used ~$40-60 each)
+- TrueNAS or OpenMediaVault
+- Time Machine target for Macs
+- Automated backups from CachyOS server
+- Optional: Plex/Jellyfin media server
+
+### Phase 3: AI Workstation (6-12 Months - Only if needed)
+
+**Hardware:** Dell T7810 dual socket tower
+**GPU:** RTX 3060 12GB or Tesla P40 24GB
+**Purpose:** Heavy AI/ML workloads
+
+**Use Cases:**
+- Larger LLMs (13B, 30B+ models)
+- Model training/fine-tuning
+- Stable Diffusion image generation
+- Keep laptop for lightweight models
+
+### Final Architecture Vision
+
+```
+Future Distributed Homelab (~$485 total investment)
+│
+├── CachyOS Laptop (cachyos-jade) - Compute Node
+│   ├── Primary services
+│   ├── Docker containers
+│   ├── Ollama (smaller models)
+│   └── Development environment
+│
+├── Raspberry Pi 5 16GB - Network Services
+│   ├── All DNS/DHCP services
+│   ├── Monitoring stack
+│   ├── Home automation
+│   └── VPN endpoint
+│
+├── Storage Tower - Data Node
+│   ├── 8-16TB storage array
+│   ├── Backup infrastructure
+│   ├── Media services
+│   └── Archive storage
+│
+└── Optional: AI Workstation - ML Node
+    ├── Large LLM inference
+    ├── Model training
+    └── GPU compute tasks
+```
+
+**Projected Power Usage:**
+- Current: ~55-107W ($8-16/month)
+- With Pi 5: ~60-115W ($9-18/month)
+- With Storage Tower: ~160-215W ($25-35/month)
+- Full Build: ~210-265W ($34-42/month)
+
+### Why This Architecture Works
+
+1. **Distributed by Function:** Each device optimized for its role
+2. **Scalable:** Add components only when needed
+3. **Efficient:** Total power under 265W even fully built out
+4. **Budget-Friendly:** Under $500 for capable infrastructure
+5. **Already Started:** Pi-hole and services already running
+
+### What NOT to Buy
+
+❌ **Dell R630/R730 Rack Servers** - Too loud, power-hungry for current needs
+❌ **High-end GPU immediately** - Current Intel Arc handling 7B models well
+❌ **Replacement for laptop** - It's working perfectly
+❌ **All hardware at once** - Grow based on actual bottlenecks
 
 ---
 

@@ -12,7 +12,7 @@
 | Device | IP Address | Purpose | Power Usage | Status |
 |--------|------------|---------|-------------|---------|
 | **CachyOS Laptop** | 192.168.1.228 | Main compute server | 50-100W | ✅ Active |
-| **Raspberry Pi 1 B+** | [Check Pi-hole] | Pi-hole DNS ad-blocking | 2-3W | ✅ Active |
+| **Raspberry Pi 1 B+** | 192.168.1.191 | Pi-hole DNS ad-blocking | 2-3W | ✅ Active |
 | **Raspberry Pi 2** | [Unknown] | Magic Mirror display | 3-4W | ✅ Active |
 
 **Total Power:** ~55-107W (~$8-16/month electricity)

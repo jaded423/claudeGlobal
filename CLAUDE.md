@@ -233,7 +233,7 @@ Essential commands and quick reference...
 - Compatible with `/sum` command for archiving
 - Follows same pattern as global `~/.claude/` docs
 
-**All existing projects already use this pattern**: promptLibrary, nvimConfig, odooReports, scripts, dotfilesPrivate, graveyard, n8nDev, n8nProd.
+**All existing projects already use this pattern**: promptLibrary, nvimConfig, odooReports, scripts, zshConfig, graveyard, n8nDev, n8nProd.
 
 **File Path References**: When the user references **"my Vault"** or **"the Vault"**, they mean:
 
@@ -341,7 +341,7 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 **Currently active projects**:
 1. **promptLibrary** - AI prompt engineering library with testing
 2. **nvimConfig** - Neovim configuration (symlinked to `~/.config/nvim`)
-3. **dotfilesPrivate** - ZSH shell config (symlinked to `~/.zshrc`)
+3. **zshConfig** - ZSH shell config (symlinked to `~/.zshrc`)
 4. **odooReports** - Business automation for Elevated Trading
 5. **scripts** - Automation infrastructure (backup system, email)
 6. **Elevated Vault** - Obsidian knowledge base in Google Drive

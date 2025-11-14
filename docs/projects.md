@@ -214,8 +214,10 @@ Detailed descriptions of all active projects in your workspace.
 **Location**: 192.168.1.228 (local network), accessible via Twingate remotely
 **User**: jaded
 **OS**: CachyOS Linux (Arch-based, performance-optimized)
-**Last Updated**: 2025-11-10
+**Last Updated**: 2025-11-14
 **Purpose**: Home lab server providing SSH access, file sharing, and personal infrastructure
+
+**Recent Changes**: Documented complete Pi-hole setup (192.168.1.191) with DNS-over-TLS via dnsdist, created Twingate integration guide for remote ad-blocking DNS access
 
 **Key Services**:
 - **SSH Server** - Remote terminal access (port 22)
@@ -224,6 +226,7 @@ Detailed descriptions of all active projects in your workspace.
 - **Docker** - Container runtime for Twingate and future services
 - **Hyprland Desktop** - Wayland compositor with Osaka-Jade theme
 - **Google Drive Integration** - Two rclone FUSE mounts (personal + elevated)
+- **Pi-hole DNS** - Network-wide ad blocking on Raspberry Pi 1 B+ (192.168.1.191) with DNS-over-TLS support
 
 **Hardware**:
 - RAM: 16GB (3.6GB used, 11GB available)

@@ -2,7 +2,25 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
-## November 7, 2025 - System-Wide Lean Documentation Structure Refactoring
+## November 14, 2025 - [MINOR] Documentation System Enhancements
+
+**Changes**:
+- Created template system with 3 starter templates
+- Implemented documentation dashboard with health metrics
+- Added enhanced skills: doc-optimizer and session-historian
+- Enhanced /init command to use templates
+- Added doc-check and doc-metrics functions to .zshrc
+- Improved interconnections.md with visual dependency graphs
+- Created detect-context command for machine awareness
+- Standardized changelog format with semantic versioning
+
+**Impact**:
+- Improved documentation consistency across projects
+- Real-time documentation health monitoring
+- Better dependency visualization and understanding
+- Automated context detection for appropriate workflows
+
+## November 7, 2025 - [MAJOR] System-Wide Lean Documentation Structure Refactoring
 
 **Major Changes**: Refactored all project CLAUDE.md files to follow a lean structure pattern with `docs/` subdirectories, establishing a consistent documentation standard across the entire system.
 
@@ -92,7 +110,7 @@ The global `~/.claude/` documentation already used this lean pattern successfull
 
 **Standard Established**: All future projects initialized with `/init` will automatically follow this lean documentation pattern, preventing the need for future refactoring.
 
-## November 6, 2025 - Removed Auto-Commit from `/log` Command
+## November 6, 2025 - [MINOR] Removed Auto-Commit from `/log` Command
 
 **Changes:**
 - Modified `/log` command to remove all git operations (commands/log.md)
@@ -114,7 +132,7 @@ The global `~/.claude/` documentation already used this lean pattern successfull
 **Rationale:**
 User was committing every time they ran `/log`, resulting in 97 commits in November alone. With hourly backups now using AI-generated commit messages via Claude Sonnet API, it's better to let changes accumulate between sessions so the AI has more context for meaningful commit messages.
 
-## November 6, 2025 - odooReports Phase 1 Complete + Graveyard System
+## November 6, 2025 - [MINOR] odooReports Phase 1 Complete + Graveyard System
 
 **Changes:**
 - Completed Phase 1: Docker containerization for odooReports (hybrid n8n architecture)
@@ -133,7 +151,7 @@ User was committing every time they ran `/log`, resulting in 97 commits in Novem
 - `~/projects/odooReports/Dockerfile`, `docker-compose.yml` - Container setup
 - Updated User Preferences with email testing policy
 
-## November 5, 2025 - Moved Global Config to Version Control with Automated Backups
+## November 5, 2025 - [MAJOR] Moved Global Config to Version Control with Automated Backups
 
 **Changes:**
 - **Moved `~/.claude` to `~/projects/.claude`** for version control

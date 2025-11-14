@@ -2,6 +2,60 @@
 
 **⚠️ CRITICAL**: This map shows all file dependencies and automation connections. Review this before moving ANY files to avoid breaking automations.
 
+## Visual Dependency Graph
+
+### Project Dependency Network
+```
+                        ┌─────────────────┐
+                        │   scripts       │
+                        │ (Automation Hub)│
+                        └────────┬────────┘
+                                 │
+        ┌────────────────────────┼────────────────────────┐
+        │                        │                        │
+        │                        │                        │
+   ┌────▼─────┐           ┌─────▼─────┐           ┌─────▼─────┐
+   │nvimConfig│           │odooReports│           │zshConfig  │
+   │          │◄──────────┤           ├──────────►│           │
+   └────┬─────┘  shares   └─────┬─────┘  shares   └─────┬─────┘
+        │       OAuth creds      │       OAuth creds      │
+        │                        │                        │
+        └────────────────────────┼────────────────────────┘
+                                 │
+                          ┌──────▼──────┐
+                          │  graveyard  │
+                          │ (Archives)  │
+                          └─────────────┘
+```
+
+### Shared Resource Matrix
+
+| Resource | Owner | Used By | Impact if Moved |
+|----------|-------|---------|-----------------|
+| **Gmail OAuth** | odooReports/AR_AP | scripts, odooReports | All email automation fails |
+| **gitBackup.sh** | scripts | All 11 projects | Hourly backups stop |
+| **SSH Keys** | macOS Keychain | All git projects | GitHub push fails |
+| **.zshrc** | zshConfig | System shell | Terminal breaks |
+| **Python 3.13** | System | scripts, odooReports | Scripts fail |
+| **Symlinks** | projects/* | System configs | Configs not loaded |
+
+### Critical Dependency Chains
+
+```
+1. Email Automation Chain:
+   credentials.json → send_gmail_oauth.py → gitBackup.sh → LaunchAgent
+                   └─→ ar_ap_pdf_styled.py → crontab
+                   └─→ odoo_stock_report.py → crontab
+
+2. Configuration Chain:
+   ~/projects/nvimConfig ← symlink ← ~/.config/nvim ← neovim
+   ~/projects/zshConfig ← symlink ← ~/.zshrc ← terminal
+
+3. Automation Chain:
+   LaunchAgent → gitBackup.sh → Python 3.13 → send_gmail_oauth.py
+              └─→ SSH keys → git push → GitHub
+```
+
 ## Symlink Network
 
 These symlinks create bidirectional dependencies - changes in one location automatically affect the other:
@@ -291,3 +345,120 @@ Before moving ANY file or directory, check this list:
 3. dotfilesPrivate
 4. hello-ai
 5. scripts
+6. promptLibrary
+7. zshConfig
+8. odooReports
+9. n8nDev
+10. n8nProd
+11. graveyard
+
+## Cross-Project Impact Analysis
+
+### If You Move `scripts/`:
+**Severity**: 🔴 CRITICAL
+- ❌ All hourly backups fail (LaunchAgent can't find gitBackup.sh)
+- ❌ Email automation breaks (can't find send_gmail_oauth.py)
+- ❌ Shell functions break (backup-nvim, backup-dotfiles)
+- ❌ Dashboard update script becomes inaccessible
+- **Fix**: Update symlink at ~/scripts, update LaunchAgent plist
+
+### If You Move `odooReports/`:
+**Severity**: 🔴 CRITICAL
+- ❌ Daily reports stop running (crontab path broken)
+- ❌ Email automation fails (OAuth credentials not found)
+- ❌ All projects using shared OAuth lose email capability
+- **Fix**: Update crontab, move/copy OAuth credentials, update all scripts
+
+### If You Move `nvimConfig/`:
+**Severity**: 🟠 HIGH
+- ❌ Neovim won't load configuration
+- ❌ Git backups reference wrong path
+- ⚠️ Shell aliases point to wrong location
+- **Fix**: Recreate symlink at ~/.config/nvim, update gitBackup.sh
+
+### If You Move `zshConfig/`:
+**Severity**: 🟠 HIGH
+- ❌ Shell configuration won't load
+- ❌ Terminal customizations lost
+- ❌ All custom functions and aliases unavailable
+- **Fix**: Recreate symlinks for ~/.zshrc and ~/.p10k.zsh
+
+### If You Update Python Version:
+**Severity**: 🟡 MEDIUM
+- ⚠️ Update path in gitBackup.sh (line 69)
+- ⚠️ Update path in email-reminder.scpt
+- ⚠️ Reinstall Python packages for new version
+- **Affected**: All email automation, Odoo reports
+
+### If You Change GitHub Authentication:
+**Severity**: 🟡 MEDIUM
+- ⚠️ Re-add SSH keys to macOS Keychain
+- ⚠️ Update git remote URLs if switching HTTP/SSH
+- **Affected**: All automated git push operations
+
+## Dependency Verification Commands
+
+### Check All Symlinks
+```bash
+# Verify all symlinks are intact
+ls -la ~/.config/nvim ~/.zshrc ~/.p10k.zsh ~/scripts | grep -E "^l"
+```
+
+### Check LaunchAgent Status
+```bash
+# Verify background jobs are running
+launchctl list | grep -E "(gitbackup|emailreminder|claude.auto)"
+```
+
+### Check Crontab
+```bash
+# Verify scheduled tasks
+crontab -l | grep -E "(odooReports|claudeAuto)"
+```
+
+### Verify Python Path
+```bash
+# Check if Python 3.13 exists
+/Library/Frameworks/Python.framework/Versions/3.13/bin/python3 --version
+```
+
+### Test Email OAuth
+```bash
+# Test email sending capability
+echo "Test" | python3 ~/scripts/bin/send_gmail_oauth.py \
+  --to joshua@elevatedtrading.com --subject "Dependency Test"
+```
+
+### Check SSH Keys
+```bash
+# Verify SSH keys in keychain
+ssh-add -l
+```
+
+## Dependency Rules
+
+1. **Never move without updating references** - Use grep to find all references first
+2. **Test after any change** - Run verification commands above
+3. **Backup before major changes** - Create copies of critical files
+4. **Document all changes** - Update this file when dependencies change
+5. **Maintain symlinks** - Always use absolute paths for reliability
+
+## Quick Reference Cheatsheet
+
+| Component | Location | Depends On | Used By |
+|-----------|----------|------------|---------|
+| gitBackup.sh | ~/scripts/bin/ | Python 3.13, OAuth, SSH | LaunchAgent |
+| OAuth creds | ~/projects/odooReports/AR_AP/ | - | 3 scripts |
+| Neovim config | ~/projects/nvimConfig | Symlink | Daily use |
+| Shell config | ~/projects/zshConfig | Symlink | Every terminal |
+| Cron reports | ~/projects/odooReports | Python 3.13 | Business ops |
+| Dashboard | ~/.claude/docs/ | Update script | Documentation |
+
+## Emergency Recovery
+
+If everything breaks:
+1. Check symlinks first: `ls -la ~/.*`
+2. Verify Python path: `which python3`
+3. Check LaunchAgent logs: `log show --predicate 'eventMessage contains "launchd"' --last 1h`
+4. Reload LaunchAgents: `launchctl unload ~/Library/LaunchAgents/*.plist && launchctl load ~/Library/LaunchAgents/*.plist`
+5. Test core functionality: `source ~/.zshrc && doc-check`

@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Server:** cachyos-jade @ 192.168.1.228
-**Last Updated:** November 14, 2025 (Updated battery charging thresholds to 50-80%, added Battery Management section, added sudo troubleshooting)
+**Last Updated:** November 14, 2025 (Simplified battery management to 80% charge limit only, removed battery-cycler service)
 
 ---
 
@@ -300,46 +300,39 @@ ssh -L 61208:localhost:61208 jaded@192.168.1.228
 
 ### 6. Battery Management
 
-**Purpose:** Maintain optimal battery health by cycling charge between thresholds
-**Service:** battery-cycler.service (systemd)
-**Status Check:** `systemctl status battery-cycler`
-**Configuration:** `/etc/battery-cycler.conf`
+**Purpose:** Maintain optimal battery health by limiting charge to 80%
+**Method:** Samsung's built-in charge threshold feature
+**Status Check:** `cat /sys/class/power_supply/BAT1/charge_control_end_threshold`
 
-**Current Thresholds:**
-- Lower threshold: 50% (charging resumes when battery drops to this level)
-- Upper threshold: 80% (charging stops when battery reaches this level)
+**Current Configuration:**
+- Charge limit: 80% (battery stops charging at this level)
+- No lower threshold (battery can discharge naturally)
 
 **How It Works:**
-The battery-cycler service monitors battery level every 60 seconds and automatically manages charging to keep the battery between 50-80%. This prevents the battery from staying at 100% constantly (which degrades battery health) while ensuring it doesn't drain too low.
+Uses Samsung's built-in hardware charge control to limit battery charge to 80%. This prevents the battery from staying at 100% constantly (which degrades battery health) while keeping the setup simple and maintenance-free.
 
-**Configuration File (`/etc/battery-cycler.conf`):**
+**Check Current Status:**
 ```bash
-LOWER_THRESHOLD=50    # Charge resumes at this level
-UPPER_THRESHOLD=80    # Charging stops at this level
-CHECK_INTERVAL=60     # Check battery every 60 seconds
-ENABLED=true          # Service enabled
+# View charge threshold (should show 80)
+cat /sys/class/power_supply/BAT1/charge_control_end_threshold
+
+# View current battery level
+cat /sys/class/power_supply/BAT1/capacity
+
+# View charging status
+cat /sys/class/power_supply/BAT1/status
 ```
 
-**Service Management:**
+**Changing Threshold:**
 ```bash
-systemctl status battery-cycler     # Check status
-journalctl -u battery-cycler -f     # View logs
-sudo systemctl restart battery-cycler  # Restart service
+# Set different charge limit (e.g., 85%)
+echo 85 | sudo tee /sys/class/power_supply/BAT1/charge_control_end_threshold
 
-# View current battery status
-cat /sys/class/power_supply/BAT*/capacity
-cat /sys/class/power_supply/BAT*/status
+# Note: This setting persists across reboots on Samsung laptops
 ```
 
-**Changing Thresholds:**
-```bash
-# Edit configuration
-sudo nvim /etc/battery-cycler.conf
-
-# Changes take effect automatically within 60 seconds (no restart needed)
-```
-
-**Script Location:** `/usr/local/bin/battery-cycler.sh`
+**Previous Setup (Removed Nov 14, 2025):**
+Previously used battery-cycler.service to cycle between 50-80%, but simplified to just use the built-in 80% limit for easier maintenance.
 
 ### 7. UFW Firewall
 
@@ -1271,6 +1264,28 @@ Future Distributed Homelab (~$485 total investment)
 ❌ **High-end GPU immediately** - Current Intel Arc handling 7B models well
 ❌ **Replacement for laptop** - It's working perfectly
 ❌ **All hardware at once** - Grow based on actual bottlenecks
+
+---
+
+## Changelog
+
+### 2025-11-14 - Simplified Battery Management
+
+**Changes:**
+- Removed battery-cycler.service systemd service
+- Removed `/usr/local/bin/battery-cycler.sh` script
+- Removed `/etc/battery-cycler.conf` configuration file
+- Removed `/var/log/battery-cycler.log` log file
+- Now using only Samsung's built-in 80% charge limit feature
+
+**Impact:**
+- Simpler, more maintainable battery management
+- No service overhead or monitoring needed
+- Battery still protected from staying at 100% charge
+- Hardware-level charge control persists across reboots
+
+**Rationale:**
+The battery-cycler service added complexity by cycling between 50-80%. The built-in Samsung feature provides the same battery protection (limiting to 80%) without the need for custom scripts or services. Simpler is better for a server that should be low-maintenance.
 
 ---
 

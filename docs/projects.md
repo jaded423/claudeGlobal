@@ -34,10 +34,12 @@ Detailed descriptions of all active projects in your workspace.
 
 **Documentation**: See `~/projects/nvimConfig/CLAUDE.md`
 
-## dotfilesPrivate
+## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Location**: `~/projects/dotfilesPrivate`
+**Last Updated**: 2025-11-14
+**Recent Changes**: Renamed from dotfilesPrivate for consistency with camelCase naming convention
+**Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`
 **Purpose**: Shell configuration with split-file security model
 
@@ -78,8 +80,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-11-12
-**Recent Changes:** Migrated git commit generation to free local LLM (Qwen 2.5 Coder 7B via Ollama)
+**Last Updated:** 2025-11-14
+**Recent Changes:** Fixed critical bugs in backup system - email notifications now work, repo names with spaces parse correctly, AI commit messages cleaned of preambles
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

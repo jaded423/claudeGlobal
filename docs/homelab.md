@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Server:** cachyos-jade @ 192.168.1.228
-**Last Updated:** November 14, 2025 (Simplified battery management to 80% charge limit only, removed battery-cycler service)
+**Last Updated:** November 15, 2025 (Installed Jellyfin media server, qBittorrent, automated security scanning system with ClamAV)
 
 ---
 
@@ -24,7 +24,10 @@ Current Homelab Infrastructure
 │
 ├── CachyOS Laptop Server (cachyos-jade) @ 192.168.1.228
 │   ├── Ollama with 7 LLMs (Intel Arc GPU accelerated)
-│   ├── Docker (Twingate connector)
+│   ├── Docker (Jellyfin, qBittorrent, ClamAV, Twingate)
+│   ├── Media Server (Jellyfin port 8096)
+│   ├── Torrent Client (qBittorrent port 8080)
+│   ├── Security Scanner (ClamAV + systemd timer)
 │   ├── SSH & Samba file sharing
 │   ├── Google Drive mounts (2 accounts)
 │   ├── Hyprland desktop environment
@@ -55,6 +58,9 @@ The home lab server provides secure remote access, file sharing, and personal in
 - Samba file sharing (ports 445, 139)
 - Twingate secure remote access
 - Docker containerization
+- **Jellyfin media server (port 8096)** - Stream movies/TV to devices
+- **qBittorrent torrent client (port 8080)** - Download manager with web UI
+- **ClamAV virus scanner (port 3310)** - Automated download security
 - Ollama local LLM inference (port 11434)
 - Hyprland desktop environment
 - Google Drive integration (2 accounts)
@@ -1268,6 +1274,81 @@ Future Distributed Homelab (~$485 total investment)
 ---
 
 ## Changelog
+
+### 2025-11-15 - Media Server and Automated Download Security System
+
+**Changes:**
+- Installed **Jellyfin media server** (Docker container, port 8096)
+  - Configured with `~/jellyfin/config` for settings and `~/jellyfin/cache` for transcoding
+  - Mounted `~/Videos` as media library location
+  - Hardware acceleration support detected (CUDA, VAAPI, QSV)
+- Installed **qBittorrent torrent client** (Docker container, port 8080)
+  - Web UI accessible at http://192.168.1.228:8080
+  - Downloads saved to `~/Downloads` directory
+  - Default credentials: admin / NgbTyrrIv (user prompted to change on first login)
+- Installed **ClamAV antivirus scanner** (Docker container, port 3310)
+  - Auto-updates virus definitions daily (8.7+ million signatures)
+  - Scans files via docker exec for virus detection
+- Created **automated security scanning system**:
+  - Script: `~/scripts/scan-and-move.sh` - Scans files with ClamAV + verifies file types
+  - Script: `~/scripts/auto-scan-downloads.sh` - Wrapper for automated execution
+  - Systemd timer: `download-scanner.timer` - Runs every minute
+  - Systemd service: `download-scanner.service` - Executes scan workflow
+  - Log file: `~/scan-log.txt` - Records all scan activity
+- Created directory structure:
+  - `~/Downloads` - qBittorrent download destination, monitored by scanner
+  - `~/Videos` - Clean files moved here, scanned by Jellyfin
+  - `~/quarantine` - Suspicious files quarantined here for manual review
+  - `~/staging` - Reserved for future use
+- Created comprehensive documentation: `~/SECURITY-SYSTEM-README.md`
+- Archived unused n8n workflow to `~/archive/n8n-backup/`
+
+**Impact:**
+- **Complete media server setup** - Download torrents, automatically scan for security, stream to TV via Jellyfin
+- **Automated security workflow** - Every file downloaded is scanned within 1 minute:
+  1. ClamAV virus/malware scan
+  2. File type verification (prevents .exe renamed as .mkv)
+  3. Auto-move to Videos (clean) or quarantine (suspicious)
+  4. Detailed logging of all scan activity
+- **Zero-interaction security** - Files are automatically processed, user only reviews quarantined items
+- **Hardware-accelerated transcoding** - Jellyfin can use Intel Arc GPU for efficient video conversion
+- **Remote access ready** - All services accessible via Twingate for secure remote streaming
+
+**Files Created:**
+- `~/jellyfin/config/` - Jellyfin configuration directory
+- `~/jellyfin/cache/` - Jellyfin transcoding cache
+- `~/qbittorrent/config/` - qBittorrent settings
+- `~/scripts/scan-and-move.sh` - Main security scan script (3KB)
+- `~/scripts/auto-scan-downloads.sh` - Automated wrapper script (947 bytes)
+- `~/.config/systemd/user/download-scanner.service` - Systemd service definition
+- `~/.config/systemd/user/download-scanner.timer` - Systemd timer (every minute)
+- `~/SECURITY-SYSTEM-README.md` - Complete system documentation (10KB)
+- `~/scan-log.txt` - Scan activity log (auto-generated)
+- `~/archive/n8n-backup/` - Archived n8n data (for future use if needed)
+
+**Docker Containers:**
+- `jellyfin` - Media server (jellyfin/jellyfin:latest)
+- `qbittorrent` - Torrent client (linuxserver/qbittorrent:latest)
+- `clamav` - Antivirus scanner (clamav/clamav:latest)
+
+**Security Features:**
+- ClamAV protection against known viruses/malware
+- File type verification (magic number checking)
+- Automatic quarantine of suspicious files
+- Detailed logging for audit trail
+- No automatic execution of downloaded content
+
+**Workflow:**
+```
+qBittorrent download → ~/Downloads
+    ↓ (systemd timer, every minute)
+ClamAV scan + File type check
+    ↓
+✅ Clean videos → ~/Videos → Jellyfin library
+⚠️ Suspicious → ~/quarantine → Manual review
+```
+
+---
 
 ### 2025-11-14 - Simplified Battery Management
 

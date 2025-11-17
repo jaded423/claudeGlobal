@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Server:** cachyos-jade @ 192.168.1.228
-**Last Updated:** November 15, 2025 (Installed Jellyfin media server, qBittorrent, automated security scanning system with ClamAV)
+**Last Updated:** November 16, 2025 (Added automated lid monitor service for screen power management)
 
 ---
 
@@ -667,12 +667,18 @@ rclone about elevated:
 **Shell:** fish (Oh My Fish)
 
 **Power Management:**
-- Lid close behavior: **ignore** (laptop stays on with lid closed)
-- Configuration: `/etc/systemd/logind.conf`
-- Settings:
-  - `HandleLidSwitch=ignore`
+- Lid close behavior: **Screen off, system stays powered on**
+- System configuration: `/etc/systemd/logind.conf`
+  - `HandleLidSwitch=ignore` - prevents suspend/hibernate
   - `HandleLidSwitchExternalPower=ignore`
-- Allows server operation in closed, cool location
+- Screen power management: **Lid Monitor Service** (automated)
+  - Service: `~/.config/systemd/user/lid-monitor.service`
+  - Script: `~/.config/hypr/scripts/lid-monitor.sh`
+  - Monitors: `/proc/acpi/button/lid/LID0/state`
+  - **Lid closed:** `hyprctl dispatch dpms off` (screen off, reduces power)
+  - **Lid open:** `hyprctl dispatch dpms on` (screen on)
+  - Auto-starts on boot, enabled by default
+- Allows server operation in closed, cool location with minimal power consumption
 - Battery status accessible via: `cat /sys/class/power_supply/BAT*/capacity`
 
 **Package Manager:**
@@ -1274,6 +1280,62 @@ Future Distributed Homelab (~$485 total investment)
 ---
 
 ## Changelog
+
+### 2025-11-16 - Automated Lid Monitor for Screen Power Management
+
+**Changes:**
+- Created systemd user service for monitoring laptop lid state
+- Implemented automatic screen power management via Hyprland DPMS
+- Service monitors `/proc/acpi/button/lid/LID0/state` and controls screen power
+
+**Impact:**
+- **Lid closed:** Screen turns off automatically (DPMS off), reducing power consumption
+- **Lid open:** Screen turns back on automatically (DPMS on)
+- System stays powered on regardless of lid state (no suspend/hibernate)
+- Eliminates unnecessary screen power draw when laptop is closed as a server
+- Service auto-starts on boot and runs continuously in background
+
+**Files created:**
+- `~/.config/systemd/user/lid-monitor.service` - Systemd user service definition
+- `~/.config/hypr/scripts/lid-monitor.sh` - Bash script that monitors lid state and controls screen
+
+**Commands used:**
+```bash
+systemctl --user enable lid-monitor.service   # Enable service to start on boot
+systemctl --user start lid-monitor.service    # Start service immediately
+systemctl --user status lid-monitor.service   # Check service status
+```
+
+**Technical details:**
+- Polling interval: 1 second (minimal CPU impact)
+- Uses Hyprland's native `hyprctl dispatch dpms [on|off]` commands
+- Logs all lid state changes with timestamps for troubleshooting
+- Respects existing systemd logind configuration (HandleLidSwitch=ignore)
+
+---
+
+### 2025-11-16 - Network Configuration Cleanup
+
+**Changes:**
+- Removed "Spaceballs" WiFi network from NetworkManager
+- Switched primary connection to "homeLab" network
+- Cleaned up network configuration to use only the main router
+
+**Impact:**
+- Simplified network management with single WiFi network
+- System now automatically connects to homeLab router only
+- Removed redundant network profile
+
+**Files modified:**
+- NetworkManager connection profiles (via `nmcli connection delete`)
+
+**Commands used:**
+```bash
+nmcli connection up homeLab          # Switch to homeLab network
+nmcli connection delete Spaceballs   # Remove old network profile
+```
+
+---
 
 ### 2025-11-15 - Media Server and Automated Download Security System
 

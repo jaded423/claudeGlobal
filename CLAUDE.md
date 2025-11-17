@@ -8,7 +8,7 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 
 **📚 Detailed Documentation**: For comprehensive information, see the `~/.claude/docs/` directory:
 - **[projects.md](docs/projects.md)** - Detailed descriptions of all active projects
-- **[homelab.md](docs/homelab.md)** - Home lab server documentation (cachyos-jade @ 192.168.1.228)
+- **[homelab.md](docs/homelab.md)** - Home lab server documentation (cachyos-jade @ 192.168.2.250)
 - **[interconnections.md](docs/interconnections.md)** - System dependency map and file movement checklists
 - **[troubleshooting.md](docs/troubleshooting.md)** - Solutions for common issues
 - **[best-practices.md](docs/best-practices.md)** - Documentation and workflow best practices
@@ -80,7 +80,7 @@ pwd               # Shows if you're in a Mac or Linux path structure
 **When working from Mac via SSH to server (Claude Code running ON MAC, executing commands ON SERVER):**
 - **This is the tricky case!**
 - Claude Code is running on your MAC
-- Commands executed via `ssh jaded@192.168.1.228 "command"` run ON SERVER
+- Commands executed via `ssh jaded@192.168.2.250 "command"` run ON SERVER
 - Documentation updates happen on your MAC (where Claude Code runs)
 - **Pattern:**
   - Document **what** changed on the server
@@ -93,7 +93,7 @@ pwd               # Shows if you're in a Mac or Linux path structure
 **Example:** You're on your Mac, using Claude Code to configure something on the home lab server via SSH.
 
 **What happens:**
-1. **Claude executes:** `ssh jaded@192.168.1.228 "systemctl restart sshd"`
+1. **Claude executes:** `ssh jaded@192.168.2.250 "systemctl restart sshd"`
 2. **Change occurs:** On home lab server
 3. **Documentation occurs:** On your Mac (where Claude Code runs)
 4. **Where to document:**
@@ -104,10 +104,10 @@ pwd               # Shows if you're in a Mac or Linux path structure
 **Commands to update server docs from Mac:**
 ```bash
 # Option 1: Edit file remotely via SSH
-ssh jaded@192.168.1.228 "echo 'New entry' >> ~/docs/maintenance.md"
+ssh jaded@192.168.2.250 "echo 'New entry' >> ~/docs/maintenance.md"
 
 # Option 2: Copy updated file from Mac to server
-scp /tmp/updated-doc.md jaded@192.168.1.228:~/docs/
+scp /tmp/updated-doc.md jaded@192.168.2.250:~/docs/
 
 # Option 3: Let it sync naturally (if you updated ~/.claude/docs/homelab.md)
 # - Mac pushes to GitHub (hourly)
@@ -158,7 +158,7 @@ uname -s && hostname && pwd
 **Example 2: Configuring Samba on home lab while SSH'd from Mac**
 - Machine: Work Mac (running Claude Code)
 - Target: Home lab server (via SSH)
-- Action: `ssh jaded@192.168.1.228 "sudo systemctl restart smb"`
+- Action: `ssh jaded@192.168.2.250 "sudo systemctl restart smb"`
 - Document: `~/.claude/docs/homelab.md` on Mac with note "Updated Samba configuration on cachyos-jade server"
 - Optionally: SSH to update `~/docs/maintenance.md` on server for detailed local docs
 - Sync: Automatic (homelab.md syncs to server hourly)
@@ -348,7 +348,7 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 7. **n8nDev** - n8n development environment (Docker, port 5678)
 8. **n8nProd** - n8n production environment (Docker, port 5679)
 9. **graveyard** - Obsolete file archive (6-month retention)
-10. **Home Lab** - CachyOS Linux server (192.168.1.228) with SSH, Samba, Twingate, Ollama
+10. **Home Lab** - CachyOS Linux server (192.168.2.250) with SSH, Samba, Twingate, Ollama
 
 All projects have hourly automated backups to GitHub.
 
@@ -357,8 +357,8 @@ All projects have hourly automated backups to GitHub.
 **Full documentation**: **[docs/homelab.md](docs/homelab.md)**
 
 **Quick access**:
-- SSH: `ssh jaded@192.168.1.228`
-- Samba: `smb://192.168.1.228/Shared`
+- SSH: `ssh jaded@192.168.2.250`
+- Samba: `smb://192.168.2.250/Shared`
 - Services: Twingate, Docker, Ollama, Hyprland, Google Drive (rclone)
 
 **Key services**: SSH server, Samba file sharing, Twingate secure remote access, Docker, Ollama local LLMs (7 models, GPU-accelerated), Hyprland desktop (Osaka-Jade theme), Google Drive integration (2 accounts).

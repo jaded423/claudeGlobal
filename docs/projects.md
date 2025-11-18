@@ -213,7 +213,7 @@ Detailed descriptions of all active projects in your workspace.
 
 **Type**: Linux server infrastructure
 **Status**: Active production server
-**Location**: 192.168.1.228 (local network), accessible via Twingate remotely
+**Location**: 192.168.2.250 (local network), accessible via Twingate remotely
 **User**: jaded
 **OS**: CachyOS Linux (Arch-based, performance-optimized)
 **Last Updated**: 2025-11-17

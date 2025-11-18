@@ -190,6 +190,40 @@ RECIPIENTS = [
 
 **Rationale**: Test emails should never reach stakeholders, clients, or executives. Only the developer (joshua) should receive test notifications.
 
+## ⚠️ Claude Code Limitations
+
+**CRITICAL: Claude CANNOT run sudo commands**
+
+Claude Code runs in a sandboxed environment and **cannot execute sudo commands** that require password authentication.
+
+**Best Practice:**
+- ❌ **DON'T**: Attempt to run sudo commands - they will ALWAYS fail
+- ✅ **DO**: Ask the user to run sudo commands directly
+
+**Pattern to follow:**
+```markdown
+I need to install this service. Please run these commands:
+
+​```bash
+sudo cp /tmp/prevent-suspend.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now prevent-suspend.service
+​```
+
+After you run these, I can verify the installation with `systemctl status prevent-suspend.service`
+```
+
+**Why this matters:**
+- Saves time - no failed command attempts
+- Saves tokens - no error output to process
+- Better UX - user gets clear instructions immediately
+
+**Exception:** Some sudo commands that don't modify state can be useful for verification:
+- `sudo ufw status` - Already auto-approved, can be attempted
+- `systemctl status <service>` - No sudo needed, can check directly
+
+**Rationale**: Attempting sudo commands wastes time and tokens. The command fails, error is returned, then Claude has to reproduce the same instructions asking the user to run it. Skip the failure - always ask first when sudo is needed for modifications.
+
 **Lean CLAUDE.md Structure for `/init`**: When creating project documentation with `/init`, **ALWAYS use the lean structure pattern**:
 
 **Main CLAUDE.md (100-150 lines)**:

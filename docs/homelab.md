@@ -5,6 +5,27 @@
 
 ---
 
+## ⚠️ Important: Claude Cannot Run Sudo Commands
+
+**When working on the home lab server**, Claude Code **cannot execute sudo commands** that require password authentication.
+
+**If you see Claude trying to run sudo commands:**
+- This is wasting time and tokens
+- The command will fail every time
+- Claude should have asked you to run it instead
+
+**Correct pattern:**
+Claude provides the commands and asks you to run them, then verifies the result:
+```bash
+# Claude asks you to run:
+sudo systemctl restart smb
+sudo ufw allow 445/tcp
+```
+
+See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude Code limitations.
+
+---
+
 ## Current Infrastructure Overview
 
 ### Active Devices

@@ -80,8 +80,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-11-14
-**Recent Changes:** Fixed critical bugs in backup system - email notifications now work, repo names with spaces parse correctly, AI commit messages cleaned of preambles
+**Last Updated:** 2025-11-18
+**Recent Changes:** Added Claude Sonnet 4 API fallback when Ollama server unreachable, optimized server health checks to only run when changes detected
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -92,6 +92,8 @@ Detailed descriptions of all active projects in your workspace.
 **Key Features**:
 - Dotfiles backup system (backs up 11 repos hourly)
 - **Free local LLM commit messages** - Uses Qwen 2.5 Coder 7B on home lab server (no API costs)
+- **Claude API fallback** - Uses Claude Sonnet 4 when home lab is offline (paid fallback)
+- **Optimized server checks** - Only pings home lab when there are changes to commit
 - Smart diff parsing for large commits (>150 lines or >5 files)
 - Automatic Ollama cleanup after commit generation
 - Gmail OAuth email sender (shared credentials with odooReports)
@@ -100,7 +102,7 @@ Detailed descriptions of all active projects in your workspace.
 
 **Critical Scripts**:
 - `gitBackup.sh` - Hourly backup of 11 git repositories
-- `generate_commit_summary_ollama.py` - Free Ollama-powered commit generator
+- `ollamaSummary.py` - Free Ollama-powered commit generator with Claude API fallback
 - `send_gmail_oauth.py` - Reusable Gmail API email sender
 - `email-reminder.scpt` - AppleScript for Gmail notifications
 - `gmail-reminder.py` - Python script for Gmail API queries

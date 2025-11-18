@@ -81,7 +81,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-11-18
-**Recent Changes:** Added Claude Sonnet 4 API fallback when Ollama server unreachable, optimized server health checks to only run when changes detected
+**Recent Changes:** Fixed Claude API fallback environment loading for launchd jobs, updated home lab server IP to 192.168.2.250
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

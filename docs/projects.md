@@ -214,10 +214,10 @@ Detailed descriptions of all active projects in your workspace.
 **Location**: 192.168.1.228 (local network), accessible via Twingate remotely
 **User**: jaded
 **OS**: CachyOS Linux (Arch-based, performance-optimized)
-**Last Updated**: 2025-11-16
+**Last Updated**: 2025-11-17
 **Purpose**: Home lab server providing SSH access, file sharing, and personal infrastructure
 
-**Recent Changes**: Added automated lid monitor service - screen turns off when lid closes (DPMS), system stays powered on, reduces unnecessary power consumption for server operation
+**Recent Changes**: Fixed Twingate remote access - disabled auto-suspend with systemd-inhibit service and logind.conf configuration. Server now stays online 24/7, Twingate accessible from anywhere.
 
 **Key Services**:
 - **SSH Server** - Remote terminal access (port 22)

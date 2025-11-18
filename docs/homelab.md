@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Server:** cachyos-jade @ 192.168.1.228
-**Last Updated:** November 16, 2025 (Added automated lid monitor service for screen power management)
+**Last Updated:** November 17, 2025 (Fixed Twingate remote access - disabled auto-suspend with systemd-inhibit)
 
 ---
 
@@ -667,19 +667,26 @@ rclone about elevated:
 **Shell:** fish (Oh My Fish)
 
 **Power Management:**
-- Lid close behavior: **Screen off, system stays powered on**
-- System configuration: `/etc/systemd/logind.conf`
-  - `HandleLidSwitch=ignore` - prevents suspend/hibernate
+- **Always-on server mode** - System never auto-suspends
+- **Suspend prevention:** Active systemd-inhibit lock blocks sleep/idle
+  - Service: `/etc/systemd/system/prevent-suspend.service`
+  - Inhibitor: `sleep:idle` in block mode ("Home lab server - always on")
+  - Verify: `systemd-inhibit --list | grep "always on"`
+  - Auto-starts on boot, enabled by default
+- **Idle action disabled:** `/etc/systemd/logind.conf`
+  - `IdleAction=ignore` - prevents automatic idle suspend
+  - `HandleLidSwitch=ignore` - prevents suspend/hibernate when lid closed
   - `HandleLidSwitchExternalPower=ignore`
-- Screen power management: **Lid Monitor Service** (automated)
+- **Screen power management:** Lid Monitor Service (automated)
   - Service: `~/.config/systemd/user/lid-monitor.service`
   - Script: `~/.config/hypr/scripts/lid-monitor.sh`
   - Monitors: `/proc/acpi/button/lid/LID0/state`
   - **Lid closed:** `hyprctl dispatch dpms off` (screen off, reduces power)
   - **Lid open:** `hyprctl dispatch dpms on` (screen on)
   - Auto-starts on boot, enabled by default
-- Allows server operation in closed, cool location with minimal power consumption
-- Battery status accessible via: `cat /sys/class/power_supply/BAT*/capacity`
+- **Result:** Server runs 24/7, Twingate always accessible, lid can be closed
+- Manual suspend still available with: `sudo systemctl suspend -i` (force ignore inhibitors)
+- Battery status: `cat /sys/class/power_supply/BAT*/capacity`
 
 **Package Manager:**
 - pacman (Arch package manager)
@@ -1280,6 +1287,50 @@ Future Distributed Homelab (~$485 total investment)
 ---
 
 ## Changelog
+
+### 2025-11-17 - Fixed Twingate Remote Access with Power Management
+
+**Changes:**
+- Diagnosed and fixed automatic suspend causing Twingate disconnections
+- Configured `/etc/systemd/logind.conf` to disable idle suspend (`IdleAction=ignore`)
+- Created systemd service: `/etc/systemd/system/prevent-suspend.service`
+- Service uses `systemd-inhibit` to actively block all sleep/suspend/idle actions
+- Enabled prevent-suspend service to auto-start on boot
+
+**Impact:**
+- **Server stays always-on** - No more automatic suspension after idle periods
+- **Twingate accessible 24/7** - Remote access works from anywhere, not just local network
+- **Suspend blocked by default** - Active inhibitor lock prevents unintended sleep
+- **Boot-persistent** - Configuration and service survive reboots
+- **Manual override available** - Can still suspend manually with `systemctl suspend -i`
+
+**Root Cause:**
+Server was auto-suspending after idle periods (visible in logs: Nov 16 14:51, Nov 17 00:02). When suspended, Twingate connector went offline, making remote access fail. The "defeats the purpose" issue was caused by systemd's default idle action (suspend after 30min).
+
+**Files created:**
+- `/etc/systemd/system/prevent-suspend.service` - Systemd service that runs systemd-inhibit to block sleep
+
+**Files modified:**
+- `/etc/systemd/logind.conf` - Added `IdleAction=ignore` to prevent automatic idle suspend
+
+**Verification:**
+```bash
+# Confirm inhibitor is active
+systemd-inhibit --list | grep "always on"
+# Output: sleep infinity ... sleep:idle ... Home lab server - always on ... block
+
+# Test suspend is blocked
+sudo systemctl suspend
+# Output: Operation inhibited by "sleep infinity" (PID 578474)
+```
+
+**Service details:**
+- Type: simple (runs continuously)
+- Command: `systemd-inhibit --what=sleep:idle --why="Home lab server - always on" --mode=block sleep infinity`
+- Restart policy: on-failure (auto-recovers if crashes)
+- Enabled: yes (starts on boot)
+
+---
 
 ### 2025-11-16 - Automated Lid Monitor for Screen Power Management
 

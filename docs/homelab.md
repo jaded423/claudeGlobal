@@ -273,10 +273,12 @@ docker images                   # List images
 
 **Purpose:** Real-time system monitoring and performance tracking
 
-#### Netdata
+#### Netdata (DISABLED)
 **Port:** 19999
-**Status Check:** `systemctl status netdata`
-**Access:** `http://192.168.1.228:19999` (local network)
+**Status:** Stopped and disabled (Nov 17, 2025)
+**Reason:** Power savings (~1.4W, 33% reduction) - not needed when Magic Mirror Pi2 is inactive
+**Original Purpose:** Live data source for Magic Mirror Pi2 project
+**Access (when enabled):** `http://192.168.2.250:19999` (local network)
 **Features:**
 - Real-time system metrics with beautiful graphs
 - CPU, memory, disk, network monitoring
@@ -284,11 +286,11 @@ docker images                   # List images
 - Alert capabilities
 - Zero configuration required
 
-**Service Management:**
+**To Re-enable:**
 ```bash
-systemctl status netdata         # Check status
-sudo systemctl restart netdata   # Restart service
-journalctl -u netdata -f         # View logs
+sudo systemctl enable --now netdata  # Re-enable for Magic Mirror work
+systemctl status netdata             # Check status
+journalctl -u netdata -f             # View logs
 ```
 
 #### Glances

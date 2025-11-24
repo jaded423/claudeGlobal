@@ -2,6 +2,38 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## November 23, 2025 - Grand Synchronization Project Phase 1 Complete
+
+**Changes:**
+- Created unified `homelab.md` documentation merging Mac and server versions
+- Standardized all IP addresses to 192.168.2.x subnet (from mixed 192.168.1.x/192.168.2.x)
+- Created `homelab-expansion.md` documenting infrastructure expansion plans
+- Implemented automated GitHub → Server sync infrastructure
+- Created `sync-project.md` documenting the grand synchronization project
+
+**Impact:**
+- Home lab documentation now consistent across both machines
+- Automated hourly sync prevents documentation drift
+- Clear roadmap for infrastructure expansion
+- Foundation established for syncing all documentation
+
+**Files created:**
+- `docs/homelab-expansion.md` - Infrastructure expansion plans and checklist
+- `docs/sync-project.md` - Grand synchronization project documentation
+- `~/scripts/sync-claude-global.sh` (on server) - Sync script
+- `~/.config/systemd/user/claude-sync.service` (on server) - Systemd service
+- `~/.config/systemd/user/claude-sync.timer` (on server) - Hourly timer
+
+**Files modified:**
+- `docs/homelab.md` - Unified with correct 192.168.2.x network
+- `CLAUDE.md` - Added references to new documentation files
+
+**Technical implementation:**
+- Mac pushes to GitHub hourly via existing gitBackup.sh
+- Server pulls from GitHub hourly via new systemd timer
+- Conflict resolution: Server hard resets to origin (Mac is source of truth)
+- Successfully tested end-to-end sync workflow
+
 ## November 14, 2025 - [MINOR] Documentation System Enhancements
 
 **Changes**:

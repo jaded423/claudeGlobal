@@ -215,11 +215,10 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active production server
 **Location**: 192.168.2.250 (local network), accessible via Twingate remotely
 **User**: jaded
+**Last Updated**: November 23, 2025
+**Recent Changes**: Unified documentation, implemented automated sync, created expansion plans
 **OS**: CachyOS Linux (Arch-based, performance-optimized)
-**Last Updated**: 2025-11-17
 **Purpose**: Home lab server providing SSH access, file sharing, and personal infrastructure
-
-**Recent Changes**: Fixed Twingate remote access - disabled auto-suspend with systemd-inhibit service and logind.conf configuration. Server now stays online 24/7, Twingate accessible from anywhere.
 
 **Key Services**:
 - **SSH Server** - Remote terminal access (port 22)

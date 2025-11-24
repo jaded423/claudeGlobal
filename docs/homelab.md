@@ -1363,5 +1363,3 @@ Google Drives:     ~/GoogleDrive/ and ~/elevatedDrive/
 Ollama models:     /usr/share/ollama/.ollama/models/
 Systemd services:  ~/.config/systemd/user/
 ```
-
-<!-- Test sync: Sun Nov 23 23:10:56 CST 2025 -->

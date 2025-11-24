@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
-**Primary Server:** cachyos-jade @ 192.168.1.228
-**Last Updated:** November 17, 2025 (Fixed Twingate remote access - disabled auto-suspend with systemd-inhibit)
+**Primary Server:** cachyos-jade @ 192.168.2.250
+**Last Updated:** November 23, 2025 (Consolidated infrastructure, unified documentation)
 
 ---
 
@@ -28,22 +28,28 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 
 ## Current Infrastructure Overview
 
+### Network Architecture
+
+**Router Configuration:** Personal router added to bypass Spectrum limitations
+- **Network Subnet:** 192.168.2.0/24 (changed from 192.168.1.x)
+- **Purpose:** Enable Pi-hole DNS and full network control
+- **Gateway:** 192.168.2.1
+
 ### Active Devices
 
 | Device | IP Address | Purpose | Power Usage | Status |
 |--------|------------|---------|-------------|---------|
-| **CachyOS Laptop** | 192.168.1.228 | Main compute server | 50-100W | ✅ Active |
-| **Raspberry Pi 1 B+** | 192.168.1.191 | Pi-hole DNS ad-blocking | 2-3W | ✅ Active |
-| **Raspberry Pi 2** | [Unknown] | Magic Mirror display | 3-4W | ✅ Active |
+| **CachyOS Laptop** | 192.168.2.250 | Main compute server | 50-100W | ✅ Active |
+| **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, Twingate backup, MagicMirror kiosk | 3-4W | ✅ Active |
 
-**Total Power:** ~55-107W (~$8-16/month electricity)
+**Total Power:** ~55-105W (~$8-16/month electricity)
 
 ### Architecture Diagram
 
 ```
 Current Homelab Infrastructure
 │
-├── CachyOS Laptop Server (cachyos-jade) @ 192.168.1.228
+├── CachyOS Laptop Server (cachyos-jade) @ 192.168.2.250
 │   ├── Ollama with 7 LLMs (Intel Arc GPU accelerated)
 │   ├── Docker (Jellyfin, qBittorrent, ClamAV, Twingate)
 │   ├── Media Server (Jellyfin port 8096)
@@ -52,21 +58,30 @@ Current Homelab Infrastructure
 │   ├── SSH & Samba file sharing
 │   ├── Google Drive mounts (2 accounts)
 │   ├── Hyprland desktop environment
+│   ├── Odoo 17 development (port 8069)
+│   ├── RustDesk Remote Desktop (ports 21115-21119)
 │   └── 16GB RAM + 22.7GB zram (37GB effective)
 │
-├── Raspberry Pi 1 B+
-│   └── Pi-hole DNS ad-blocking (network-wide protection)
-│
-└── Raspberry Pi 2
-    └── Magic Mirror with touch screen (info dashboard)
+└── Raspberry Pi 2 @ 192.168.2.131
+    ├── Pi-hole DNS (network-wide ad blocking)
+    ├── Twingate connector (backup)
+    ├── Portainer (Docker UI, port 9000)
+    ├── Homarr dashboard (port 7575)
+    └── MagicMirror kiosk (port 8080, 6x4" touchscreen)
+        ├── Weather (Wylie, TX)
+        ├── Pi system stats (°C)
+        ├── Server stats via SSH (°C)
+        └── Pi-hole query stats
 ```
+
+**Future Expansion:** See [homelab-expansion.md](homelab-expansion.md) for planned upgrades and completed milestones.
 
 ---
 
 ## CachyOS Server Details
 
 **Server Name:** cachyos-jade
-**Local IP:** 192.168.1.228
+**Local IP:** 192.168.2.250
 **User:** jaded
 **OS:** CachyOS Linux (Arch-based, performance-optimized)
 **Kernel:** 6.17.7-3-cachyos
@@ -79,16 +94,18 @@ The home lab server provides secure remote access, file sharing, and personal in
 - Samba file sharing (ports 445, 139)
 - Twingate secure remote access
 - Docker containerization
+- **Odoo 17 development (port 8069)** - ERP/business app learning environment
 - **Jellyfin media server (port 8096)** - Stream movies/TV to devices
 - **qBittorrent torrent client (port 8080)** - Download manager with web UI
 - **ClamAV virus scanner (port 3310)** - Automated download security
+- **RustDesk Remote Desktop (ports 21115-21119)** - Cross-platform remote access
 - Ollama local LLM inference (port 11434)
 - Hyprland desktop environment
 - Google Drive integration (2 accounts)
 - System monitoring (Netdata port 19999, Glances port 61208)
 
 **Access Methods:**
-- **At Home:** Direct LAN access (192.168.1.228) - fastest
+- **At Home:** Direct LAN access (192.168.2.250) - fastest
 - **Remote:** Twingate network (jaded423) - secure tunnel
 
 ---
@@ -98,8 +115,9 @@ The home lab server provides secure remote access, file sharing, and personal in
 ### Network Configuration
 
 **Local Network:**
-- IP Address: 192.168.1.228
-- Subnet: 192.168.1.0/24
+- IP Address: 192.168.2.250
+- Subnet: 192.168.2.0/24
+- Gateway: 192.168.2.1
 - Access: Direct LAN (60+ MB/s transfers)
 
 **Remote Access (Twingate):**
@@ -108,6 +126,7 @@ The home lab server provides secure remote access, file sharing, and personal in
 - Resources:
   - SSH Access (port 22) - assigned to jaded user
   - File Sharing (ports 445, 139) - assigned to family members
+  - RustDesk Remote Desktop (ports 21115-21119, 21116 UDP) - assigned to jaded user
 
 **Firewall (UFW):**
 - Default: Deny incoming
@@ -121,12 +140,13 @@ The home lab server provides secure remote access, file sharing, and personal in
 │         User Access Layer               │
 │  - SSH (port 22)                        │
 │  - Samba (ports 445, 139)               │
+│  - RustDesk (ports 21115-21119)         │
 │  - Twingate Connector (remote access)   │
 └─────────────────────────────────────────┘
                ↓
 ┌─────────────────────────────────────────┐
 │      Service Management Layer           │
-│  - systemd (sshd, smb)                  │
+│  - systemd (sshd, smb, rustdesk)        │
 │  - Docker (Twingate container)          │
 │  - UFW (firewall)                       │
 └─────────────────────────────────────────┘
@@ -157,7 +177,7 @@ The home lab server provides secure remote access, file sharing, and personal in
 
 **Access from Work Mac:**
 ```bash
-ssh jaded@192.168.1.228
+ssh jaded@192.168.2.250
 ```
 
 **Service Management:**
@@ -190,12 +210,12 @@ journalctl -u sshd -f           # View logs
 *At Home (Mac):*
 ```bash
 # Finder: Cmd+K, then enter:
-smb://192.168.1.228/Shared
+smb://192.168.2.250/Shared
 ```
 
 *At Home (Windows):*
 ```
-\\192.168.1.228\Shared
+\\192.168.2.250\Shared
 ```
 
 *Remote (via Twingate):*
@@ -249,6 +269,25 @@ docker-compose up -d           # Start with new version
 
 **Setup Script:** `~/setup/install-twingate-docker.sh`
 
+**Expansion Plan - Dual Connector Architecture:**
+
+Currently, this home lab runs one Twingate connector, allowing work Mac to access home resources remotely. **Planned expansion:** Add a second connector on work PC to enable bidirectional access.
+
+**Planned Architecture:**
+```
+Mac (Client) → Twingate Cloud → Home Lab Connector → Home resources (SSH, Samba, RustDesk, Jellyfin, Odoo)
+Mac (Client) → Twingate Cloud → Work PC Connector → Work resources (RustDesk, files, servers)
+```
+
+**Benefits:**
+- Access work PC from home (RustDesk desktop, files)
+- Access home lab from work (development, media, files)
+- Both connectors on same Twingate network (jaded423)
+- Mac client routes to appropriate connector based on resource
+- No additional cost (free tier supports multiple connectors)
+
+**See:** `~/rustdesk-setup.md` Part 6 for detailed expansion plan
+
 ### 4. Docker
 
 **Purpose:** Container runtime for Twingate and future services
@@ -279,12 +318,6 @@ docker images                   # List images
 **Reason:** Power savings (~1.4W, 33% reduction) - not needed when Magic Mirror Pi2 is inactive
 **Original Purpose:** Live data source for Magic Mirror Pi2 project
 **Access (when enabled):** `http://192.168.2.250:19999` (local network)
-**Features:**
-- Real-time system metrics with beautiful graphs
-- CPU, memory, disk, network monitoring
-- Process tracking
-- Alert capabilities
-- Zero configuration required
 
 **To Re-enable:**
 ```bash
@@ -296,13 +329,12 @@ journalctl -u netdata -f             # View logs
 #### Glances
 **Port:** 61208 (web mode)
 **Status Check:** `ps aux | grep glances`
-**Access:** `http://192.168.1.228:61208` (web mode)
+**Access:** `http://192.168.2.250:61208` (web mode)
 **Features:**
 - Lightweight system monitor
 - Terminal and web modes
 - Similar to btop but with web interface option
 - Lower resource usage than Netdata
-- Perfect for Pi/low-power devices
 
 **Usage:**
 ```bash
@@ -318,15 +350,6 @@ cat /sys/class/power_supply/BAT*/capacity
 cat /sys/class/power_supply/BAT*/status
 ```
 
-**Note:** Due to current network communication issues (see Troubleshooting section), web access may require SSH tunneling:
-```bash
-# From Mac - forward Netdata
-ssh -L 19999:localhost:19999 jaded@192.168.1.228
-
-# From Mac - forward Glances
-ssh -L 61208:localhost:61208 jaded@192.168.1.228
-```
-
 ### 6. Battery Management
 
 **Purpose:** Maintain optimal battery health by limiting charge to 80%
@@ -336,9 +359,6 @@ ssh -L 61208:localhost:61208 jaded@192.168.1.228
 **Current Configuration:**
 - Charge limit: 80% (battery stops charging at this level)
 - No lower threshold (battery can discharge naturally)
-
-**How It Works:**
-Uses Samsung's built-in hardware charge control to limit battery charge to 80%. This prevents the battery from staying at 100% constantly (which degrades battery health) while keeping the setup simple and maintenance-free.
 
 **Check Current Status:**
 ```bash
@@ -351,17 +371,6 @@ cat /sys/class/power_supply/BAT1/capacity
 # View charging status
 cat /sys/class/power_supply/BAT1/status
 ```
-
-**Changing Threshold:**
-```bash
-# Set different charge limit (e.g., 85%)
-echo 85 | sudo tee /sys/class/power_supply/BAT1/charge_control_end_threshold
-
-# Note: This setting persists across reboots on Samsung laptops
-```
-
-**Previous Setup (Removed Nov 14, 2025):**
-Previously used battery-cycler.service to cycle between 50-80%, but simplified to just use the built-in 80% limit for easier maintenance.
 
 ### 7. UFW Firewall
 
@@ -405,56 +414,35 @@ sudo ufw disable                # Disable firewall
 
 - **`llama3.2:3b`** (2.0GB)
   - **Best for:** General chat, summarization, Q&A, writing assistance
-  - **Strengths:** Balanced performance, follows instructions well, good at reasoning
-  - **Use when:** You need reliable general-purpose AI without specialized needs
   - **Speed:** Fast (3B parameters)
 
 - **`phi3.5:3.8b`** (2.2GB)
   - **Best for:** Mathematical reasoning, logical problems, structured tasks
-  - **Strengths:** Excellent at math/logic, very efficient for its size, low resource usage
-  - **Use when:** Working with calculations, analysis, or need precise reasoning
   - **Speed:** Fast (3.8B parameters)
 
 - **`qwen2.5:7b`** (4.7GB)
   - **Best for:** Multilingual tasks, coding help, complex reasoning
-  - **Strengths:** Great with multiple languages, strong coding abilities, high quality responses
-  - **Use when:** Need best balance of quality and speed, working with non-English text
   - **Speed:** Moderate (7B parameters)
 
 *Coding-Focused Models:*
 
 - **`qwen2.5-coder:7b`** (4.7GB)
   - **Best for:** Code generation, refactoring, algorithm design, debugging
-  - **Strengths:** Trained specifically on code, understands 80+ languages, excellent at explaining code
-  - **Use when:** Writing new code, converting between languages, understanding complex codebases
   - **Speed:** Moderate (7B parameters)
 
 - **`deepseek-coder:6.7b`** (3.8GB)
   - **Best for:** Code completion, filling in code gaps, autocomplete-style suggestions
-  - **Strengths:** Fill-in-the-middle capability, great for IDE-style completions
-  - **Use when:** Need autocomplete suggestions, filling in missing code sections
   - **Speed:** Moderate (6.7B parameters)
 
 *Ultra-Lightweight Models:*
 
 - **`gemma2:2b`** (1.6GB)
   - **Best for:** Quick queries, simple tasks, running multiple instances
-  - **Strengths:** Very low resource usage, surprisingly capable for size, fast responses
-  - **Use when:** Testing prompts, simple Q&A, need instant responses, running on low resources
   - **Speed:** Very fast (2B parameters)
 
 - **`llama3.2:1b`** (1.3GB)
   - **Best for:** Lightning-fast responses, basic chat, simple classifications
-  - **Strengths:** Smallest model, fastest inference, minimal RAM usage
-  - **Use when:** Need immediate responses, simple yes/no tasks, batch processing many simple queries
   - **Speed:** Extremely fast (1B parameters)
-
-**Model Selection Guide:**
-- **For coding:** Start with `qwen2.5-coder:7b` (best quality) or `deepseek-coder:6.7b` (good completions)
-- **For general tasks:** Use `qwen2.5:7b` (best quality) or `llama3.2:3b` (faster)
-- **For math/logic:** Use `phi3.5:3.8b`
-- **For speed:** Use `gemma2:2b` or `llama3.2:1b`
-- **For multilingual:** Use `qwen2.5:7b`
 
 **Hardware Acceleration:**
 - GPU: Intel Arc Graphics 130V/140V (integrated)
@@ -482,20 +470,7 @@ curl http://localhost:11434/api/generate -d '{
   "model": "llama3.2:3b",
   "prompt": "Why is the sky blue?"
 }'
-
-# Download new model
-ollama pull modelname:tag
-
-# Remove model to free space
-ollama rm modelname:tag
 ```
-
-**Performance Notes:**
-- GPU acceleration enabled for 2-3x faster inference
-- CPU-only mode available as fallback
-- Models run efficiently with 16GB RAM + 22.7GB zram swap
-- Best for: Code generation, text analysis, quick queries
-- Not ideal for: Very large context windows, real-time streaming at scale
 
 **Documentation:** [Ollama Docs](https://github.com/ollama/ollama)
 
@@ -724,9 +699,9 @@ rclone about elevated:
 
 **Hostname:** cachyos-jade
 **Primary Interface:** (check with `ip addr`)
-**IPv4:** 192.168.1.228
-**Gateway:** 192.168.1.1 (likely)
-**DNS:** (check `/etc/resolv.conf`)
+**IPv4:** 192.168.2.250
+**Gateway:** 192.168.2.1
+**DNS:** Pi-hole at 192.168.2.131
 
 ---
 
@@ -736,7 +711,7 @@ rclone about elevated:
 
 **Standard Access:**
 ```bash
-ssh jaded@192.168.1.228
+ssh jaded@192.168.2.250
 ```
 
 **Authentication:**
@@ -747,12 +722,12 @@ ssh jaded@192.168.1.228
 Add to `~/.ssh/config` on work Mac:
 ```
 Host homelab
-    HostName 192.168.1.228
+    HostName 192.168.2.250
     User jaded
     IdentityFile ~/.ssh/id_ed25519
 
 Host homelab-short
-    HostName 192.168.1.228
+    HostName 192.168.2.250
     User jaded
 ```
 
@@ -766,42 +741,42 @@ ssh homelab
 **Samba Share:**
 ```bash
 # From Finder: Cmd+K, then:
-smb://192.168.1.228/Shared
+smb://192.168.2.250/Shared
 
 # Or mount via command line:
 mkdir -p ~/mnt/homelab
-mount_smbfs //jaded@192.168.1.228/Shared ~/mnt/homelab
+mount_smbfs //jaded@192.168.2.250/Shared ~/mnt/homelab
 ```
 
 **SFTP/SCP (via SSH):**
 ```bash
 # Copy file to server
-scp file.txt jaded@192.168.1.228:~/
+scp file.txt jaded@192.168.2.250:~/
 
 # Copy file from server
-scp jaded@192.168.1.228:~/file.txt .
+scp jaded@192.168.2.250:~/file.txt .
 
 # Copy directory
-scp -r jaded@192.168.1.228:~/Documents ./
+scp -r jaded@192.168.2.250:~/Documents ./
 
 # SFTP interactive session
-sftp jaded@192.168.1.228
+sftp jaded@192.168.2.250
 ```
 
 ### Remote Development
 
 **VS Code Remote SSH:**
 1. Install "Remote - SSH" extension
-2. Add host: `jaded@192.168.1.228`
+2. Add host: `jaded@192.168.2.250`
 3. Connect and develop directly on server
 
 **rsync for Development:**
 ```bash
 # Sync local changes to server
-rsync -avz --exclude='.git' ~/local/project/ jaded@192.168.1.228:~/remote/project/
+rsync -avz --exclude='.git' ~/local/project/ jaded@192.168.2.250:~/remote/project/
 
 # Sync server changes to local
-rsync -avz jaded@192.168.1.228:~/remote/project/ ~/local/project/
+rsync -avz jaded@192.168.2.250:~/remote/project/ ~/local/project/
 ```
 
 ---
@@ -871,10 +846,10 @@ rsync -avz jaded@192.168.1.228:~/remote/project/ ~/local/project/
 **Recommended Backup Command (from work Mac):**
 ```bash
 # Backup setup directory
-scp -r jaded@192.168.1.228:~/setup ~/backups/homelab-setup-$(date +%Y%m%d)
+scp -r jaded@192.168.2.250:~/setup ~/backups/homelab-setup-$(date +%Y%m%d)
 
 # Backup important configs
-ssh jaded@192.168.1.228 'tar czf - ~/.config/hypr ~/.config/waybar ~/.ssh' > ~/backups/homelab-configs-$(date +%Y%m%d).tar.gz
+ssh jaded@192.168.2.250 'tar czf - ~/.config/hypr ~/.config/waybar ~/.ssh' > ~/backups/homelab-configs-$(date +%Y%m%d).tar.gz
 ```
 
 ### System Updates
@@ -900,8 +875,6 @@ docker-compose up -d            # Recreate with new images
 ---
 
 ## Troubleshooting
-
-**⚠️ Network Communication Issues**: If web services on the server are not accessible from Mac, see **[Network Troubleshooting Guide](/tmp/homelab-network-troubleshooting.md)** for detailed ARP/network diagnostics and solutions.
 
 ### SSH Issues
 
@@ -1176,140 +1149,24 @@ hyprctl reload
 
 ---
 
-## Future Enhancements
-
-### Potential Additions
-
-1. **Docker Services:**
-   - Portainer (Docker management UI)
-   - Prometheus + Grafana (monitoring)
-   - Pi-hole (network-wide ad blocking)
-   - Home Assistant (home automation)
-
-2. **Backup Automation:**
-   - Automated backups to work Mac
-   - Cloud backup integration
-   - Rsnapshot for incremental backups
-
-3. **Development Environment:**
-   - Docker registry for custom images
-   - CI/CD pipeline (Gitea + Drone)
-   - Development databases (PostgreSQL, Redis)
-
-4. **Media Server:**
-   - Plex or Jellyfin media server
-   - Transmission or qBittorrent
-   - Sonarr/Radarr automation
-
-5. **Documentation:**
-   - CLAUDE.md with project-specific guidance
-   - Automated documentation sync to work Mac
-   - Wiki for detailed procedures
-
----
-
-## Future Expansion Plans
-
-### Phase 2A: Raspberry Pi 5 Consolidation (Next Month - $185)
-
-**Hardware:** Raspberry Pi 5 with 16GB RAM
-**Purpose:** Consolidate and expand lightweight services
-
-**Migration Plan:**
-```
-Raspberry Pi 5 16GB (new)
-├── Services to Migrate:
-│   ├── Pi-hole DNS (from Pi 1 B+)
-│   └── Magic Mirror (from Pi 2)
-│
-└── New Services to Add:
-    ├── Uptime Kuma (monitoring)
-    ├── Homepage dashboard
-    ├── Home Assistant (optional)
-    └── Wireguard VPN server
-```
-
-**Old Pi Repurposing:**
-- **Pi 1 B+:** Sensor node, backup DNS, or retire (512MB RAM limited)
-- **Pi 2:** Testing environment or IoT gateway
-
-### Phase 2B: Storage Server (3-6 Months - $200-300)
-
-**Hardware:** Dell Precision T3600 or HP Z420 Tower
-**Purpose:** NAS and backup infrastructure
-
-**Configuration:**
-- 2-3x 4TB HDDs (used ~$40-60 each)
-- TrueNAS or OpenMediaVault
-- Time Machine target for Macs
-- Automated backups from CachyOS server
-- Optional: Plex/Jellyfin media server
-
-### Phase 3: AI Workstation (6-12 Months - Only if needed)
-
-**Hardware:** Dell T7810 dual socket tower
-**GPU:** RTX 3060 12GB or Tesla P40 24GB
-**Purpose:** Heavy AI/ML workloads
-
-**Use Cases:**
-- Larger LLMs (13B, 30B+ models)
-- Model training/fine-tuning
-- Stable Diffusion image generation
-- Keep laptop for lightweight models
-
-### Final Architecture Vision
-
-```
-Future Distributed Homelab (~$485 total investment)
-│
-├── CachyOS Laptop (cachyos-jade) - Compute Node
-│   ├── Primary services
-│   ├── Docker containers
-│   ├── Ollama (smaller models)
-│   └── Development environment
-│
-├── Raspberry Pi 5 16GB - Network Services
-│   ├── All DNS/DHCP services
-│   ├── Monitoring stack
-│   ├── Home automation
-│   └── VPN endpoint
-│
-├── Storage Tower - Data Node
-│   ├── 8-16TB storage array
-│   ├── Backup infrastructure
-│   ├── Media services
-│   └── Archive storage
-│
-└── Optional: AI Workstation - ML Node
-    ├── Large LLM inference
-    ├── Model training
-    └── GPU compute tasks
-```
-
-**Projected Power Usage:**
-- Current: ~55-107W ($8-16/month)
-- With Pi 5: ~60-115W ($9-18/month)
-- With Storage Tower: ~160-215W ($25-35/month)
-- Full Build: ~210-265W ($34-42/month)
-
-### Why This Architecture Works
-
-1. **Distributed by Function:** Each device optimized for its role
-2. **Scalable:** Add components only when needed
-3. **Efficient:** Total power under 265W even fully built out
-4. **Budget-Friendly:** Under $500 for capable infrastructure
-5. **Already Started:** Pi-hole and services already running
-
-### What NOT to Buy
-
-❌ **Dell R630/R730 Rack Servers** - Too loud, power-hungry for current needs
-❌ **High-end GPU immediately** - Current Intel Arc handling 7B models well
-❌ **Replacement for laptop** - It's working perfectly
-❌ **All hardware at once** - Grow based on actual bottlenecks
-
----
-
 ## Changelog
+
+### 2025-11-23 - Consolidated Infrastructure & Documentation Unification
+
+**Changes:**
+- Consolidated Raspberry Pi infrastructure - Pi 1 B+ decommissioned
+- Pi 2 now hosts Pi-hole DNS, Twingate backup, Portainer, Homarr, and MagicMirror
+- Added MagicMirror kiosk dashboard with touchscreen display
+- Network moved to 192.168.2.x subnet with personal router for full control
+- Added new services: Odoo 17, RustDesk, Portainer, Homarr
+- Unified documentation between Mac and server versions
+- Created separate homelab-expansion.md for future plans
+
+**Impact:**
+- Simpler infrastructure with one less device to maintain
+- Pi-hole DNS now working properly with personal router
+- Better service consolidation on Pi 2
+- Documentation now consistent across both machines
 
 ### 2025-11-17 - Fixed Twingate Remote Access with Power Management
 
@@ -1328,32 +1185,13 @@ Future Distributed Homelab (~$485 total investment)
 - **Manual override available** - Can still suspend manually with `systemctl suspend -i`
 
 **Root Cause:**
-Server was auto-suspending after idle periods (visible in logs: Nov 16 14:51, Nov 17 00:02). When suspended, Twingate connector went offline, making remote access fail. The "defeats the purpose" issue was caused by systemd's default idle action (suspend after 30min).
+Server was auto-suspending after idle periods. When suspended, Twingate connector went offline, making remote access fail. The issue was caused by systemd's default idle action (suspend after 30min).
 
 **Files created:**
 - `/etc/systemd/system/prevent-suspend.service` - Systemd service that runs systemd-inhibit to block sleep
 
 **Files modified:**
 - `/etc/systemd/logind.conf` - Added `IdleAction=ignore` to prevent automatic idle suspend
-
-**Verification:**
-```bash
-# Confirm inhibitor is active
-systemd-inhibit --list | grep "always on"
-# Output: sleep infinity ... sleep:idle ... Home lab server - always on ... block
-
-# Test suspend is blocked
-sudo systemctl suspend
-# Output: Operation inhibited by "sleep infinity" (PID 578474)
-```
-
-**Service details:**
-- Type: simple (runs continuously)
-- Command: `systemd-inhibit --what=sleep:idle --why="Home lab server - always on" --mode=block sleep infinity`
-- Restart policy: on-failure (auto-recovers if crashes)
-- Enabled: yes (starts on boot)
-
----
 
 ### 2025-11-16 - Automated Lid Monitor for Screen Power Management
 
@@ -1373,20 +1211,11 @@ sudo systemctl suspend
 - `~/.config/systemd/user/lid-monitor.service` - Systemd user service definition
 - `~/.config/hypr/scripts/lid-monitor.sh` - Bash script that monitors lid state and controls screen
 
-**Commands used:**
-```bash
-systemctl --user enable lid-monitor.service   # Enable service to start on boot
-systemctl --user start lid-monitor.service    # Start service immediately
-systemctl --user status lid-monitor.service   # Check service status
-```
-
 **Technical details:**
 - Polling interval: 1 second (minimal CPU impact)
 - Uses Hyprland's native `hyprctl dispatch dpms [on|off]` commands
 - Logs all lid state changes with timestamps for troubleshooting
 - Respects existing systemd logind configuration (HandleLidSwitch=ignore)
-
----
 
 ### 2025-11-16 - Network Configuration Cleanup
 
@@ -1403,14 +1232,6 @@ systemctl --user status lid-monitor.service   # Check service status
 **Files modified:**
 - NetworkManager connection profiles (via `nmcli connection delete`)
 
-**Commands used:**
-```bash
-nmcli connection up homeLab          # Switch to homeLab network
-nmcli connection delete Spaceballs   # Remove old network profile
-```
-
----
-
 ### 2025-11-15 - Media Server and Automated Download Security System
 
 **Changes:**
@@ -1419,9 +1240,8 @@ nmcli connection delete Spaceballs   # Remove old network profile
   - Mounted `~/Videos` as media library location
   - Hardware acceleration support detected (CUDA, VAAPI, QSV)
 - Installed **qBittorrent torrent client** (Docker container, port 8080)
-  - Web UI accessible at http://192.168.1.228:8080
+  - Web UI accessible at http://192.168.2.250:8080
   - Downloads saved to `~/Downloads` directory
-  - Default credentials: admin / NgbTyrrIv (user prompted to change on first login)
 - Installed **ClamAV antivirus scanner** (Docker container, port 3310)
   - Auto-updates virus definitions daily (8.7+ million signatures)
   - Scans files via docker exec for virus detection
@@ -1435,44 +1255,19 @@ nmcli connection delete Spaceballs   # Remove old network profile
   - `~/Downloads` - qBittorrent download destination, monitored by scanner
   - `~/Videos` - Clean files moved here, scanned by Jellyfin
   - `~/quarantine` - Suspicious files quarantined here for manual review
-  - `~/staging` - Reserved for future use
 - Created comprehensive documentation: `~/SECURITY-SYSTEM-README.md`
-- Archived unused n8n workflow to `~/archive/n8n-backup/`
 
 **Impact:**
 - **Complete media server setup** - Download torrents, automatically scan for security, stream to TV via Jellyfin
-- **Automated security workflow** - Every file downloaded is scanned within 1 minute:
-  1. ClamAV virus/malware scan
-  2. File type verification (prevents .exe renamed as .mkv)
-  3. Auto-move to Videos (clean) or quarantine (suspicious)
-  4. Detailed logging of all scan activity
+- **Automated security workflow** - Every file downloaded is scanned within 1 minute
 - **Zero-interaction security** - Files are automatically processed, user only reviews quarantined items
 - **Hardware-accelerated transcoding** - Jellyfin can use Intel Arc GPU for efficient video conversion
 - **Remote access ready** - All services accessible via Twingate for secure remote streaming
-
-**Files Created:**
-- `~/jellyfin/config/` - Jellyfin configuration directory
-- `~/jellyfin/cache/` - Jellyfin transcoding cache
-- `~/qbittorrent/config/` - qBittorrent settings
-- `~/scripts/scan-and-move.sh` - Main security scan script (3KB)
-- `~/scripts/auto-scan-downloads.sh` - Automated wrapper script (947 bytes)
-- `~/.config/systemd/user/download-scanner.service` - Systemd service definition
-- `~/.config/systemd/user/download-scanner.timer` - Systemd timer (every minute)
-- `~/SECURITY-SYSTEM-README.md` - Complete system documentation (10KB)
-- `~/scan-log.txt` - Scan activity log (auto-generated)
-- `~/archive/n8n-backup/` - Archived n8n data (for future use if needed)
 
 **Docker Containers:**
 - `jellyfin` - Media server (jellyfin/jellyfin:latest)
 - `qbittorrent` - Torrent client (linuxserver/qbittorrent:latest)
 - `clamav` - Antivirus scanner (clamav/clamav:latest)
-
-**Security Features:**
-- ClamAV protection against known viruses/malware
-- File type verification (magic number checking)
-- Automatic quarantine of suspicious files
-- Detailed logging for audit trail
-- No automatic execution of downloaded content
 
 **Workflow:**
 ```
@@ -1483,8 +1278,6 @@ ClamAV scan + File type check
 ✅ Clean videos → ~/Videos → Jellyfin library
 ⚠️ Suspicious → ~/quarantine → Manual review
 ```
-
----
 
 ### 2025-11-14 - Simplified Battery Management
 
@@ -1513,10 +1306,12 @@ The battery-cycler service added complexity by cycling between 50-80%. The built
 - `~/setup/README.md` - Setup scripts documentation
 - `~/.config/hypr/` - Hyprland configuration
 - `~/.config/systemd/user/` - User service files
+- `~/rustdesk-setup.md` - RustDesk configuration
 
 **Work Mac:**
-- `~/.claude/CLAUDE.md` - Global Claude documentation (this reference)
+- `~/.claude/CLAUDE.md` - Global Claude documentation
 - `~/.claude/docs/interconnections.md` - System dependency map
+- `~/.claude/docs/homelab-expansion.md` - Future expansion plans
 - `~/.ssh/config` - SSH client configuration
 
 **External Resources:**
@@ -1533,11 +1328,12 @@ The battery-cycler service added complexity by cycling between 50-80%. The built
 
 ### Connection Info
 ```
-IP Address: 192.168.1.228
+IP Address: 192.168.2.250
 User: jaded
-SSH: ssh jaded@192.168.1.228
-Samba: smb://192.168.1.228/Shared
+SSH: ssh jaded@192.168.2.250
+Samba: smb://192.168.2.250/Shared
 Twingate: jaded423
+Pi-hole: 192.168.2.131
 ```
 
 ### Service Status Commands

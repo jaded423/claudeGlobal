@@ -215,8 +215,8 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active production server
 **Location**: 192.168.2.250 (local network), accessible via Twingate remotely
 **User**: jaded
-**Last Updated**: November 23, 2025
-**Recent Changes**: Unified documentation, implemented automated sync, created expansion plans
+**Last Updated**: November 24, 2025
+**Recent Changes**: Configured Raspberry Pi 2 with 4GB swap (up from 512MB) and SSH key authentication
 **OS**: CachyOS Linux (Arch-based, performance-optimized)
 **Purpose**: Home lab server providing SSH access, file sharing, and personal infrastructure
 

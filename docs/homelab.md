@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Server:** cachyos-jade @ 192.168.2.250
-**Last Updated:** November 23, 2025 (Consolidated infrastructure, unified documentation)
+**Last Updated:** November 24, 2025 (Raspberry Pi 2 swap upgrade and SSH key configuration)
 
 ---
 
@@ -1150,6 +1150,25 @@ hyprctl reload
 ---
 
 ## Changelog
+
+### 2025-11-24 - Raspberry Pi 2 Memory and SSH Configuration
+
+**Changes:**
+- Increased swap file from 512MB to 4GB on Raspberry Pi 2
+- Configured CONF_SWAPSIZE=4096 and CONF_MAXSWAP=4096 in /etc/dphys-swapfile
+- Set up SSH key authentication from Mac to Pi (jaded@192.168.2.131)
+- Added Mac's ED25519 public key to Pi's authorized_keys
+
+**Impact:**
+- MagicMirror and other services have significantly more virtual memory available
+- Improved performance for memory-intensive operations
+- Passwordless SSH access now enabled from Mac to Pi
+- Easier remote management and automation capabilities
+
+**Configuration details:**
+- Swap: 4GB at /var/swap (was 512MB)
+- SSH: ED25519 key authentication enabled
+- User: jaded@192.168.2.131
 
 ### 2025-11-23 - Consolidated Infrastructure & Documentation Unification
 

@@ -9,6 +9,8 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 **📚 Detailed Documentation**: For comprehensive information, see the `~/.claude/docs/` directory:
 - **[projects.md](docs/projects.md)** - Detailed descriptions of all active projects
 - **[homelab.md](docs/homelab.md)** - Home lab server documentation (cachyos-jade @ 192.168.2.250)
+- **[homelab-expansion.md](docs/homelab-expansion.md)** - Infrastructure expansion plans and checklist
+- **[sync-project.md](docs/sync-project.md)** - 🔄 Grand synchronization project for Mac ↔ Server docs
 - **[interconnections.md](docs/interconnections.md)** - System dependency map and file movement checklists
 - **[troubleshooting.md](docs/troubleshooting.md)** - Solutions for common issues
 - **[best-practices.md](docs/best-practices.md)** - Documentation and workflow best practices

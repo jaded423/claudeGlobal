@@ -80,8 +80,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-11-18
-**Recent Changes:** Fixed Claude API fallback environment loading for launchd jobs, updated home lab server IP to 192.168.2.250
+**Last Updated:** 2025-11-25
+**Recent Changes:** Switched default commit model to phi4:14b after comparative testing (v2.3.0)
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -91,7 +91,7 @@ Detailed descriptions of all active projects in your workspace.
 
 **Key Features**:
 - Dotfiles backup system (backs up 11 repos hourly)
-- **Free local LLM commit messages** - Uses Qwen 2.5 Coder 7B on home lab server (no API costs)
+- **Free local LLM commit messages** - Uses Phi 4 (14B) on home lab server (no API costs)
 - **Claude API fallback** - Uses Claude Sonnet 4 when home lab is offline (paid fallback)
 - **Optimized server checks** - Only pings home lab when there are changes to commit
 - Smart diff parsing for large commits (>150 lines or >5 files)

@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Server:** cachyos-jade @ 192.168.2.250
-**Last Updated:** November 24, 2025 (Raspberry Pi 2 swap upgrade and SSH key configuration)
+**Last Updated:** November 25, 2025 (Ollama model update - phi4:14b default, Open WebUI added)
 
 ---
 
@@ -407,8 +407,21 @@ sudo ufw disable                # Disable firewall
 **Port:** 11434 (localhost only)
 **Status Check:** `systemctl status ollama`
 **API Endpoint:** `http://127.0.0.1:11434`
+**Open WebUI:** http://192.168.2.250:3000 (web interface for model interaction)
 
-**Installed Models (Total: ~20GB):**
+**Installed Models (Total: ~30GB):**
+
+*High-Quality Models (14B parameters):*
+
+- **`phi4:14b`** (9.1GB) ⭐ **DEFAULT for git commits**
+  - **Best for:** Git commit messages, code analysis, complex reasoning
+  - **Speed:** Moderate (~15-20s for commits)
+  - **Notes:** Clean output, accurate conventional commit format, excellent code understanding
+
+- **`qwen3:14b`** (9.0GB)
+  - **Best for:** General reasoning, chat, analysis
+  - **Speed:** Moderate
+  - **Notes:** Has "thinking" mode that outputs reasoning before answers (not ideal for automation)
 
 *General Use Models:*
 
@@ -433,6 +446,13 @@ sudo ufw disable                # Disable firewall
 - **`deepseek-coder:6.7b`** (3.8GB)
   - **Best for:** Code completion, filling in code gaps, autocomplete-style suggestions
   - **Speed:** Moderate (6.7B parameters)
+
+*Specialized Models:*
+
+- **`tavernari/git-commit-message:sp_commit_pro`** (4.7GB)
+  - **Best for:** Git commit message generation (specialized fine-tune)
+  - **Speed:** Moderate
+  - **Notes:** Good quality but phi4:14b produces more accurate terminology
 
 *Ultra-Lightweight Models:*
 
@@ -1150,6 +1170,28 @@ hyprctl reload
 ---
 
 ## Changelog
+
+### 2025-11-25 - Ollama Model Update & Open WebUI
+
+**Changes:**
+- Installed Open WebUI for web-based model interaction (port 3000)
+- Installed new high-quality 14B parameter models:
+  - `phi4:14b` - Now default for git commit message generation
+  - `qwen3:14b` - General reasoning and chat
+  - `tavernari/git-commit-message:sp_commit_pro` - Specialized commit model
+- Conducted comparative testing of three models for commit message quality
+- Updated `~/scripts/bin/ollamaSummary.py` to use phi4:14b as default model
+
+**Impact:**
+- Better quality AI-generated git commit messages
+- Open WebUI provides easy browser-based access to all models
+- phi4:14b selected as best model for automation (clean output, accurate conventional commit format)
+- qwen3:14b available but has "thinking" output mode not ideal for automation
+
+**Testing Results:**
+- phi4:14b: 9/10 - Clean output, excellent terminology, proper formatting
+- tavernari/sp_commit_pro: 8/10 - Good but minor terminology issues
+- qwen3:14b: 3/10 - Unusable for automation (outputs thousands of "thinking" tokens)
 
 ### 2025-11-24 - Raspberry Pi 2 Memory and SSH Configuration
 

@@ -74,7 +74,9 @@ Current Homelab Infrastructure
         └── Pi-hole query stats
 ```
 
-**Future Expansion:** See [homelab-expansion.md](homelab-expansion.md) for planned upgrades and completed milestones.
+**Future Expansion:**
+- [homelab-expansion.md](homelab-expansion.md) - Planned single-site upgrades and completed milestones
+- [homelab-multi-site-expansion.md](homelab-multi-site-expansion.md) - Multi-site Proxmox architecture with CompTIA certification learning path
 
 ---
 

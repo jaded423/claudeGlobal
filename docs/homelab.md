@@ -1225,6 +1225,32 @@ hyprctl reload
 
 ## Changelog
 
+### 2025-11-29 - Git Backup Scripts Updated for Proxmox Architecture
+
+**Changes:**
+- Updated `~/scripts/bin/ollamaSummary.py` to connect to VM 102 (192.168.2.126) instead of Proxmox host
+- Updated `~/scripts/bin/gitBackup.sh` SSH connections to target Ubuntu Server VM at 192.168.2.126
+- Added `.update.lock` to scripts/.gitignore to prevent spurious backup triggers
+- Scripts now correctly target the VM running Ollama service (VM 102)
+
+**Impact:**
+- Git backup automation now works with Proxmox architecture
+- AI-powered commit message generation restored (connects to correct Ollama instance)
+- Eliminates false backup triggers from Claude Code lock files
+- All automated backup scripts operational again
+
+**Technical Details:**
+- Changed OLLAMA_SERVER from `jaded@192.168.2.250` to `jaded@192.168.2.126`
+- Updated all SSH health checks in gitBackup.sh to use VM 102 IP
+- Server memory/disk checks now query Ubuntu Server VM, not Proxmox host
+
+**Files Modified:**
+- `~/scripts/bin/ollamaSummary.py` (line 28)
+- `~/scripts/bin/gitBackup.sh` (lines 55, 67, 71, 77)
+- `~/scripts/.gitignore` (added .update.lock)
+
+---
+
 ### 2025-11-29 - Google Drive Integration & VM Automount Complete
 
 **Changes:**

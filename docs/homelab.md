@@ -64,6 +64,8 @@ New Proxmox-Based Homelab Infrastructure (Nov 2025)
 │   │   ├── SeaBIOS boot (legacy BIOS for compatibility)
 │   │   ├── VirtIO display (accessible via Proxmox web console)
 │   │   ├── Arch Linux + Hyprland (DHH's Omarchy distro)
+│   │   ├── SSH enabled (remote access via jaded@192.168.2.161)
+│   │   ├── Auto-mount Samba share with Google Drive access (via fstab)
 │   │   └── Auto-starts on boot ✅
 │   │
 │   ├── VM 101: Ubuntu Desktop 24.04 (8GB RAM, 4 cores, 120GB disk)
@@ -1223,6 +1225,33 @@ hyprctl reload
 
 ## Changelog
 
+### 2025-11-29 - Google Drive Integration & VM Automount Complete
+
+**Changes:**
+- ✅ Completed rclone installation on VM 102 (Ubuntu Server)
+- ✅ Restored Google Drive OAuth tokens from backup
+- ✅ Configured `--allow-other` flag for rclone FUSE mounts (enables Samba access)
+- ✅ Both Google Drive accounts now accessible via Samba:
+  - Personal: `smb://192.168.2.126/Shared/GoogleDrive`
+  - Work: `smb://192.168.2.126/Shared/ElevatedDrive`
+- ✅ Enabled SSH on VM 100 (Omarchy) for remote troubleshooting
+- ✅ Configured automatic Samba mount on VM 100 via /etc/fstab
+- ✅ Google Drive access verified and auto-mounts on reboot
+
+**Impact:**
+- VM 100 (Omarchy) can now access both Google Drive accounts through Samba
+- Auto-mount configured - share available immediately after boot
+- Single rclone instance serves multiple VMs (no duplicate OAuth tokens needed)
+- All changes persist across VM reboots
+
+**Technical Details:**
+- rclone services updated with `--allow-other` flag
+- /etc/fuse.conf configured with `user_allow_other`
+- VM 100 fstab configured with credentials file and systemd automount
+- Home directory permissions adjusted for symlink traversal
+
+---
+
 ### 2025-11-29 - Major Infrastructure Migration to Proxmox VE
 
 **BREAKING CHANGE:** Migrated entire home lab from bare-metal CachyOS to Proxmox VE 9.1 hypervisor with VM-based architecture.
@@ -1252,6 +1281,8 @@ hyprctl reload
 - Specs: 8GB RAM, 4 cores, 120GB disk
 - Boot: SeaBIOS (legacy BIOS for bootloader compatibility)
 - Display: VirtIO (accessible via Proxmox web console)
+- SSH: Enabled (jaded@192.168.2.161)
+- Samba: Auto-mount configured via fstab with Google Drive access
 - Purpose: Desktop environment experimentation
 - Status: ✅ Working, auto-starts on boot
 
@@ -1336,6 +1367,7 @@ hyprctl reload
 - **Proxmox Web UI:** https://192.168.2.250:8006
 - **SSH to Ubuntu Server:** `ssh jaded@192.168.2.126`
 - **SSH to Proxmox Host:** `ssh root@192.168.2.250`
+- **SSH to Omarchy:** `ssh jaded@192.168.2.161`
 - **Omarchy:** Via Proxmox web console (VM 100 → Console)
 - **All services:** Same ports as before (Jellyfin 8096, qBittorrent 8080, Ollama 11434, etc.)
 
@@ -1353,10 +1385,11 @@ hyprctl reload
 - ✅ All Docker containers operational
 - ✅ Ollama with full model library ready
 - ✅ Auto-start configured for essential VMs
-- ⚠️ Some manual tasks remain (Samba password, rclone, static IP, firewall)
+- ✅ rclone and Google Drive mounts operational
+- ⚠️ Some manual tasks remain (Samba password, static IP, firewall)
 
 **What's Next:**
-- Complete remaining service restoration (rclone, Google Drive mounts)
+- Set Samba password on Ubuntu Server (`sudo smbpasswd -a jaded`)
 - Configure firewall on Ubuntu Server
 - Set static IP for predictable addressing
 - Fine-tune GPU passthrough for Ubuntu Desktop input

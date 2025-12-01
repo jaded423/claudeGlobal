@@ -329,6 +329,106 @@ If reports or backups fail after moving directories:
    # Should find no matches
    ```
 
+## Twingate & SSH Issues
+
+### SSH to VMs breaks when adding Twingate resources for VM IPs
+
+**Problem:** When you add a Twingate resource for a VM IP (like 192.168.2.126 for VM 102), SSH to the Proxmox host (192.168.2.250) fails with "timeout during banner exchange" even though routes exist and TCP connections succeed.
+
+**Symptoms:**
+- Routes for both .250 and .126 appear in routing table (`netstat -rn | grep 192.168.2`)
+- TCP connections to port 22 succeed (`nc -v -z 192.168.2.250 22` shows success)
+- SSH hangs during banner exchange and times out after ~60 seconds
+- Only happens when ANY Twingate resource pointing to VM IPs (.126, .131, etc.) exists
+- Works fine when only the Proxmox host (.250) resource exists in Twingate
+- Removing the VM resource immediately fixes SSH to .250
+
+**Root Cause:**
+The Proxmox host is running its own Twingate daemon (`/usr/sbin/twingated`) with a route for its own IP through the sdwan0 interface:
+```bash
+# On Proxmox host, check routes:
+ssh root@192.168.2.250 "ip route show dev sdwan0"
+# Shows: 192.168.2.250 dev sdwan0 proto static scope host metric 25
+```
+
+When your Mac's Twingate tries to route to a VM on the same network (192.168.2.x/24), it creates a routing conflict. The Proxmox Twingate daemon gets confused about traffic destined for the 192.168.2.x network, causing SSH banner exchange to fail (TCP connects but application-level protocol breaks).
+
+**Solution - Use SSH ProxyJump:**
+
+Instead of creating Twingate resources for VM IPs, configure SSH ProxyJump to access VMs through the Proxmox host:
+
+**Step 1:** Only keep Proxmox host (.250) in Twingate resources
+- Remove any resources pointing to VM IPs (.126, .131, etc.)
+- Keep only the "proxmox-web" resource (192.168.2.250, ports 22 and 8006)
+
+**Step 2:** Configure ProxyJump in `~/.ssh/config` on your Mac:
+```ssh
+Host 192.168.2.250
+  User root
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# VM 102 - Ubuntu Server (auto ProxyJump through Proxmox)
+Host 192.168.2.126
+  User jaded
+  ProxyJump 192.168.2.250
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+```
+
+**Step 3:** Access VMs automatically:
+```bash
+# This now automatically jumps through .250 first
+ssh jaded@192.168.2.126
+
+# Your git backup scripts work without changes
+# SSH config handles the routing transparently
+```
+
+**Benefits:**
+- ✅ No Twingate routing conflicts
+- ✅ Automated scripts work without modification (SSH config handles routing)
+- ✅ Only one Twingate resource needed (Proxmox host at .250)
+- ✅ All VMs accessible via automatic ProxyJump
+- ✅ Single point of security (only .250 exposed through Twingate)
+
+**For Additional VMs:**
+Add similar ProxyJump entries for any other VMs:
+```ssh
+Host 192.168.2.131
+  User pi
+  ProxyJump 192.168.2.250
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+**Testing the Fix:**
+```bash
+# 1. Verify routes (should only see .250, not .126)
+netstat -rn | grep 192.168.2
+
+# 2. Test SSH to Proxmox host (should work)
+ssh root@192.168.2.250 "hostname"
+
+# 3. Test SSH to VM via ProxyJump (should work)
+ssh jaded@192.168.2.126 "hostname"
+
+# 4. Test git operations
+ssh jaded@192.168.2.126 "git --version"
+```
+
+**Why Not Fix Twingate on Proxmox?**
+While you could remove Twingate from the Proxmox host or remove its .250 route, the ProxyJump approach is better because:
+- Follows security best practice (single entry point)
+- Simpler Twingate configuration (one resource vs many)
+- Works with existing Proxmox Twingate setup (may be used for other purposes)
+- More maintainable long-term
+
 ## Getting Help
 
 If you encounter an issue not covered here:

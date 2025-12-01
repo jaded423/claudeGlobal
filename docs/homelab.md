@@ -211,8 +211,44 @@ The home lab now runs as a Type 1 hypervisor with 3 VMs providing isolated servi
 
 **Access from Work Mac:**
 ```bash
-ssh jaded@192.168.2.250
+# Proxmox host
+ssh root@192.168.2.250
+
+# Ubuntu Server VM (via automatic ProxyJump)
+ssh jaded@192.168.2.126
 ```
+
+**ProxyJump Configuration for VMs:**
+
+Due to a routing conflict between Twingate running on both the Mac and Proxmox host, VMs cannot be accessed directly through Twingate. The Proxmox host has a route for its own IP (192.168.2.250) through the Twingate sdwan0 interface, which conflicts with direct routing to VMs on the same network (192.168.2.x/24).
+
+**Solution:** SSH ProxyJump configured in `~/.ssh/config` on work Mac:
+
+```ssh
+Host 192.168.2.250
+  User root
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# VM 102 - Ubuntu Server (auto ProxyJump through Proxmox)
+Host 192.168.2.126
+  User jaded
+  ProxyJump 192.168.2.250
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+```
+
+**How it works:**
+- Only 192.168.2.250 (Proxmox host) is configured as a Twingate resource
+- VM access uses ProxyJump: Mac → .250 → .126
+- Automated scripts work without modification (SSH config handles routing)
+- No Twingate routing conflicts
 
 **Service Management:**
 ```bash
@@ -1245,6 +1281,38 @@ hyprctl reload
 ---
 
 ## Changelog
+
+### 2025-12-01 - SSH ProxyJump Configuration for VM Access
+
+**Changes:**
+- Diagnosed Twingate routing conflict between Mac and Proxmox host
+- Configured SSH ProxyJump in `~/.ssh/config` for VM 102 (192.168.2.126)
+- Added User directives for automatic username selection (root@.250, jaded@.126)
+- Documented routing conflict and solution in homelab.md and troubleshooting.md
+
+**Impact:**
+- ✅ VM 102 now accessible via automatic SSH ProxyJump through Proxmox host
+- ✅ Git backup scripts will work without modification (SSH config handles routing)
+- ✅ Only Proxmox host (.250) needs Twingate resource (removed VM resources)
+- ✅ No more routing conflicts when accessing VMs remotely
+
+**Root Cause Identified:**
+Proxmox host runs Twingate daemon (`/usr/sbin/twingated`) with route for 192.168.2.250 through sdwan0 interface. When Mac's Twingate creates routes to VMs on same network (192.168.2.x/24), it causes routing conflict - SSH TCP handshake succeeds but banner exchange times out.
+
+**Solution:**
+SSH ProxyJump configuration provides automatic two-hop connection (Mac → .250 → .126) without Twingate routing conflicts. Only the Proxmox host is exposed through Twingate, VMs are accessed via jump.
+
+**Technical Details:**
+- Connection flow: Mac → Twingate → 192.168.2.250 (Proxmox) → 192.168.2.126 (VM 102)
+- SSH config handles ProxyJump transparently for all commands
+- Automated git scripts work without code changes
+
+**Files Modified:**
+- `~/.ssh/config` - Added ProxyJump configuration for VM 102
+- `~/.claude/docs/homelab.md` - Documented ProxyJump setup and routing conflict
+- `~/.claude/docs/troubleshooting.md` - Added comprehensive Twingate SSH troubleshooting section
+
+---
 
 ### 2025-11-29 - Git Backup Scripts Updated for Proxmox Architecture
 

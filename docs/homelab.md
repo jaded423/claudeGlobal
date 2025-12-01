@@ -214,6 +214,9 @@ The home lab now runs as a Type 1 hypervisor with 3 VMs providing isolated servi
 # Proxmox host
 ssh root@192.168.2.250
 
+# Omarchy Desktop VM (via automatic ProxyJump)
+ssh jaded@192.168.2.161
+
 # Ubuntu Server VM (via automatic ProxyJump)
 ssh jaded@192.168.2.126
 ```
@@ -233,6 +236,16 @@ Host 192.168.2.250
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
+# VM 100 - Omarchy Desktop (auto ProxyJump through Proxmox)
+Host 192.168.2.161
+  User jaded
+  ProxyJump 192.168.2.250
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
 # VM 102 - Ubuntu Server (auto ProxyJump through Proxmox)
 Host 192.168.2.126
   User jaded
@@ -246,7 +259,7 @@ Host 192.168.2.126
 
 **How it works:**
 - Only 192.168.2.250 (Proxmox host) is configured as a Twingate resource
-- VM access uses ProxyJump: Mac → .250 → .126
+- VM access uses ProxyJump: Mac → .250 → .161 (or .126)
 - Automated scripts work without modification (SSH config handles routing)
 - No Twingate routing conflicts
 

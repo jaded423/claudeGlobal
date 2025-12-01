@@ -42,7 +42,7 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 | Device | IP Address | Purpose | Power Usage | Status |
 |--------|------------|---------|-------------|---------|
 | **Proxmox Host** | 192.168.2.250 | Type 1 hypervisor (3 VMs) | 50-100W | ✅ Active |
-| **└─ VM 100: Omarchy** | (bridged) | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
+| **└─ VM 100: Omarchy** | 192.168.2.161 | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
 | **└─ VM 101: Ubuntu Desktop** | (bridged) | Ubuntu 24.04 Desktop with GPU passthrough | - | ⚠️ Manual start |
 | **└─ VM 102: Ubuntu Server** | 192.168.2.126 | Ubuntu 24.04 Server (all services) | - | ✅ Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, Twingate backup, MagicMirror kiosk | 3-4W | ✅ Active |
@@ -1299,12 +1299,15 @@ hyprctl reload
 
 **Changes:**
 - Diagnosed Twingate routing conflict between Mac and Proxmox host
-- Configured SSH ProxyJump in `~/.ssh/config` for VM 102 (192.168.2.126)
-- Added User directives for automatic username selection (root@.250, jaded@.126)
+- Configured SSH ProxyJump in `~/.ssh/config` for VM 102 (192.168.2.126) and VM 100 (192.168.2.161)
+- Enabled SSH on VM 100 (Omarchy Desktop) and copied Mac public key for authentication
+- Added User directives for automatic username selection (root@.250, jaded@.161, jaded@.126)
 - Documented routing conflict and solution in homelab.md and troubleshooting.md
+- Updated homelab.md with VM 100 IP address (192.168.2.161)
 
 **Impact:**
-- ✅ VM 102 now accessible via automatic SSH ProxyJump through Proxmox host
+- ✅ Both VMs (100 & 102) now accessible via automatic SSH ProxyJump through Proxmox host
+- ✅ VM 100 (Omarchy) now has SSH enabled and configured for remote access
 - ✅ Git backup scripts will work without modification (SSH config handles routing)
 - ✅ Only Proxmox host (.250) needs Twingate resource (removed VM resources)
 - ✅ No more routing conflicts when accessing VMs remotely
@@ -1313,16 +1316,17 @@ hyprctl reload
 Proxmox host runs Twingate daemon (`/usr/sbin/twingated`) with route for 192.168.2.250 through sdwan0 interface. When Mac's Twingate creates routes to VMs on same network (192.168.2.x/24), it causes routing conflict - SSH TCP handshake succeeds but banner exchange times out.
 
 **Solution:**
-SSH ProxyJump configuration provides automatic two-hop connection (Mac → .250 → .126) without Twingate routing conflicts. Only the Proxmox host is exposed through Twingate, VMs are accessed via jump.
+SSH ProxyJump configuration provides automatic two-hop connection (Mac → .250 → VMs) without Twingate routing conflicts. Only the Proxmox host is exposed through Twingate, VMs are accessed via jump.
 
 **Technical Details:**
-- Connection flow: Mac → Twingate → 192.168.2.250 (Proxmox) → 192.168.2.126 (VM 102)
+- Connection flow: Mac → Twingate → 192.168.2.250 (Proxmox) → 192.168.2.161 (VM 100) or 192.168.2.126 (VM 102)
 - SSH config handles ProxyJump transparently for all commands
 - Automated git scripts work without code changes
+- VM 100 required SSH installation (`sudo pacman -S openssh`) and key authentication setup
 
 **Files Modified:**
-- `~/.ssh/config` - Added ProxyJump configuration for VM 102
-- `~/.claude/docs/homelab.md` - Documented ProxyJump setup and routing conflict
+- `~/.ssh/config` - Added ProxyJump configuration for VM 100 and VM 102
+- `~/.claude/docs/homelab.md` - Documented ProxyJump setup, routing conflict, and VM 100 IP address
 - `~/.claude/docs/troubleshooting.md` - Added comprehensive Twingate SSH troubleshooting section
 
 ---

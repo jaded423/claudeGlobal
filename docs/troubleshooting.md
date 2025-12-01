@@ -371,6 +371,16 @@ Host 192.168.2.250
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
+# VM 100 - Omarchy Desktop (auto ProxyJump through Proxmox)
+Host 192.168.2.161
+  User jaded
+  ProxyJump 192.168.2.250
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
 # VM 102 - Ubuntu Server (auto ProxyJump through Proxmox)
 Host 192.168.2.126
   User jaded
@@ -384,8 +394,9 @@ Host 192.168.2.126
 
 **Step 3:** Access VMs automatically:
 ```bash
-# This now automatically jumps through .250 first
-ssh jaded@192.168.2.126
+# These now automatically jump through .250 first
+ssh jaded@192.168.2.161  # Omarchy Desktop
+ssh jaded@192.168.2.126  # Ubuntu Server
 
 # Your git backup scripts work without changes
 # SSH config handles the routing transparently
@@ -409,14 +420,15 @@ Host 192.168.2.131
 
 **Testing the Fix:**
 ```bash
-# 1. Verify routes (should only see .250, not .126)
+# 1. Verify routes (should only see .250, not VM IPs)
 netstat -rn | grep 192.168.2
 
 # 2. Test SSH to Proxmox host (should work)
 ssh root@192.168.2.250 "hostname"
 
-# 3. Test SSH to VM via ProxyJump (should work)
-ssh jaded@192.168.2.126 "hostname"
+# 3. Test SSH to VMs via ProxyJump (should work)
+ssh jaded@192.168.2.161 "hostname"  # Omarchy Desktop
+ssh jaded@192.168.2.126 "hostname"  # Ubuntu Server
 
 # 4. Test git operations
 ssh jaded@192.168.2.126 "git --version"

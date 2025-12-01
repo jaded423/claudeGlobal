@@ -1045,6 +1045,27 @@ grep -E "follow symlinks|wide links" /etc/samba/smb.conf
 
 ### Twingate Issues
 
+**After server reboot - connectors show green but can't connect:**
+
+**Problem:** After rebooting Proxmox or home lab server, Twingate connectors show as "Connected" (green) in the admin console, but you can't access any resources (SSH, web UI, etc.).
+
+**Cause:** Mac Twingate client has stale connection state and routing tables. Even though connectors reconnected successfully, the client hasn't refreshed its connection.
+
+**Fix - Restart Twingate Client on Mac:**
+```bash
+# Method 1: Via command line
+killall Twingate && open -a Twingate
+
+# Method 2: Via menu bar
+# Click Twingate icon → Quit → Reopen Twingate from Applications
+```
+
+**Important:** After restarting the client, it may take several minutes (5-10 min) to fully re-establish connections and routing. Be patient - the first connection attempt may timeout, but subsequent attempts will succeed once sync completes.
+
+**Prevention:** After rebooting any home lab server, immediately restart your Mac Twingate client to force a fresh connection state.
+
+---
+
 **Connector not connecting:**
 ```bash
 # Check container status

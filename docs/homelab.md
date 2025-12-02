@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
-**Primary Server:** Proxmox VE @ 192.168.2.250 (formerly cachyos-jade)
-**Last Updated:** November 29, 2025 (Major infrastructure migration to Proxmox with VM-based architecture)
+**Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster"
+**Last Updated:** December 1, 2025 (Cluster expansion + VM migration to tower for better performance)
 
 ---
 
@@ -28,6 +28,8 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 
 ## Current Infrastructure Overview
 
+**🎉 CLUSTER UPDATE (Dec 1, 2025):** Expanded to 2-node Proxmox cluster with VM migration to more powerful hardware!
+
 **🎉 MAJOR UPDATE (Nov 28-29, 2025):** Migrated from bare-metal CachyOS to Proxmox VE with VM-based architecture!
 
 ### Network Architecture
@@ -41,42 +43,51 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 
 | Device | IP Address | Purpose | Power Usage | Status |
 |--------|------------|---------|-------------|---------|
-| **Proxmox Host** | 192.168.2.250 | Type 1 hypervisor (3 VMs) | 50-100W | ✅ Active |
-| **└─ VM 100: Omarchy** | 192.168.2.161 | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
-| **└─ VM 101: Ubuntu Desktop** | (bridged) | Ubuntu 24.04 Desktop with GPU passthrough | - | ⚠️ Manual start |
-| **└─ VM 102: Ubuntu Server** | 192.168.2.126 | Ubuntu 24.04 Server (all services) | - | ✅ Auto-start |
+| **Proxmox Cluster "home-cluster"** | | 2-node HA cluster | 100-180W | ✅ Active |
+| **├─ prox-book5 (node 1)** | 192.168.2.250 | Samsung Galaxy Book5 Pro, 16GB RAM | 50-100W | ✅ Active |
+| **│  └─ VM 100: Omarchy** | 192.168.2.161 | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
+| **└─ prox-tower (node 2)** | 192.168.2.249 | ThinkStation 510, 32GB RAM, Xeon E5-1620 | 50-80W | ✅ Active |
+|    **└─ VM 102: Ubuntu Server** | 192.168.2.126 | Ubuntu 24.04 Server (all services) | - | ✅ Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, Twingate backup, MagicMirror kiosk | 3-4W | ✅ Active |
 
-**Total Power:** ~55-105W (~$8-16/month electricity)
+**Total Power:** ~105-185W (~$15-28/month electricity)
+
+**Cluster Notes:**
+- VM 101 (Ubuntu Desktop) deleted Dec 1 to free space on prox-book5
+- VM 102 migrated from prox-book5 to prox-tower Dec 1 for better cooling/performance
+- Both nodes run Twingate connectors for redundant remote access
+- Quorum: 2/2 nodes, HA-capable for future service distribution
 
 ### Architecture Diagram
 
 ```
-New Proxmox-Based Homelab Infrastructure (Nov 2025)
+Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │
-├── Proxmox VE Host @ 192.168.2.250 (Samsung Galaxy Book5 Pro)
+├── NODE 1: prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro)
 │   ├── Hardware: 16GB RAM, Intel Arc GPU, 952GB NVMe
-│   ├── ZFS RAID0 storage
+│   ├── ZFS RAID0 storage (~880GB available)
 │   ├── IOMMU/VT-d enabled for GPU passthrough
 │   ├── Lid-close handling (stays running, screen off)
+│   ├── Cluster role: Node 1 (ID: 0x00000001)
 │   │
-│   ├── VM 100: Omarchy Desktop (8GB RAM, 4 cores, 120GB disk)
-│   │   ├── SeaBIOS boot (legacy BIOS for compatibility)
-│   │   ├── VirtIO display (accessible via Proxmox web console)
-│   │   ├── Arch Linux + Hyprland (DHH's Omarchy distro)
-│   │   ├── SSH enabled (remote access via jaded@192.168.2.161)
-│   │   ├── Auto-mount Samba share with Google Drive access (via fstab)
-│   │   └── Auto-starts on boot ✅
-│   │
-│   ├── VM 101: Ubuntu Desktop 24.04 (8GB RAM, 4 cores, 120GB disk)
-│   │   ├── UEFI boot
-│   │   ├── Intel Arc GPU passthrough (displays on laptop screen)
-│   │   ├── Kernel 6.14 with Intel Arc drivers
-│   │   ├── ⚠️ GPU display works, keyboard/mouse needs USB passthrough
-│   │   └── Manual start (not needed for server operations)
+│   └── VM 100: Omarchy Desktop @ 192.168.2.161 (8GB RAM, 4 cores, 120GB disk)
+│       ├── SeaBIOS boot (legacy BIOS for compatibility)
+│       ├── VirtIO display (accessible via Proxmox web console)
+│       ├── Arch Linux + Hyprland (DHH's Omarchy distro)
+│       ├── SSH enabled (remote access via ProxyJump through .250)
+│       ├── Auto-mount Samba share with Google Drive access (via fstab)
+│       └── Auto-starts on boot ✅
+│
+├── NODE 2: prox-tower @ 192.168.2.249 (ThinkStation 510)
+│   ├── Hardware: 32GB RAM, Xeon E5-1620 v4 (4c/8t), NVIDIA Quadro M4000
+│   ├── LVM-thin storage (~365GB available)
+│   ├── Docker installed (version 26.1.5)
+│   ├── Twingate connector (privileged container)
+│   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
 │   └── VM 102: Ubuntu Server 24.04 @ 192.168.2.126 (6GB RAM, 3 cores, 200GB disk)
 │       ├── UEFI boot, SSH enabled
+│       ├── Migrated from prox-book5 Dec 1, 2025 (live migration, 79ms downtime)
 │       ├── Docker + All Services:
 │       │   ├── Twingate connector (secure remote access)
 │       │   ├── Jellyfin media server (port 8096)
@@ -98,6 +109,12 @@ New Proxmox-Based Homelab Infrastructure (Nov 2025)
         ├── Pi system stats (°C)
         ├── Server stats via SSH (°C)
         └── Pi-hole query stats
+
+Cluster Details:
+- Name: home-cluster
+- Nodes: 2/2 online (quorum active)
+- HA Capable: Yes (can distribute services across nodes)
+- Remote Access: Twingate on both prox-tower and VM 102
 ```
 
 **Future Expansion:**
@@ -1294,6 +1311,72 @@ hyprctl reload
 ---
 
 ## Changelog
+
+### 2025-12-01 - 2-Node Proxmox Cluster Creation & VM Migration
+
+**Changes:**
+- Created 2-node Proxmox cluster "home-cluster" with prox-book5 and prox-tower
+- Joined ThinkStation 510 (prox-tower @ 192.168.2.249) to existing prox-book5 node
+- Successfully migrated VM 102 (Ubuntu Server with Ollama) from prox-book5 to prox-tower
+  - Live migration with only 79ms downtime
+  - 200 GiB disk transferred in ~15 minutes
+  - All services verified operational (Docker, Ollama, Samba, Twingate)
+- Deleted VM 101 (Ubuntu Desktop) from prox-book5, freed 120GB storage
+- Created snapshot "omarchy-baseline" of VM 100 for backup protection
+- Fixed critical time synchronization issue (7-hour difference between nodes)
+- Synchronized repository configuration between nodes (community repos)
+- Installed Docker on prox-tower (Debian package, version 26.1.5)
+- Deployed Twingate connector on prox-tower in privileged Docker container
+- Fixed storage configuration (added local-lvm to /etc/pve/storage.cfg)
+
+**Impact:**
+- ✅ Proxmox cluster operational with quorum and HA capabilities
+- ✅ VM 102 now running on more powerful hardware (32GB RAM vs 16GB)
+- ✅ Better cooling for Ollama workloads on tower vs laptop
+- ✅ prox-book5 freed up - only hosting VM 100 (Omarchy Desktop)
+- ✅ Both nodes accessible via Twingate with secure remote access
+- ✅ Cluster ready for future expansion and service distribution
+
+**Hardware Configuration:**
+
+**prox-book5 (192.168.2.250):**
+- Samsung Galaxy Book5 Pro, 16GB RAM
+- Now hosts: VM 100 (Omarchy Desktop, 8GB RAM)
+- Storage: ZFS RAID0, ~880GB available after VM 101 deletion
+
+**prox-tower (192.168.2.249):**
+- Lenovo ThinkStation 510, 32GB RAM
+- Intel Xeon E5-1620 v4 @ 3.50GHz (4c/8t)
+- NVIDIA Quadro M4000 GPU
+- Now hosts: VM 102 (Ubuntu Server, 6GB RAM, Ollama + Docker services)
+- Storage: LVM-thin, ~365GB available
+
+**Files Modified:**
+- `/etc/pve/storage.cfg` on prox-tower - Added local-lvm storage configuration
+- `/etc/resolv.conf` on prox-tower - Fixed DNS configuration
+- Time configuration on prox-tower - Synced to match prox-book5
+- Repository configs on both nodes - Disabled enterprise, enabled community
+
+**Migration Details:**
+- Migration started: 20:31:14
+- Migration completed: 20:47:08 (15m 54s total)
+- Disk transfer: 200.0 GiB in 15m 6s (100% complete)
+- VM state transfer: 4.2 GiB
+- Downtime during cutover: 79ms
+- Average speed: 210.4 MiB/s
+- Final status: VM 102 running successfully on prox-tower with all 10 Ollama models intact
+
+**Troubleshooting Resolved:**
+- Time sync issue causing Proxmox web UI 401 errors (fixed with timedatectl)
+- DNS resolution failures during Docker install (added fallback DNS)
+- Twingate connector privilege errors (required --privileged flag)
+- Storage not found during migration (manually added to cluster config)
+- Snapshot blocking migration (deleted pre-twingate-setup snapshot)
+
+**Repository Discovery:**
+Your excellent observation about repository mismatch between nodes - prox-book5 had community repos enabled while prox-tower still had enterprise repos. This could have caused package version mismatches and migration issues. Now both nodes use identical repo configuration.
+
+---
 
 ### 2025-12-01 - SSH ProxyJump Configuration for VM Access
 

@@ -209,16 +209,17 @@ Detailed descriptions of all active projects in your workspace.
 
 **Documentation**: See `~/projects/n8nProd/CLAUDE.md`
 
-## Home Lab - cachyos-jade
+## Home Lab - Proxmox Cluster "home-cluster"
 
-**Type**: Linux server infrastructure
-**Status**: Active production server
-**Location**: 192.168.2.250 (local network), accessible via Twingate remotely
-**User**: jaded
-**Last Updated**: November 24, 2025
-**Recent Changes**: Configured Raspberry Pi 2 with 4GB swap (up from 512MB) and SSH key authentication
-**OS**: CachyOS Linux (Arch-based, performance-optimized)
-**Purpose**: Home lab server providing SSH access, file sharing, and personal infrastructure
+**Type**: Proxmox VE cluster infrastructure
+**Status**: Active production cluster (2 nodes)
+**Location**: 192.168.2.x network, accessible via Twingate remotely
+**Last Updated**: December 1, 2025
+**Recent Changes**: Created 2-node Proxmox cluster, migrated VM 102 (Ubuntu Server + Ollama) to prox-tower for better cooling, deleted VM 101, deployed Twingate on tower
+**Nodes**:
+  - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
+  - prox-tower @ 192.168.2.249 (ThinkStation 510, 32GB RAM, Xeon, hosts VM 102)
+**Purpose**: Clustered home lab infrastructure with HA capabilities, hosting development and production services
 
 **Key Services**:
 - **SSH Server** - Remote terminal access (port 22)

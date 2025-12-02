@@ -981,6 +981,103 @@ rsync -avz jaded@192.168.2.250:~/remote/project/ ~/local/project/
 
 ---
 
+## Proxmox Node CLI Setup
+
+**Purpose:** Standard CLI tools and configuration for all Proxmox nodes in the cluster
+
+**When to use:** Setting up a new Proxmox node or standardizing an existing node
+
+### What Gets Installed
+
+**Core Tools:**
+- **tmux** 3.5a - Terminal multiplexer
+- **zsh** 5.9 - Advanced shell (set as default)
+- **Oh My Zsh** - Zsh framework with plugins
+- **Powerlevel10k** - Zsh theme (your custom config)
+- **Neovim** 0.10.4 - Modern vim editor
+- **build-essential + make** - Build tools (gcc, g++, etc.)
+- **Node.js** 20.19.2 + **npm** - Required for Mason LSP servers
+- **deno** 2.5.6 - JavaScript/TypeScript runtime
+- **fzf** 0.60 - Fuzzy finder
+- **zoxide** 0.9.8 - Smarter cd command
+- **Claude Code** 2.0.56 - AI assistant
+
+**Your Configs:**
+- `.zshrc` from ~/projects/zshConfig
+- `.p10k.zsh` Powerlevel10k config
+- Full nvim config from nvimConfig repo
+
+### Installation Commands
+
+**Quick install (all steps):**
+```bash
+# 1. Fix DNS (use Pi-hole at 192.168.2.131)
+echo '# Fixed DNS - use Pi-hole' > /etc/resolv.conf
+echo 'nameserver 192.168.2.131' >> /etc/resolv.conf
+echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
+
+# 2. Install base packages
+apt update
+apt install -y tmux zsh neovim git curl unzip fzf build-essential make
+
+# 3. Install Oh My Zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+# 4. Install Powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
+
+# 5. Install deno, zoxide, and Claude Code
+curl -fsSL https://deno.land/install.sh | sh
+curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+curl -fsSL https://claude.ai/install.sh | bash
+
+# 6. Set zsh as default shell
+chsh -s $(which zsh)
+
+# 7. Copy configs from Mac
+# Run these on your Mac:
+scp ~/projects/zshConfig/zshrc root@<proxmox-ip>:~/.zshrc
+scp ~/projects/zshConfig/p10k.zsh root@<proxmox-ip>:~/.p10k.zsh
+
+# 8. Clone nvim config
+git clone https://github.com/jaded423/nvimConfig.git ~/.config/nvim
+
+# 9. Update PATH
+echo 'export DENO_INSTALL="/root/.deno"' >> ~/.zshrc
+echo 'export PATH="$DENO_INSTALL/bin:$HOME/.local/bin:$PATH"' >> ~/.zshrc
+
+# 10. Create symlinks for immediate access (important!)
+# Tools installed to ~/.local/bin aren't in PATH until shell restart
+# Creating symlinks to /usr/local/bin makes them available immediately
+ln -sf /root/.local/bin/zoxide /usr/local/bin/zoxide
+ln -sf /root/.deno/bin/deno /usr/local/bin/deno
+ln -sf /root/.local/bin/claude /usr/local/bin/claude
+```
+
+**Verify tools are accessible:**
+```bash
+which zoxide deno claude  # Should show /usr/local/bin for all three
+```
+
+**Then logout and log back in to use zsh with all tools.**
+
+### Notes
+
+**DNS Issues:** Proxmox nodes may have Twingate managing `/etc/resolv.conf` with non-working DNS servers (100.95.0.x). Always set Pi-hole (192.168.2.131) as primary DNS before running apt commands.
+
+**PATH Issues:** Tools installed via curl scripts (deno, zoxide, Claude Code) go to `~/.local/bin` which isn't in root's default PATH. The symlinks to `/usr/local/bin` fix this immediately. Without symlinks, tools won't work until you logout/login or start a new zsh shell.
+
+**Claude Code:** Requires browser authentication on first run. SSH into the node from your Mac to authenticate (can't auth from console).
+
+**Nvim Plugins:** First time you open nvim, Lazy.nvim will automatically install all plugins (~1 minute). Mason will auto-install LSP servers (requires Node.js).
+
+### Currently Installed
+
+- ✅ **prox-tower** (192.168.2.249) - Full CLI suite installed Dec 2, 2025
+- ✅ **prox-book5** (192.168.2.250) - Full CLI suite installed Dec 2, 2025
+
+---
+
 ## Maintenance
 
 ### Regular Tasks

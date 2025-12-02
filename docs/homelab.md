@@ -692,15 +692,34 @@ killall hyprpaper && hyprpaper &
 
 ## Google Drive Integration
 
-### rclone FUSE Mounts
+### rclone FUSE Mounts (VM 102)
 
 **Tool:** rclone with VFS caching
 **Mount Type:** FUSE (Filesystem in Userspace)
+**Location:** VM 102 (192.168.2.126)
 
-### First Drive (Personal)
+**Directory Structure:**
+```
+/home/jaded/GoogleDrives/
+├── elevated/           (joshua@elevatedtrading.com)
+│   ├── MyDrive/       ← "My Drive" contents (includes Elevated Vault)
+│   ├── SharedDrives/  ← Team/shared drives (empty placeholder)
+│   └── OtherComputers/ ← Backup & Sync computers (empty placeholder)
+└── jaded/             (jaded423@gmail.com)
+    ├── MyDrive/       ← "My Drive" contents
+    ├── SharedDrives/  ← Team/shared drives (empty placeholder)
+    └── OtherComputers/ ← Backup & Sync computers (empty placeholder)
+
+# Convenience symlinks
+/home/jaded/elevatedDrive → /home/jaded/GoogleDrives/elevated
+/home/jaded/GoogleDrive → /home/jaded/GoogleDrives/jaded
+```
+
+### First Drive (Personal - jaded423@gmail.com)
 
 **Remote Name:** gdrive
-**Mount Point:** `/home/jaded/GoogleDrive/`
+**Mount Point:** `/home/jaded/GoogleDrives/jaded/MyDrive/`
+**Symlink:** `/home/jaded/GoogleDrive/`
 **Service:** `~/.config/systemd/user/rclone-gdrive.service`
 
 **VFS Settings:**
@@ -717,11 +736,13 @@ systemctl --user enable rclone-gdrive.service    # Auto-mount on login
 journalctl --user -u rclone-gdrive.service -f    # View logs
 ```
 
-### Second Drive (Elevated)
+### Second Drive (Work - joshua@elevatedtrading.com)
 
 **Remote Name:** elevated
-**Mount Point:** `/home/jaded/elevatedDrive/`
+**Mount Point:** `/home/jaded/GoogleDrives/elevated/MyDrive/`
+**Symlink:** `/home/jaded/elevatedDrive/`
 **Service:** `~/.config/systemd/user/rclone-elevated.service`
+**Contains:** Elevated Vault (Obsidian workspace)
 
 **VFS Settings:**
 - Cache mode: writes
@@ -737,19 +758,67 @@ systemctl --user enable rclone-elevated.service    # Auto-mount on login
 journalctl --user -u rclone-elevated.service -f    # View logs
 ```
 
+### Proxmox Node Access (SSHFS Mounts)
+
+Both **prox-book5** and **prox-tower** mount the Google Drives from VM 102 via SSHFS:
+
+**Mount Points on Proxmox Nodes:**
+- `/mnt/elevated/` - Work Google Drive (joshua@elevatedtrading.com)
+  - `/mnt/elevated/MyDrive/Elevated Vault/` - Obsidian workspace
+- `/mnt/jaded/` - Personal Google Drive (jaded423@gmail.com)
+
+**Configuration:**
+```bash
+# Both nodes have these mounts in /etc/fstab
+jaded@192.168.2.126:/home/jaded/GoogleDrives/elevated /mnt/elevated fuse.sshfs defaults,allow_other,_netdev,reconnect,IdentityFile=/root/.ssh/id_rsa 0 0
+jaded@192.168.2.126:/home/jaded/GoogleDrives/jaded /mnt/jaded fuse.sshfs defaults,allow_other,_netdev,reconnect,IdentityFile=/root/.ssh/id_rsa 0 0
+```
+
+**SSH Keys:**
+- prox-book5 → VM 102: SSH key already configured
+- prox-tower → VM 102: SSH key configured Dec 2, 2025
+
+**Obsidian.nvim Configuration:**
+Both Proxmox nodes have obsidian.nvim configured to access the Elevated Vault:
+```lua
+-- ~/.config/nvim/lua/plugins/tools/obsidian.lua
+path = "/mnt/elevated/MyDrive/Elevated Vault"
+```
+
 ### Usage
 
-**Access mounted drives:**
+**Access mounted drives (on VM 102):**
 ```bash
-ls ~/GoogleDrive/       # First drive
-ls ~/elevatedDrive/     # Second drive
+# Personal drive
+ls ~/GoogleDrive/MyDrive/              # Browse "My Drive" contents
+ls ~/GoogleDrives/jaded/MyDrive/       # Same, via real path
+
+# Work drive
+ls ~/elevatedDrive/MyDrive/            # Browse "My Drive" contents (includes Elevated Vault)
+ls ~/GoogleDrives/elevated/MyDrive/    # Same, via real path
+
+# Access Obsidian Vault
+cd ~/elevatedDrive/MyDrive/Elevated\ Vault/
 
 # Copy files to either drive
-cp file.txt ~/GoogleDrive/
-cp document.pdf ~/elevatedDrive/
+cp file.txt ~/GoogleDrive/MyDrive/
+cp document.pdf ~/elevatedDrive/MyDrive/
 
 # Edit files directly (changes sync automatically)
-nano ~/GoogleDrive/document.txt
+nano ~/GoogleDrive/MyDrive/document.txt
+```
+
+**Access from Proxmox nodes (prox-book5 or prox-tower):**
+```bash
+# Work drive
+ls /mnt/elevated/MyDrive/              # Browse "My Drive" contents
+ls /mnt/elevated/MyDrive/Elevated\ Vault/  # Access Obsidian workspace
+
+# Personal drive
+ls /mnt/jaded/MyDrive/                 # Browse "My Drive" contents
+
+# Use with neovim/obsidian.nvim
+nvim /mnt/elevated/MyDrive/Elevated\ Vault/  # Opens Obsidian vault
 ```
 
 **rclone Commands:**

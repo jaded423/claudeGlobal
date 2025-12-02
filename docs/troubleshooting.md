@@ -441,6 +441,72 @@ While you could remove Twingate from the Proxmox host or remove its .250 route, 
 - Works with existing Proxmox Twingate setup (may be used for other purposes)
 - More maintainable long-term
 
+### SSH Timeouts When Remote - Missing Twingate Resources
+
+**Problem:** SSH connections to Proxmox hosts (.249, .250) or VMs (.126, .161) timeout when working remotely, but work fine when at home on local network. Ollama server connections fail, gitBackup.sh can't reach servers, ollamaSummary.py fails with "connection timeout."
+
+**Symptoms:**
+- SSH hangs with "Operation timed out" when remote (at work, traveling)
+- Works perfectly when at home on same LAN
+- ProxyJump configuration exists but still times out
+- Automated scripts that worked at home fail when remote
+
+**Cause:**
+When at home, you're on the same LAN (192.168.2.x/24) and can reach all devices directly without Twingate. When remote, you MUST have Twingate resources configured for each Proxmox host you want to access. Even if your ProxyJump is configured correctly, without Twingate resources, your Mac cannot reach the Proxmox hosts to establish the first hop.
+
+**Solution - Configure Twingate Resources:**
+
+**Step 1:** Log into Twingate Admin Console
+```
+https://jaded423.twingate.com
+```
+
+**Step 2:** Create resources for BOTH Proxmox hosts:
+
+**Resource 1: prox-book5**
+- Name: "prox-book5 SSH" (or similar)
+- Address: `192.168.2.250`
+- Ports: `22` (TCP)
+- Assign to: Your user account
+- Connector: Any available connector on your network
+
+**Resource 2: prox-tower**
+- Name: "prox-tower SSH" (or similar)
+- Address: `192.168.2.249`
+- Ports: `22` (TCP)
+- Assign to: Your user account
+- Connector: Any available connector on your network
+
+**Step 3:** Wait 30 seconds for resources to deploy, then test:
+```bash
+# Test direct access to both Proxmox hosts
+ssh root@192.168.2.250 "hostname"  # Should show: prox-book5
+ssh root@192.168.2.249 "hostname"  # Should show: prox-tower
+
+# Test VM access via ProxyJump (should now work)
+ssh jaded@192.168.2.161 "hostname"  # Omarchy Desktop via .250
+ssh jaded@192.168.2.126 "hostname"  # Ubuntu Server via .249
+
+# Test Ollama connection
+ssh 192.168.2.126 "ollama list"     # Should show installed models
+```
+
+**Why This Happens:**
+- **At home:** Direct LAN access, no Twingate needed (192.168.2.x directly reachable)
+- **Remote:** Must route through Twingate to reach home network
+- **ProxyJump alone isn't enough:** SSH config tells how to route, but Twingate resources control what you can reach
+
+**Key Learning:**
+ProxyJump configuration in `~/.ssh/config` defines the routing path (Mac → host → VM), but Twingate resources control what you can access remotely. Both are required:
+- **Twingate resources:** Permission/access to reach Proxmox hosts from remote locations
+- **ProxyJump config:** Routing instructions for how to reach VMs through hosts
+
+**Verification:**
+After adding Twingate resources, your automated scripts should work from anywhere:
+- ✅ `gitBackup.sh` - Can SSH to 192.168.2.126 for git operations
+- ✅ `ollamaSummary.py` - Can reach Ollama server at 192.168.2.126
+- ✅ Manual SSH to all hosts and VMs works remotely
+
 ## Getting Help
 
 If you encounter an issue not covered here:

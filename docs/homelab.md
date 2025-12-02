@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster"
-**Last Updated:** December 1, 2025 (Cluster expansion + VM migration to tower for better performance)
+**Last Updated:** December 2, 2025 (VM 102 resource upgrades + Twingate remote access configuration)
 
 ---
 
@@ -85,9 +85,10 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │   ├── Twingate connector (privileged container)
 │   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
-│   └── VM 102: Ubuntu Server 24.04 @ 192.168.2.126 (6GB RAM, 3 cores, 200GB disk)
+│   └── VM 102: Ubuntu Server 24.04 @ 192.168.2.126 (20GB RAM, 3 cores, 300GB disk, 45GB swap)
 │       ├── UEFI boot, SSH enabled
 │       ├── Migrated from prox-book5 Dec 1, 2025 (live migration, 79ms downtime)
+│       ├── Upgraded Dec 2, 2025: RAM 8GB→20GB, Disk 200GB→300GB, Swap 4GB→45GB for large LLM support
 │       ├── Docker + All Services:
 │       │   ├── Twingate connector (secure remote access)
 │       │   ├── Jellyfin media server (port 8096)
@@ -226,15 +227,30 @@ The home lab now runs as a Type 1 hypervisor with 3 VMs providing isolated servi
 - Public key authentication enabled (work Mac key installed)
 - Password authentication available as fallback
 
+**⚠️ LOCAL vs REMOTE Access:**
+
+**When at home (local network):**
+- Direct access to all IPs (no Twingate needed)
+- ProxyJump still works but not required
+- All scripts and tools work directly
+
+**When remote (work, travel, etc.):**
+- **MUST have Twingate resources configured** for each Proxmox host you want to reach
+- Twingate client must be connected and active
+- If you can't SSH somewhere you could before: check Twingate resources!
+
 **Access from Work Mac:**
 ```bash
-# Proxmox host
+# Proxmox Node 1 (prox-book5)
 ssh root@192.168.2.250
 
-# Omarchy Desktop VM (via automatic ProxyJump)
+# Proxmox Node 2 (prox-tower)
+ssh root@192.168.2.249
+
+# VM 100 - Omarchy Desktop (via automatic ProxyJump through prox-book5)
 ssh jaded@192.168.2.161
 
-# Ubuntu Server VM (via automatic ProxyJump)
+# VM 102 - Ubuntu Server (via automatic ProxyJump through prox-tower)
 ssh jaded@192.168.2.126
 ```
 
@@ -245,6 +261,7 @@ Due to a routing conflict between Twingate running on both the Mac and Proxmox h
 **Solution:** SSH ProxyJump configured in `~/.ssh/config` on work Mac:
 
 ```ssh
+# Proxmox Node 1 - prox-book5
 Host 192.168.2.250
   User root
   AddKeysToAgent yes
@@ -253,7 +270,16 @@ Host 192.168.2.250
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# VM 100 - Omarchy Desktop (auto ProxyJump through Proxmox)
+# Proxmox Node 2 - prox-tower
+Host 192.168.2.249
+  User root
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# VM 100 - Omarchy Desktop (ProxyJump through prox-book5)
 Host 192.168.2.161
   User jaded
   ProxyJump 192.168.2.250
@@ -263,10 +289,10 @@ Host 192.168.2.161
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# VM 102 - Ubuntu Server (auto ProxyJump through Proxmox)
+# VM 102 - Ubuntu Server (ProxyJump through prox-tower)
 Host 192.168.2.126
   User jaded
-  ProxyJump 192.168.2.250
+  ProxyJump 192.168.2.249
   AddKeysToAgent yes
   UseKeychain yes
   IdentityFile ~/.ssh/id_ed25519
@@ -275,10 +301,13 @@ Host 192.168.2.126
 ```
 
 **How it works:**
-- Only 192.168.2.250 (Proxmox host) is configured as a Twingate resource
-- VM access uses ProxyJump: Mac → .250 → .161 (or .126)
-- Automated scripts work without modification (SSH config handles routing)
+- Both Proxmox hosts (.249 and .250) are configured as Twingate resources
+- VM access uses ProxyJump: Mac → host → VM
+  - VM 100: Mac → .250 (prox-book5) → .161
+  - VM 102: Mac → .249 (prox-tower) → .126
+- Automated scripts (gitBackup.sh, ollamaSummary.py) work without modification
 - No Twingate routing conflicts
+- **Critical:** Without Twingate resources configured, remote SSH will timeout!
 
 **Service Management:**
 ```bash

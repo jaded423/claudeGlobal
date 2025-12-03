@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 2, 2025 (QDevice setup, CPU protection, routing fixes)
+**Last Updated:** December 2, 2025 (Intel AMT discovery, MagicMirror kiosk fixes, Pi cleanup)
 
 ---
 
@@ -82,6 +82,7 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │
 ├── NODE 2: prox-tower @ 192.168.2.249 (ThinkStation 510)
 │   ├── Hardware: 32GB RAM, Xeon E5-1620 v4 (4c/8t), NVIDIA Quadro M4000
+│   ├── Intel AMT/vPro: Available but not configured (needs monitor to press Ctrl+P in MEBx)
 │   ├── LVM-thin storage (~365GB available)
 │   ├── Docker installed (version 26.1.5)
 │   ├── Twingate connector (privileged container)
@@ -106,12 +107,12 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
     ├── Pi-hole DNS (network-wide ad blocking)
     ├── Twingate connector (backup)
     ├── Portainer (Docker UI, port 9000)
-    ├── Homarr dashboard (port 7575)
-    ├── MagicMirror kiosk (port 8080, 6x4" touchscreen)
+    ├── MagicMirror kiosk (port 8080, 6x4" touchscreen) ✅ Auto-starts reliably
     │   ├── Weather (Wylie, TX)
     │   ├── Pi system stats (°C)
     │   ├── Server stats via SSH (°C)
-    │   └── Pi-hole query stats
+    │   ├── Pi-hole query stats
+    │   └── Reset script: `~/reset-kiosk.sh`
     └── **Corosync QDevice** (cluster quorum service, port 5403)
         └── Provides 3rd vote for Proxmox cluster quorum
 
@@ -1501,6 +1502,55 @@ cat ~/.config/hypr/hyprpaper.conf
 hyprctl reload
 ```
 
+### Intel AMT / Out-of-Band Management (prox-tower)
+
+**Intel AMT provides remote access even when Proxmox is frozen/crashed:**
+
+**Status:** Available but not yet configured (requires physical monitor)
+
+**To Configure AMT (one-time setup):**
+1. Connect monitor to prox-tower (HDMI or DisplayPort)
+2. Reboot: `ssh root@192.168.2.249 reboot`
+3. Watch for "Press Ctrl+P to enter MEBx" during boot
+4. Press **Ctrl+P** to enter MEBx setup
+5. Default password: `admin` (must change on first login)
+6. Configure:
+   - Activate Network Access
+   - Set static IP (recommended: 192.168.2.248)
+   - Enable Remote KVM
+   - Enable Serial-over-LAN
+7. Save and exit
+
+**After Configuration:**
+- Access via web: `https://192.168.2.248:16993`
+- Use MeshCommander: https://www.meshcommander.com/meshcommander
+- Can remotely power on/off/reboot
+- Can access KVM (keyboard/video/mouse) even when OS is frozen
+- Add AMT IP as Twingate resource for remote access
+
+**MagicMirror Kiosk Reset (Raspberry Pi 2):**
+
+**Quick reset:**
+```bash
+ssh jaded@192.168.2.131 "~/reset-kiosk.sh"
+```
+
+**Manual restart if needed:**
+```bash
+# Kill existing processes
+pkill -f chromium
+pkill -f 'node.*server'
+
+# Restart
+~/kiosk.sh
+```
+
+**Check if running:**
+```bash
+ps aux | grep -E 'chromium|node.*server' | grep -v grep
+curl http://localhost:8080  # Should return HTML
+```
+
 ---
 
 ## Security Considerations
@@ -1558,6 +1608,72 @@ hyprctl reload
 ---
 
 ## Changelog
+
+### 2025-12-02 - Intel AMT Discovery & Raspberry Pi Kiosk Fixes
+
+**Changes:**
+- **Intel AMT/vPro Capability Identified on ThinkStation 510 (prox-tower):**
+  - Confirmed Intel Xeon E5-1620 v4 CPU supports Intel vPro/AMT
+  - Intel Management Engine device (`/dev/mei0`) detected and functional
+  - AMT provides out-of-band management (remote KVM, power control, serial console)
+  - **Status:** Not yet configured - requires physical display access to press Ctrl+P during boot
+  - **Next steps:** Need portable monitor to access MEBx setup during boot
+  - **Future capability:** Once configured, can remotely access/reboot tower even when Proxmox is frozen
+
+- **MagicMirror Kiosk White Screen Issue Fixed (Raspberry Pi 2):**
+  - **Problem:** After reboot, kiosk displayed white screen until manual CLI reset
+  - **Root cause:** Script waited only 5 seconds, but MagicMirror needs ~20 seconds to start
+  - **Solution:** Updated `~/kiosk.sh` with intelligent waiting loop
+    - Checks every second if MagicMirror is ready (up to 30 seconds)
+    - Only launches Chromium after confirming MagicMirror responds on port 8080
+    - Adds 2-second buffer after detection for stability
+  - **Created:** `~/reset-kiosk.sh` - Quick manual reset script for convenience
+  - **Result:** Kiosk now starts reliably on every boot without white screen
+
+- **Homarr Container Removed from Raspberry Pi 2:**
+  - Removed unused Homarr dashboard container and image
+  - **Freed:** 950MB of storage on Pi 2
+  - **Reason:** MagicMirror kiosk preferred, Homarr not needed
+  - **Remaining containers:** Twingate connector, Portainer
+
+**Impact:**
+- ✅ **MagicMirror reliable:** No more white screen on Pi reboot
+- ✅ **950MB freed:** More resources available on resource-constrained Pi 2
+- ✅ **Remote management ready:** prox-tower has AMT hardware, just needs configuration
+- ✅ **Better user experience:** Easy reset script available when needed
+
+**Files Modified:**
+- `~/kiosk.sh` on Pi 2 - Smart waiting loop for MagicMirror startup
+- `~/reset-kiosk.sh` on Pi 2 - New quick reset script (created)
+
+**Technical Details:**
+
+**AMT Discovery Process:**
+- Scanned for Intel MEI device: Found `/dev/mei0`
+- Checked CPU support: Xeon E5-1620 v4 confirmed vPro-capable
+- Identified MEBx access method: Ctrl+P during boot sequence
+- Determined configuration requirement: Physical display needed for initial setup
+
+**Kiosk Fix Implementation:**
+```bash
+# Old behavior: Fixed 5-second wait
+sleep 5
+
+# New behavior: Smart wait loop
+for i in {1..30}; do
+    if curl -s http://localhost:8080 > /dev/null 2>&1; then
+        break  # MagicMirror is ready!
+    fi
+    sleep 1
+done
+```
+
+**What We Learned:**
+- ThinkStation 510 has enterprise-grade remote management built-in (Intel AMT)
+- Startup timing issues need intelligent waiting, not fixed delays
+- Small Pi needs aggressive cleanup of unused services (950MB is significant on 1GB RAM device)
+
+---
 
 ### 2025-12-02 - QDevice Quorum Setup & CPU Protection Implementation
 

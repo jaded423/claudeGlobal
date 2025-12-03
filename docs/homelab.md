@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
-**Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster"
-**Last Updated:** December 2, 2025 (VM 102 resource upgrades + Twingate remote access configuration)
+**Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
+**Last Updated:** December 2, 2025 (QDevice setup, CPU protection, routing fixes)
 
 ---
 

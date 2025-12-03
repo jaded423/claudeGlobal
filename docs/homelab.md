@@ -56,7 +56,9 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 - VM 101 (Ubuntu Desktop) deleted Dec 1 to free space on prox-book5
 - VM 102 migrated from prox-book5 to prox-tower Dec 1 for better cooling/performance
 - Both nodes run Twingate connectors for redundant remote access
-- Quorum: 2/2 nodes, HA-capable for future service distribution
+- **QDevice added Dec 2:** Pi at .131 provides 3rd vote for quorum (2/3 votes required)
+- Quorum: 3 votes (2 nodes + QDevice), HA-capable, survives single node failure
+- **CPU protection:** VMs limited to 75% CPU with automatic watchdog suspension at 90%
 
 ### Architecture Diagram
 
@@ -105,17 +107,21 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
     ├── Twingate connector (backup)
     ├── Portainer (Docker UI, port 9000)
     ├── Homarr dashboard (port 7575)
-    └── MagicMirror kiosk (port 8080, 6x4" touchscreen)
-        ├── Weather (Wylie, TX)
-        ├── Pi system stats (°C)
-        ├── Server stats via SSH (°C)
-        └── Pi-hole query stats
+    ├── MagicMirror kiosk (port 8080, 6x4" touchscreen)
+    │   ├── Weather (Wylie, TX)
+    │   ├── Pi system stats (°C)
+    │   ├── Server stats via SSH (°C)
+    │   └── Pi-hole query stats
+    └── **Corosync QDevice** (cluster quorum service, port 5403)
+        └── Provides 3rd vote for Proxmox cluster quorum
 
 Cluster Details:
 - Name: home-cluster
-- Nodes: 2/2 online (quorum active)
-- HA Capable: Yes (can distribute services across nodes)
+- Nodes: 2/2 online + QDevice (192.168.2.131)
+- Quorum: 3 votes total (2 Proxmox nodes + 1 QDevice), requires 2 for quorum
+- HA Capable: Yes (survives single node failure, can distribute services)
 - Remote Access: Twingate on both prox-tower and VM 102
+- CPU Protection: VMs limited to 75% CPU, watchdog auto-suspends at 90%
 ```
 
 **Future Expansion:**
@@ -1422,6 +1428,51 @@ ollama list
 ollama pull modelname:tag
 ```
 
+### CPU Watchdog Issues
+
+**Check watchdog status:**
+```bash
+# Check if watchdog is running
+systemctl status cpu-watchdog
+
+# View recent watchdog actions
+tail -f /var/log/cpu-watchdog.log
+
+# Check current CPU usage
+top -bn1 | grep "Cpu(s)"
+```
+
+**Watchdog suspended a VM:**
+```bash
+# List all VMs and their status
+qm list
+
+# Resume a suspended VM
+qm resume <VMID>
+
+# Check why it was suspended (high CPU)
+grep "suspending" /var/log/cpu-watchdog.log
+```
+
+**Disable watchdog temporarily:**
+```bash
+# Stop watchdog service
+systemctl stop cpu-watchdog
+
+# Start it again
+systemctl start cpu-watchdog
+```
+
+**Adjust CPU threshold:**
+```bash
+# Edit the script to change threshold from 90%
+nvim /usr/local/bin/cpu-watchdog.sh
+
+# Change CPU_THRESHOLD=90 to desired value
+# Then restart the service
+systemctl restart cpu-watchdog
+```
+
 ### Desktop Environment Issues
 
 **Waybar not appearing:**
@@ -1507,6 +1558,95 @@ hyprctl reload
 ---
 
 ## Changelog
+
+### 2025-12-02 - QDevice Quorum Setup & CPU Protection Implementation
+
+**Changes:**
+- **QDevice Deployment:**
+  - Installed `corosync-qnetd` on Raspberry Pi 2 (192.168.2.131)
+  - Added Pi as third voting member (QDevice) to Proxmox cluster
+  - Cluster quorum upgraded from 2-vote to 3-vote system
+  - Quorum requirement: 2 out of 3 votes (50%+ majority)
+  - Both Proxmox nodes can now reach QDevice on port 5403
+
+- **Critical Routing Fix:**
+  - Diagnosed Twingate routing conflict preventing cluster node communication
+  - Issue: Twingate was routing cluster traffic (192.168.2.249) through sdwan0 VPN interface
+  - Fixed by adding explicit route in `/etc/network/interfaces` on prox-book5
+  - Route forces cluster communication through local vmbr0 interface, not Twingate
+  - One-way communication problem resolved (nodes can now see each other)
+  - Split-brain situation prevented
+
+- **CPU Resource Protection:**
+  - Set CPU limit to 75% on VM 100 (Omarchy Desktop) on prox-book5
+  - Set CPU limit to 75% on VM 102 (Ubuntu Server) on prox-tower
+  - Leaves 25% CPU guaranteed for Proxmox host management
+  - Created CPU watchdog service on both nodes:
+    - Script: `/usr/local/bin/cpu-watchdog.sh`
+    - Service: `/etc/systemd/system/cpu-watchdog.service`
+    - Monitors CPU usage every 5 seconds
+    - Auto-suspends VMs if total CPU exceeds 90%
+    - Logs actions to `/var/log/cpu-watchdog.log`
+  - Both watchdog services enabled and running
+
+**Impact:**
+- ✅ **High Availability Achieved:** Cluster survives single node failure (2/3 votes remain)
+- ✅ **No More Lockups:** CPU limits prevent VMs from starving Proxmox host
+- ✅ **Remote Access Protected:** Guaranteed CPU for SSH/Twingate even under load
+- ✅ **Automatic Recovery:** Watchdog suspends runaway VMs before host freezes
+- ✅ **Cluster Stability:** Nodes communicate reliably over local network
+- ✅ **Persistent Configuration:** Routing fix survives reboots via network interfaces config
+
+**Technical Details:**
+
+**QDevice Setup Process:**
+1. Installed `corosync-qnetd` on Pi (Raspbian Bookworm)
+2. Generated QDevice certificates on Pi
+3. Installed `corosync-qdevice` package on both Proxmox nodes
+4. Exchanged certificates between nodes and QDevice
+5. Configured cluster to use QDevice with `pvecm qdevice setup 192.168.2.131`
+6. Verified quorum with 3 votes active
+
+**Routing Fix:**
+- Problem: `ip route get 192.168.2.249` showed traffic going via `sdwan0` (Twingate)
+- Solution: Added route to `/etc/network/interfaces` inside vmbr0 block:
+  ```
+  up ip route add 192.168.2.249 dev vmbr0 src 192.168.2.250
+  ```
+- Result: Cluster traffic now routes locally, Twingate no longer interferes
+
+**CPU Protection:**
+- VM 100: `qm set 100 -cpulimit 0.75` (max 75% of 4 allocated cores)
+- VM 102: `qm set 102 -cpulimit 0.75` (max 75% of 3 allocated cores)
+- Watchdog threshold: 90% total system CPU
+- Action: Suspend VM (not kill) - can be resumed when load decreases
+
+**Files Created:**
+- `/usr/local/bin/cpu-watchdog.sh` on both nodes
+- `/etc/systemd/system/cpu-watchdog.service` on both nodes
+
+**Files Modified:**
+- `/etc/network/interfaces` on prox-book5 (routing fix)
+- `/etc/pve/corosync.conf` (QDevice configuration)
+- VM configs for 100 and 102 (CPU limits)
+
+**Root Causes Identified:**
+1. **Cluster communication failures:** Twingate routing conflict
+2. **System freezes/reboots:** VMs monopolizing CPU without limits
+3. **2-node quorum issues:** Loss of either node broke cluster
+
+**All Issues Resolved:**
+- QDevice provides quorum tiebreaker
+- Routing fix enables reliable cluster communication
+- CPU protection prevents resource starvation
+
+**What We Learned:**
+- Proxmox cluster networking can conflict with VPN software
+- 2-node clusters need QDevice for true HA
+- CPU limits are essential for VM resource isolation
+- Network interface route priority matters (vmbr0 before sdwan0)
+
+---
 
 ### 2025-12-01 - 2-Node Proxmox Cluster Creation & VM Migration
 

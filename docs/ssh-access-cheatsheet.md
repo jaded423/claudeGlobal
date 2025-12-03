@@ -1,0 +1,301 @@
+# SSH Access Cheat Sheet
+
+Quick reference for accessing all machines in the multi-location network.
+
+**Last Updated:** December 3, 2025
+
+---
+
+## Quick Access Commands
+
+### From Mac (Local or Remote via Twingate)
+
+```bash
+# Proxmox Hosts (direct access)
+ssh root@192.168.2.250      # prox-book5 (Node 1)
+ssh root@192.168.2.249      # prox-tower (Node 2)
+
+# VMs (auto ProxyJump configured)
+ssh jaded@192.168.2.161     # VM 100 - Omarchy Desktop (via prox-book5)
+ssh jaded@192.168.2.126     # VM 102 - Ubuntu Server (via prox-tower)
+
+# Raspberry Pi
+ssh jaded@192.168.2.131     # magic-pihole (Pi-hole, Twingate, MagicMirror)
+
+# Mac (from homelab via Twingate)
+ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
+```
+
+---
+
+## Network Diagram
+
+```
+                        ┌─────────────────────────────────────────┐
+                        │           TWINGATE CLOUD                │
+                        │         (jaded423 network)              │
+                        └───────────────┬─────────────────────────┘
+                                        │
+        ┌───────────────────────────────┼───────────────────────────────┐
+        │                               │                               │
+        ▼                               ▼                               ▼
+┌───────────────┐              ┌───────────────┐              ┌───────────────┐
+│  CONNECTOR 1  │              │  CONNECTOR 2  │              │  CONNECTOR 3  │
+│ prox-book5    │              │ prox-tower    │              │ magic-pihole  │
+│ CT 200 (LXC)  │              │ CT 201 (LXC)  │              │ Docker        │
+│ 192.168.2.246 │              │ (DHCP)        │              │ 192.168.2.131 │
+└───────┬───────┘              └───────┬───────┘              └───────────────┘
+        │                               │
+        ▼                               ▼
+┌───────────────────┐          ┌───────────────────┐
+│ prox-book5        │          │ prox-tower        │
+│ 192.168.2.250     │          │ 192.168.2.249     │
+│ Proxmox Node 1    │          │ Proxmox Node 2    │
+│ User: root        │          │ User: root        │
+├───────────────────┤          ├───────────────────┤
+│ └─ VM 100         │          │ └─ VM 102         │
+│    192.168.2.161  │          │    192.168.2.126  │
+│    Omarchy        │          │    Ubuntu Server  │
+│    User: jaded    │          │    User: jaded    │
+└───────────────────┘          └───────────────────┘
+```
+
+---
+
+## Device Reference Table
+
+| Device | IP | User | Access Method | Services |
+|--------|-----|------|---------------|----------|
+| **prox-book5** | 192.168.2.250 | root | Direct SSH | Proxmox Node 1, CT 200 |
+| **prox-tower** | 192.168.2.249 | root | Direct SSH | Proxmox Node 2, CT 201, VM 102 |
+| **VM 100 (Omarchy)** | 192.168.2.161 | jaded | ProxyJump via .250 | Arch Desktop |
+| **VM 102 (Ubuntu)** | 192.168.2.126 | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin, Samba |
+| **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
+| **Mac** | host.docker.internal | joshuabrown | Twingate resource | Development |
+| **Work PC** | TBD | TBD | Twingate (planned) | RustDesk, Dev |
+
+---
+
+## SSH Config (Mac: ~/.ssh/config)
+
+```ssh-config
+# GitHub
+Host github.com
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+
+# Proxmox Node 1 - prox-book5
+Host 192.168.2.250 prox-book5
+  HostName 192.168.2.250
+  User root
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Proxmox Node 2 - prox-tower  
+Host 192.168.2.249 prox-tower
+  HostName 192.168.2.249
+  User root
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# VM 100 - Omarchy Desktop (ProxyJump through prox-book5)
+Host 192.168.2.161 omarchy vm100
+  HostName 192.168.2.161
+  User jaded
+  ProxyJump 192.168.2.250
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# VM 102 - Ubuntu Server (ProxyJump through prox-tower)
+Host 192.168.2.126 ubuntu-server vm102
+  HostName 192.168.2.126
+  User jaded
+  ProxyJump 192.168.2.249
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Raspberry Pi - magic-pihole
+Host 192.168.2.131 pihole pi
+  HostName 192.168.2.131
+  User jaded
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Mac (via Twingate from homelab)
+Host mac macbook
+  HostName host.docker.internal
+  User joshuabrown
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+---
+
+## Access Scenarios
+
+### Scenario 1: Working from Mac at Home (LAN)
+```bash
+# Direct access to everything on 192.168.2.x
+ssh root@192.168.2.250      # prox-book5
+ssh jaded@192.168.2.126     # Ubuntu Server (ProxyJump auto-applies)
+```
+- Twingate NOT required (same LAN)
+- ProxyJump still routes VM traffic through Proxmox hosts
+
+### Scenario 2: Working from Mac Remotely (Twingate)
+```bash
+# Connect Twingate first, then same commands
+twingate status             # Verify connected
+ssh root@192.168.2.250      # Works via Twingate
+ssh jaded@192.168.2.126     # Works via ProxyJump through Twingate
+```
+- **Requires Twingate resources** for each Proxmox host (.249, .250)
+- VMs accessible via ProxyJump (no separate Twingate resource needed)
+
+### Scenario 3: Working from Homelab to Mac
+```bash
+# From prox-book5 or prox-tower
+ssh joshuabrown@host.docker.internal
+```
+- Requires Twingate connector running on homelab
+- Mac must be a Twingate resource (host.docker.internal)
+
+### Scenario 4: Cross-Node Access (Proxmox to Proxmox)
+```bash
+# From prox-book5 to prox-tower
+ssh root@192.168.2.249
+
+# From prox-tower to prox-book5  
+ssh root@192.168.2.250
+```
+- Direct LAN access (same subnet)
+- No Twingate needed for inter-node communication
+
+---
+
+## Twingate Resources Required
+
+| Resource Name | Address | Ports | Purpose |
+|---------------|---------|-------|---------|
+| prox-book5 SSH | 192.168.2.250 | 22 | SSH to Node 1 + ProxyJump base |
+| prox-tower SSH | 192.168.2.249 | 22 | SSH to Node 2 + ProxyJump base |
+| magic-pihole SSH | 192.168.2.131 | 22 | SSH to Pi |
+| mac-ssh | host.docker.internal | 22 | SSH to Mac from homelab |
+| homeLab Shared | 192.168.2.250 | 139, 445 | Samba file sharing |
+
+**Note:** VMs (.161, .126) do NOT need separate Twingate resources - access them via ProxyJump through the Proxmox hosts.
+
+---
+
+## Troubleshooting
+
+### SSH Timeout to VMs
+```bash
+# Test Proxmox host first
+ssh root@192.168.2.250 "hostname"
+
+# If that works but VM fails, check ProxyJump
+ssh -v jaded@192.168.2.126  # Verbose output
+```
+
+### Twingate Not Connected
+```bash
+# Mac
+twingate status
+twingate connect
+
+# Verify routes exist
+ping 192.168.2.250
+```
+
+### Permission Denied
+```bash
+# Check SSH key is loaded
+ssh-add -l
+
+# Re-add if needed
+ssh-add ~/.ssh/id_ed25519
+```
+
+### ProxyJump Not Working
+```bash
+# Test direct hop first
+ssh root@192.168.2.250 "ssh jaded@192.168.2.126 hostname"
+
+# Check SSH config syntax
+ssh -G 192.168.2.126 | grep -i proxy
+```
+
+---
+
+## Host Aliases (Short Names)
+
+With the SSH config above, you can use short names:
+
+```bash
+ssh prox-book5    # → root@192.168.2.250
+ssh prox-tower    # → root@192.168.2.249
+ssh omarchy       # → jaded@192.168.2.161 (via ProxyJump)
+ssh vm100         # → jaded@192.168.2.161 (via ProxyJump)
+ssh ubuntu-server # → jaded@192.168.2.126 (via ProxyJump)
+ssh vm102         # → jaded@192.168.2.126 (via ProxyJump)
+ssh pihole        # → jaded@192.168.2.131
+ssh pi            # → jaded@192.168.2.131
+ssh mac           # → joshuabrown@host.docker.internal
+```
+
+---
+
+## Future: Work PC Setup
+
+When setting up the Windows PC at work:
+
+1. Install Twingate connector on Work PC
+2. Add Twingate resource for Work PC (RustDesk ports 21115-21119)
+3. Add SSH config entry (if SSH server installed):
+   ```
+   Host work-pc
+     HostName <work-pc-twingate-address>
+     User <username>
+   ```
+4. Access via RustDesk or SSH through Twingate
+
+---
+
+## Quick Copy Commands
+
+**Copy file TO Ubuntu Server:**
+```bash
+scp file.txt jaded@192.168.2.126:~/
+```
+
+**Copy file FROM Ubuntu Server:**
+```bash
+scp jaded@192.168.2.126:~/file.txt ./
+```
+
+**Rsync to Ubuntu Server:**
+```bash
+rsync -avz ./folder/ jaded@192.168.2.126:~/folder/
+```
+
+**Execute remote command:**
+```bash
+ssh jaded@192.168.2.126 "docker ps"
+```

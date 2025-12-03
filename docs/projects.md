@@ -214,8 +214,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: December 2, 2025
-**Recent Changes**: Upgraded VM 102 resources (RAM 8GB→20GB, Disk 200GB→300GB, Swap 4GB→45GB) for large LLM support (tested llama3.1:70b 42GB model). Configured Twingate resources for both Proxmox hosts (.249 and .250) to enable remote access from work - critical for automated scripts (gitBackup.sh, ollamaSummary.py) to function remotely.
+**Last Updated**: December 3, 2025
+**Recent Changes**: Twingate connector architecture overhaul - moved connectors from VMs to dedicated LXC containers (CT 200 on prox-book5, CT 201 on prox-tower) for resilience. Recovered from prox-tower outage. Removed nested Docker-in-VM connector from VM 102.
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 32GB RAM, Xeon, hosts VM 102)

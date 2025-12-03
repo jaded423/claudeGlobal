@@ -13,6 +13,7 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 - **[homelab-multi-site-expansion.md](docs/homelab-multi-site-expansion.md)** - Multi-site Proxmox & CEPH architecture with CompTIA certification roadmap
 - **[sync-project.md](docs/sync-project.md)** - 🔄 Grand synchronization project for Mac ↔ Server docs
 - **[interconnections.md](docs/interconnections.md)** - System dependency map and file movement checklists
+- **[ssh-access-cheatsheet.md](docs/ssh-access-cheatsheet.md)** - Quick reference for SSH access to all machines
 - **[troubleshooting.md](docs/troubleshooting.md)** - Solutions for common issues
 - **[best-practices.md](docs/best-practices.md)** - Documentation and workflow best practices
 - **[multi-ai-system.md](docs/multi-ai-system.md)** - Multi-AI documentation with symlinks
@@ -294,6 +295,7 @@ This is the Obsidian knowledge base stored in Google Drive. No need to search fo
 │   ├── projects.md     # All active projects overview
 │   ├── homelab.md      # Home lab server documentation
 │   ├── interconnections.md  # System dependency map
+- **[ssh-access-cheatsheet.md](docs/ssh-access-cheatsheet.md)** - Quick reference for SSH access to all machines
 │   ├── troubleshooting.md   # Common issues and solutions
 │   └── project-logs/   # Detailed session logs per project
 ├── agents/             # AI agent definitions
@@ -411,6 +413,7 @@ Safety net for file deletion. Move obsolete files here instead of deleting immed
 ## System Interconnections
 
 **⚠️ BEFORE MOVING ANY FILES**, consult **[docs/interconnections.md](docs/interconnections.md)**.
+- **[ssh-access-cheatsheet.md](docs/ssh-access-cheatsheet.md)** - Quick reference for SSH access to all machines
 
 **Critical dependencies to be aware of**:
 - **Symlinks**: `~/.config/nvim`, `~/.zshrc`, `~/.p10k.zsh`, `~/scripts`
@@ -424,6 +427,7 @@ Safety net for file deletion. Move obsolete files here instead of deleting immed
 ```bash
 # What uses this directory/file?
 grep -r "path/to/check" ~/.claude/docs/interconnections.md
+- **[ssh-access-cheatsheet.md](docs/ssh-access-cheatsheet.md)** - Quick reference for SSH access to all machines
 ```
 
 ## Multi-AI Documentation System
@@ -502,4 +506,5 @@ crontab -l  # Check cron jobs
 - [Project Documentation](https://docs.claude.com/en/docs/claude-code/project-docs)
 - **[Detailed Project Info](docs/projects.md)** - All active projects
 - **[System Interconnections](docs/interconnections.md)** - Dependency map
+- **[ssh-access-cheatsheet.md](docs/ssh-access-cheatsheet.md)** - Quick reference for SSH access to all machines
 - **[Troubleshooting Guide](docs/troubleshooting.md)** - Common issues

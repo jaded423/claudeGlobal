@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 2, 2025 (Intel AMT discovery, MagicMirror kiosk fixes, Pi cleanup)
+**Last Updated:** December 3, 2025 (Twingate connector architecture overhaul, prox-tower recovery)
 
 ---
 
@@ -71,7 +71,7 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │   ├── IOMMU/VT-d enabled for GPU passthrough
 │   ├── Lid-close handling (stays running, screen off)
 │   ├── Cluster role: Node 1 (ID: 0x00000001)
-│   │
+│   ├── CT 200: Twingate Connector (LXC) @ 192.168.2.246 - Debian 12, Docker, auto-start ✅
 │   └── VM 100: Omarchy Desktop @ 192.168.2.161 (8GB RAM, 4 cores, 120GB disk)
 │       ├── SeaBIOS boot (legacy BIOS for compatibility)
 │       ├── VirtIO display (accessible via Proxmox web console)
@@ -85,7 +85,7 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │   ├── Intel AMT/vPro: Available but not configured (needs monitor to press Ctrl+P in MEBx)
 │   ├── LVM-thin storage (~365GB available)
 │   ├── Docker installed (version 26.1.5)
-│   ├── Twingate connector (privileged container)
+│   ├── CT 201: Twingate Connector (LXC) - Debian 12, Docker, auto-start ✅
 │   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
 │   └── VM 102: Ubuntu Server 24.04 @ 192.168.2.126 (20GB RAM, 3 cores, 300GB disk, 45GB swap)
@@ -93,7 +93,6 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │       ├── Migrated from prox-book5 Dec 1, 2025 (live migration, 79ms downtime)
 │       ├── Upgraded Dec 2, 2025: RAM 8GB→20GB, Disk 200GB→300GB, Swap 4GB→45GB for large LLM support
 │       ├── Docker + All Services:
-│       │   ├── Twingate connector (secure remote access)
 │       │   ├── Jellyfin media server (port 8096)
 │       │   ├── qBittorrent torrent client (port 8080)
 │       │   ├── ClamAV antivirus (port 3310)
@@ -1608,6 +1607,78 @@ curl http://localhost:8080  # Should return HTML
 ---
 
 ## Changelog
+
+### 2025-12-03 - Twingate Connector Architecture Overhaul & prox-tower Recovery
+
+**Incident Summary:**
+- prox-tower went offline unexpectedly around 09:53 CST
+- Discovered Twingate connector was running inside VM 102 (Docker-in-VM), not on Proxmox host
+- This meant losing prox-tower = losing the "prox-book5 connector" (which was actually on tower's VM)
+- magic-pihole connector was the only working connector keeping remote access alive
+- QDevice quorum setup from previous night saved the cluster from losing quorum
+
+**Root Cause Analysis:**
+- Corosync logs showed prox-tower (node 2) dropped abruptly at 09:53:05
+- "Failed to receive leave message" indicates crash/power loss, not graceful shutdown
+- Pattern repeated multiple times in 24 hours (15:12, 18:55, 09:53)
+- ARP table showed 192.168.2.249 as INCOMPLETE (completely unreachable)
+
+**Architecture Fix - Twingate Connectors moved to LXC:**
+Created dedicated LXC containers on each Proxmox node for Twingate connectors:
+
+| Node | Container | IP | Purpose |
+|------|-----------|-----|---------|
+| prox-book5 | CT 200 (twingate-connector) | 192.168.2.246 | New LXC connector |
+| prox-tower | CT 201 (twingate-tower) | DHCP | New LXC connector |
+| magic-pihole | Docker | 192.168.2.131 | Existing connector (hero of the day) |
+
+**LXC Container Specs (both nodes):**
+- Template: debian-12-standard
+- Memory: 512MB
+- Cores: 1
+- Disk: 4GB
+- Features: nesting=1 (for Docker)
+- Onboot: Yes (auto-starts with Proxmox)
+- Network: Bridge vmbr0, DHCP
+
+**Removed:**
+- Twingate connector from VM 102 (nested Docker container)
+- Eliminated "Russian nesting doll" architecture (container-in-Docker-in-VM)
+
+**Impact:**
+- ✅ **3 resilient connectors** - All on bare metal/LXC, no VM dependencies
+- ✅ **Survives VM migrations** - Connectors stay on node even when VMs move
+- ✅ **Consistent architecture** - Same setup pattern on all nodes
+- ✅ **Lightweight** - ~60MB memory per connector vs full VM overhead
+- ✅ **Auto-recovery** - LXC containers auto-start on node boot
+
+**Lessons Learned:**
+- Always run critical network services (Twingate, Pi-hole) on bare metal or LXC, not inside VMs
+- Having QDevice quorum saved cluster availability during node failure
+- Document where connectors actually run, not where you think they run
+- Redundancy only works if components are truly independent
+
+**Commands Used:**
+```bash
+# Create LXC container
+pct create 200 local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst \
+  --hostname twingate-connector --memory 512 --cores 1 \
+  --rootfs local-zfs:4 --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+  --unprivileged 1 --features nesting=1 --onboot 1 --start 1
+
+# Install Docker in container
+pct exec 200 -- apt-get update && apt-get install -y docker-ce...
+
+# Deploy Twingate
+pct exec 200 -- docker run -d --name twingate-connector \
+  --restart always --network host \
+  -e TWINGATE_NETWORK="jaded423" \
+  -e TWINGATE_ACCESS_TOKEN="..." \
+  -e TWINGATE_REFRESH_TOKEN="..." \
+  twingate/connector:latest
+```
+
+---
 
 ### 2025-12-02 - Intel AMT Discovery & Raspberry Pi Kiosk Fixes
 

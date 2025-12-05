@@ -2,6 +2,45 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## December 5, 2025 - Cross-Machine Conversation History Sync
+
+**Changes:**
+- Merged Claude Code conversation histories from Mac (1,286 conversations) and Server (122 conversations)
+- Removed 127 duplicate conversations, resulting in 1,281 unique conversations sorted chronologically
+- Removed `history.jsonl` from `.gitignore` to enable git tracking
+- Created `claudegit` alias for syncing history before launching Claude Code
+- Updated `.gitignore` on both Mac and Server to track history.jsonl
+- Added Python merge script (`/tmp/merge-history.py`) for future manual history merges
+
+**Impact:**
+- Unified conversation history accessible from any machine
+- No more "which machine did I have that conversation on?" confusion
+- Automatic sync via hourly git backup system
+- `claudegit` command pulls latest history before launching Claude
+
+**Files created:**
+- `/tmp/merge-history.py` - Python script to merge JSONL history files by timestamp
+
+**Files modified:**
+- `~/.claude/.gitignore` (Mac & Server) - Now tracks history.jsonl (commented out line 8)
+- `~/.claude/history.jsonl` (Mac & Server) - Merged and synchronized (1,281 conversations)
+- `~/projects/zshConfig/zshrc` (Mac) - Added `claudegit` alias at line 98
+- `/root/.zshrc` (Server) - Added `claudegit` alias after existing aliases section
+
+**Technical implementation:**
+- History files merged by timestamp using Python script
+- Duplicate detection based on (timestamp, project, display text)
+- Git commit `e90bda7` pushed to `github.com:jaded423/claudeGlobal.git`
+- Server initialized as git repo and pulled from GitHub
+- Alias runs: `cd ~/.claude && git pull && cd - > /dev/null && claude`
+- Hourly backup handles pushing new conversations to GitHub
+
+**Workflow:**
+1. Use Claude on any machine → conversation saved to local history.jsonl
+2. Hourly backup commits and pushes to GitHub
+3. On any other machine: `claudegit` pulls latest history before launching
+4. All machines have access to complete conversation history
+
 ## November 23, 2025 - Grand Synchronization Project Phase 1 Complete
 
 **Changes:**

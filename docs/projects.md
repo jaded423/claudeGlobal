@@ -37,8 +37,8 @@ Detailed descriptions of all active projects in your workspace.
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2025-11-14
-**Recent Changes**: Renamed from dotfilesPrivate for consistency with camelCase naming convention
+**Last Updated**: 2025-12-05
+**Recent Changes**: Added `claudegit` alias for syncing Claude conversation history before launching
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`
 **Purpose**: Shell configuration with split-file security model
@@ -115,6 +115,8 @@ Detailed descriptions of all active projects in your workspace.
 
 **Type**: Claude Code global configuration
 **Status**: Active critical infrastructure
+**Last Updated**: 2025-12-05
+**Recent Changes**: Enabled conversation history syncing across machines with `claudegit` alias
 **Location**: `~/projects/.claude`
 **Symlinked to**: `~/.claude`
 **Purpose**: Global configuration for Claude Code across all projects
@@ -126,6 +128,7 @@ Detailed descriptions of all active projects in your workspace.
 - Detailed docs: projects.md, interconnections.md, troubleshooting.md, project-logs/
 - Global settings and permissions configuration
 - **Automated backup**: Hourly via launchd (as of 2025-11-05)
+- **Cross-machine history sync**: `history.jsonl` now tracked in git (as of 2025-12-05)
 
 **Critical Functionality**:
 - `/log` command - Autonomous documentation of Claude's session changes (no auto-commit)
@@ -133,12 +136,14 @@ Detailed descriptions of all active projects in your workspace.
 - `/compact` command - Archive and compress documentation
 - Cross-project awareness via docs/projects.md
 - Hourly backup with AI-generated commit messages via Claude Haiku
+- `claudegit` alias - Syncs conversation history before launching Claude
 
 **Version Control**:
 - Repository: `github.com/jaded423/claudeGlobal` (private)
 - Symlink approach: Zero disruption to Claude Code functionality
+- Now tracks: `history.jsonl` for cross-machine conversation sync (1,281 conversations)
 - Excludes session data: debug/, file-history/, todos/, projects/
-- Tracks: documentation, commands, agents, skills, settings
+- Tracks: documentation, commands, agents, skills, settings, conversation history
 
 **Documentation**: See `~/projects/.claude/CLAUDE.md`
 

@@ -81,7 +81,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-12-06
-**Recent Changes:** Implemented hybrid AI model approach - gemma2:2b for small diffs, Claude API for large diffs (v2.5.0)
+**Recent Changes:** Troubleshot timeout issues, created solution documentation for complexity-based model selection and Twingate service account setup
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

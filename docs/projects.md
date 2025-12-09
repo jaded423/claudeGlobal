@@ -81,7 +81,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-12-09
-**Recent Changes:** Added claudeHistory repository to hourly automated backup system (now backing up 14 repos)
+**Recent Changes:** Major performance optimization - backup time reduced 84% (22.6 min → 3.7 min)
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -90,13 +90,14 @@ Detailed descriptions of all active projects in your workspace.
 **Purpose**: Centralized automation scripts for backups and notifications
 
 **Key Features**:
-- Dotfiles backup system (backs up 11 repos hourly)
-- **Hybrid AI commit messages** - Optimized for speed and quality:
-  - Small/medium diffs (<100 lines): gemma2:2b local model (75-145s, free)
-  - Large diffs (≥100 lines): Claude Sonnet 4 API (<10s, paid)
-- **Optimized server checks** - Only pings home lab when there are changes to commit
+- Dotfiles backup system (backs up 14 repos hourly)
+- **AI commit messages** - Single-model approach (v3.1):
+  - Model: qwen2.5-coder:7b (code-specialized, local Ollama)
+  - Condensed summaries for diffs >50 lines (was 150)
+  - Claude History repo uses instant file-count commits (no AI)
+  - Timing metadata in commit messages for performance tracking
+  - Backup time: ~3.7 minutes for all 14 repos
 - Smart diff parsing for large commits
-- Automatic Ollama cleanup after commit generation
 - Gmail OAuth email sender (shared credentials with odooReports)
 - Email reminder system (AppleScript + Python)
 - **Automated backup**: Self-backed-up hourly via launchd

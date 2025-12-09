@@ -5,7 +5,7 @@ session-env/
 shell-snapshots/
 todos/
 projects/
-# history.jsonl  # Now tracked for cross-machine sync
+history.jsonl  # Now in dedicated claudeHistory repo
 statsig/
 
 # Local settings overrides

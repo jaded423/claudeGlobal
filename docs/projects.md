@@ -37,8 +37,8 @@ Detailed descriptions of all active projects in your workspace.
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2025-12-05
-**Recent Changes**: Added `claudegit` alias for syncing Claude conversation history before launching
+**Last Updated**: 2025-12-09
+**Recent Changes**: Replaced `claudegit` alias with `claude()` wrapper function - now typing `claude` automatically syncs global config and conversation history before launch
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`
 **Purpose**: Shell configuration with split-file security model
@@ -80,8 +80,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-06
-**Recent Changes:** Troubleshot timeout issues, created solution documentation for complexity-based model selection and Twingate service account setup
+**Last Updated:** 2025-12-09
+**Recent Changes:** Added claudeHistory repository to hourly automated backup system (now backing up 14 repos)
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -111,13 +111,10 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/scripts/CLAUDE.md`
 
 ## claudeGlobal
-**Last Updated:** 2025-11-06
-**Recent Changes:** Removed auto-commit from /log command to reduce commit frequency and improve AI-generated commit messages
-
 **Type**: Claude Code global configuration
 **Status**: Active critical infrastructure
-**Last Updated**: 2025-12-05
-**Recent Changes**: Enabled conversation history syncing across machines with `claudegit` alias
+**Last Updated**: 2025-12-09
+**Recent Changes**: Separated conversation history into dedicated claudeHistory repo, main repo now config-only (removed history.jsonl from tracking)
 **Location**: `~/projects/.claude`
 **Symlinked to**: `~/.claude`
 **Purpose**: Global configuration for Claude Code across all projects
@@ -129,7 +126,31 @@ Detailed descriptions of all active projects in your workspace.
 - Detailed docs: projects.md, interconnections.md, troubleshooting.md, project-logs/
 - Global settings and permissions configuration
 - **Automated backup**: Hourly via launchd (as of 2025-11-05)
-- **Cross-machine history sync**: `history.jsonl` now tracked in git (as of 2025-12-05)
+- **Conversation history**: Now in dedicated claudeHistory repo (as of 2025-12-09)
+
+## claudeHistory
+**Type**: Claude Code conversation history
+**Status**: Active critical infrastructure
+**Last Updated**: 2025-12-09
+**Recent Changes**: Created dedicated repository for complete conversation history sync
+**Location**: `~/projects/claudeHistory`
+**Symlinked from**: `~/.claude/history.jsonl` and `~/.claude/projects/`
+**Purpose**: Single source of truth for Claude Code conversations across all machines
+
+**Key Features**:
+- Complete conversation history: 1,312 conversations, 757 session files (97 MB)
+- Automatically syncs via `claude` command wrapper function
+- Works with hourly automated backup system
+- Keeps main .claude repo lean (config only)
+- Multi-AI documentation (GEMINI.md, AGENTS.md symlinks)
+
+**How It Works**:
+- `~/.claude/history.jsonl` → symlink to `~/projects/claudeHistory/history.jsonl`
+- `~/.claude/projects/` → symlink to `~/projects/claudeHistory/projects/`
+- Typing `claude` automatically pulls latest from both .claude and claudeHistory repos
+- Ensures you can access any conversation from any machine
+
+**Documentation**: See `~/projects/claudeHistory/CLAUDE.md`
 
 **Critical Functionality**:
 - `/log` command - Autonomous documentation of Claude's session changes (no auto-commit)

@@ -80,8 +80,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-09
-**Recent Changes:** Added `serverMonitor.sh` - real-time TUI dashboard for remote Ollama server monitoring
+**Last Updated:** 2025-12-10
+**Recent Changes:** Upgraded to phi4.16k (14B model) for higher quality commit messages - VM 102 now has 6 cores, 40GB RAM
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -91,20 +91,20 @@ Detailed descriptions of all active projects in your workspace.
 
 **Key Features**:
 - Dotfiles backup system (backs up 14 repos hourly)
-- **AI commit messages** - Single-model approach (v3.1):
-  - Model: qwen2.5-coder:7b (code-specialized, local Ollama)
-  - Condensed summaries for diffs >50 lines (was 150)
+- **AI commit messages** - Single-model approach (v3.2):
+  - Model: phi4.16k (phi4:14b with 16K context, local Ollama)
+  - Pre-loaded with 60m keepalive (73ms load time vs 20s cold)
+  - Condensed summaries for diffs >50 lines
   - Claude History repo uses instant file-count commits (no AI)
-  - Timing metadata in commit messages for performance tracking
-  - Backup time: ~3.7 minutes for all 14 repos
+  - Commit time: ~40s per commit (higher quality than 7B)
 - Smart diff parsing for large commits
 - Gmail OAuth email sender (shared credentials with odooReports)
 - Email reminder system (AppleScript + Python)
 - **Automated backup**: Self-backed-up hourly via launchd
 
 **Critical Scripts**:
-- `gitBackup.sh` - Hourly backup of 11 git repositories
-- `ollamaSummary.py` - Free Ollama-powered commit generator with Claude API fallback
+- `gitBackup.sh` - Hourly backup of 14 git repositories
+- `ollamaSummary.py` - Ollama-powered commit generator (phi4.16k)
 - `send_gmail_oauth.py` - Reusable Gmail API email sender
 - `email-reminder.scpt` - AppleScript for Gmail notifications
 - `gmail-reminder.py` - Python script for Gmail API queries

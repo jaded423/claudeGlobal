@@ -1615,6 +1615,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-10 | Created phi4.16k custom Ollama model (14B @ 16K ctx), pre-loaded for commits |
 | 2025-12-09 | VM 102 resource upgrade: RAM 20→40GB, cores 3→6, swap 44→20GB |
 | 2025-12-03 | Twingate connector architecture overhaul - moved to LXC containers |
 | 2025-12-02 | Intel AMT discovery on prox-tower, QDevice quorum setup |

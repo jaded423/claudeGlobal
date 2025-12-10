@@ -81,7 +81,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-12-09
-**Recent Changes:** Major performance optimization - backup time reduced 84% (22.6 min → 3.7 min)
+**Recent Changes:** Added `serverMonitor.sh` - real-time TUI dashboard for remote Ollama server monitoring
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -242,11 +242,11 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: December 3, 2025
-**Recent Changes**: Twingate connector architecture overhaul - moved connectors from VMs to dedicated LXC containers (CT 200 on prox-book5, CT 201 on prox-tower) for resilience. Recovered from prox-tower outage. Removed nested Docker-in-VM connector from VM 102.
+**Last Updated**: 2025-12-09
+**Recent Changes**: Upgraded VM 102 (ubuntu-server) resources - RAM 20GB→40GB, CPU cores 3→6, removed cpulimit, resized swap 44GB→20GB. Host now has 78GB RAM after hardware upgrade.
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
-  - prox-tower @ 192.168.2.249 (ThinkStation 510, 32GB RAM, Xeon, hosts VM 102)
+  - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-1620 v4, hosts VM 102)
 **Purpose**: Clustered home lab infrastructure with HA capabilities, hosting development and production services
 
 **Key Services**:

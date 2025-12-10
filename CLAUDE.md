@@ -228,6 +228,46 @@ After you run these, I can verify the installation with `systemctl status preven
 
 **Rationale**: Attempting sudo commands wastes time and tokens. The command fails, error is returned, then Claude has to reproduce the same instructions asking the user to run it. Skip the failure - always ask first when sudo is needed for modifications.
 
+## 📺 Persistent tmux Session for Transparency
+
+**Use a persistent tmux session called `claude` for all system-changing operations**
+
+This gives the user visibility into what Claude is doing while avoiding overhead for quick read-only commands.
+
+**Pattern:**
+```bash
+# Ensure session exists (create if needed, reuse if exists)
+tmux has-session -t claude 2>/dev/null || tmux new-session -d -s claude
+
+# Run system-changing commands in the session
+tmux send-keys -t claude "command-here" Enter
+```
+
+**Use the `claude` tmux session for:**
+- ✅ Installing/uninstalling packages (`pip install`, `brew install`)
+- ✅ Editing system files
+- ✅ Git operations (`git commit`, `git push`)
+- ✅ File deletions/moves
+- ✅ Copying large files
+- ✅ Running builds/compilations
+- ✅ **Any operation that CHANGES the system**
+
+**Skip tmux for quick read-only operations:**
+- ❌ Reading files (`cat`, `grep`, `ls`)
+- ❌ Checking status (`git status`, `systemctl status`)
+- ❌ Quick lookups and verifications
+
+**User can attach anytime:**
+- Via iTerm integration: `tClaude` (alias)
+- Standard tmux: `tmux attach -t claude`
+
+**Benefits:**
+- 🎯 User can monitor all important operations in real-time
+- 🚀 No session creation/deletion overhead
+- 🔄 One persistent session always ready
+- 🧹 No session clutter
+- 💡 Transparent operations build trust
+
 **Lean CLAUDE.md Structure for `/init`**: When creating project documentation with `/init`, **ALWAYS use the lean structure pattern**:
 
 **Main CLAUDE.md (100-150 lines)**:

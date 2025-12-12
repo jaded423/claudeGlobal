@@ -62,12 +62,13 @@ Detailed descriptions of all active projects in your workspace.
 **Location**: `~/projects/odooReports`
 **Purpose**: Automated reporting for Elevated Trading
 **Last Updated**: 2025-12-12
-**Recent Changes**: Fixed Labels report - restored missing cron job, fixed /Users/joshuabrown paths, rewrote backup logic with dated filenames and automatic archival to backups folder
+**Recent Changes**: Added new Manufacturing Report - weekly production tracking with SKU, pricing, and profit margin analysis (Profit/Unit, Margin %, Total Profit). Runs Mondays 6 AM, emails to cynthia, shannon, joshua.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
 - **Labels Report**: Stock inventory tracking (Excel) - daily 9 AM weekdays
 - **Last Order Report**: Customer order history for 16 key accounts (PDF + Excel) - Fridays 6 AM
+- **Manufacturing Report**: Weekly production with profit analysis (Excel) - Mondays 6 AM
 
 **Key Features**:
 - Gmail OAuth integration for email delivery

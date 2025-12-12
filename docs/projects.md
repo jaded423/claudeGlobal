@@ -62,7 +62,7 @@ Detailed descriptions of all active projects in your workspace.
 **Location**: `~/projects/odooReports`
 **Purpose**: Automated reporting for Elevated Trading
 **Last Updated**: 2025-12-12
-**Recent Changes**: Added lastOrder report - weekly customer order history tracking with PDF/Excel output, color-coded status, Fridays 6 AM to joshua/cynthia/shannon
+**Recent Changes**: Fixed Labels report - restored missing cron job, fixed /Users/joshuabrown paths, rewrote backup logic with dated filenames and automatic archival to backups folder
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays

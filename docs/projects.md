@@ -242,11 +242,11 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-09
-**Recent Changes**: Upgraded VM 102 (ubuntu-server) resources - RAM 20GB→40GB, CPU cores 3→6, removed cpulimit, resized swap 44GB→20GB. Host now has 78GB RAM after hardware upgrade.
+**Last Updated**: 2025-12-12
+**Recent Changes**: Major rebuild - converted prox-tower storage from LVM to ZFS, rebuilt VM 101 (ubuntu-server) with 40GB RAM/6 cores, restored all services including 9 ollama models and 4 Docker containers (open-webui, jellyfin, qbittorrent, clamav)
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
-  - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-1620 v4, hosts VM 102)
+  - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-1620 v4, ZFS storage, hosts CT 201 + VM 101)
 **Purpose**: Clustered home lab infrastructure with HA capabilities, hosting development and production services
 
 **Key Services**:

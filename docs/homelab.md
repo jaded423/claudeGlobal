@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 9, 2025 (VM 102 resource upgrade, changelog compacted)
+**Last Updated:** December 12, 2025 (prox-tower storage conversion & VM 101 rebuild)
 
 ---
 
@@ -47,7 +47,8 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 | **├─ prox-book5 (node 1)** | 192.168.2.250 | Samsung Galaxy Book5 Pro, 16GB RAM | 50-100W | ✅ Active |
 | **│  └─ VM 100: Omarchy** | 192.168.2.161 | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
 | **└─ prox-tower (node 2)** | 192.168.2.249 | ThinkStation 510, 32GB RAM, Xeon E5-1620 | 50-80W | ✅ Active |
-|    **└─ VM 102: Ubuntu Server** | 192.168.2.126 | Ubuntu 24.04 Server (all services) | - | ✅ Auto-start |
+|    **├─ CT 201: Twingate Connector** | (LXC) | Debian 12, Docker, Twingate | - | ✅ Auto-start |
+|    **└─ VM 101: Ubuntu Server** | 192.168.2.126 | Ubuntu 24.04 Server (all services) | - | ✅ Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, Twingate backup, MagicMirror kiosk | 3-4W | ✅ Active |
 
 **Total Power:** ~105-185W (~$15-28/month electricity)
@@ -83,23 +84,21 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 ├── NODE 2: prox-tower @ 192.168.2.249 (ThinkStation 510)
 │   ├── Hardware: 32GB RAM, Xeon E5-1620 v4 (4c/8t), NVIDIA Quadro M4000
 │   ├── Intel AMT/vPro: Available but not configured (needs monitor to press Ctrl+P in MEBx)
-│   ├── LVM-thin storage (~365GB available)
-│   ├── Docker installed (version 26.1.5)
+│   ├── ZFS storage (rpool-tower, ~370GB available) - converted from LVM Dec 12, 2025
 │   ├── CT 201: Twingate Connector (LXC) - Debian 12, Docker, auto-start ✅
 │   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
-│   └── VM 102: Ubuntu Server 24.04 @ 192.168.2.126 (20GB RAM, 3 cores, 300GB disk, 45GB swap)
+│   └── VM 101: Ubuntu Server 24.04 @ 192.168.2.126 (40GB RAM, 6 cores, 300GB disk)
 │       ├── UEFI boot, SSH enabled
-│       ├── Migrated from prox-book5 Dec 1, 2025 (live migration, 79ms downtime)
-│       ├── Upgraded Dec 2, 2025: RAM 8GB→20GB, Disk 200GB→300GB, Swap 4GB→45GB for large LLM support
+│       ├── Rebuilt Dec 12, 2025 (fresh install after storage conversion)
 │       ├── Docker + All Services:
 │       │   ├── Jellyfin media server (port 8096)
 │       │   ├── qBittorrent torrent client (port 8080)
 │       │   ├── ClamAV antivirus (port 3310)
 │       │   ├── Open WebUI (Ollama interface, port 3000)
-│       │   └── Ollama with 10 LLMs (port 11434, ~47GB models)
-│       ├── Samba file sharing (ports 445, 139) with Google Drive access ✅
-│       ├── rclone + Google Drive mounts (2 accounts, auto-mount on boot) ✅
+│       │   └── Ollama with 9 LLMs (port 11434)
+│       ├── oh-my-zsh + powerlevel10k theme
+│       ├── Configs restored: .zshrc, .p10k.zsh, nvim, rclone
 │       └── Auto-starts on boot ✅
 │
 └── Raspberry Pi 2 @ 192.168.2.131
@@ -1615,6 +1614,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-12 | **Major rebuild:** prox-tower LVM→ZFS conversion, VM 101 fresh Ubuntu Server (40GB RAM, 6 cores), 9 ollama models, 4 Docker containers |
 | 2025-12-10 | Created phi4.16k custom Ollama model (14B @ 16K ctx), pre-loaded for commits |
 | 2025-12-09 | VM 102 resource upgrade: RAM 20→40GB, cores 3→6, swap 44→20GB |
 | 2025-12-03 | Twingate connector architecture overhaul - moved to LXC containers |
@@ -1622,6 +1622,37 @@ curl http://localhost:8080  # Should return HTML
 | 2025-12-01 | 2-node Proxmox cluster creation, VM migration to prox-tower |
 | 2025-11-29 | Migrated from bare-metal CachyOS to Proxmox VE |
 | 2025-11-28 | Personal router setup (192.168.2.x subnet) |
+
+### 2025-12-12 - prox-tower Storage Conversion & VM 101 Rebuild
+
+**Changes:**
+- Converted prox-tower storage from LVM-thin to ZFS (rpool-tower, ~370GB)
+- Recreated CT 201 (twingate-tower) LXC container with Twingate connector
+- Built new VM 101 (ubuntu-server) replacing VM 102:
+  - Ubuntu Server 24.04 @ 192.168.2.126
+  - 40GB RAM, 6 cores, 300GB disk
+  - UEFI boot with auto-start enabled
+- Installed Docker with 4 containers:
+  - open-webui (port 3000) - Ollama web interface
+  - jellyfin (port 8096) - media server
+  - qbittorrent (port 8080) - torrent client
+  - clamav - antivirus scanner
+- Installed ollama with 9 models:
+  - phi4:14b, llama3.2:3b, qwen2.5-coder:7b (priority 1-2)
+  - deepseek-coder:6.7b, qwen2.5:7b, qwen3:14b, phi3.5:3.8b
+  - gemma2:2b, llama3.2:1b (lightweight)
+- Restored configs from backup: .zshrc, .p10k.zsh, nvim, rclone
+- Installed oh-my-zsh + powerlevel10k theme
+- Created media folder structure: ~/media/{Movies,TV Shows,Music,Photos}
+- Configured passwordless sudo for jaded user
+
+**Impact:**
+- ZFS storage provides better snapshots and data integrity
+- VM 101 has more resources than previous VM 102 (40GB vs 20GB RAM, 6 vs 3 cores)
+- All services restored and running
+- Twingate connector online for remote access
+
+**Note:** Docker volume backups from old VM were corrupted; containers set up fresh
 
 ---
 

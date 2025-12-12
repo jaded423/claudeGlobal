@@ -84,8 +84,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-11
-**Recent Changes:** Removed system health checks - cleaner code, no unnecessary SSH connections when no backups occur
+**Last Updated:** 2025-12-12
+**Recent Changes:** Added Claude Sonnet API fallback (v3.3.0) - when Ollama server is unreachable, falls back to Claude API with full diff for better commit messages
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -95,12 +95,13 @@ Detailed descriptions of all active projects in your workspace.
 
 **Key Features**:
 - Dotfiles backup system (backs up 14 repos hourly)
-- **AI commit messages** - Single-model approach (v3.2):
-  - Model: phi4.16k (phi4:14b with 16K context, local Ollama)
+- **AI commit messages** - Hybrid approach (v3.3.0):
+  - Primary: phi4.16k (phi4:14b with 16K context, local Ollama)
+  - Fallback: Claude Sonnet API (200K context, full diff for better results)
   - Pre-loaded with 60m keepalive (73ms load time vs 20s cold)
-  - Condensed summaries for diffs >50 lines
+  - Condensed summaries for diffs >50 lines (Ollama only)
   - Claude History repo uses instant file-count commits (no AI)
-  - Commit time: ~40s per commit (higher quality than 7B)
+  - Commit time: ~40s Ollama, ~7s Claude API
 - Smart diff parsing for large commits
 - Gmail OAuth email sender (shared credentials with odooReports)
 - Email reminder system (AppleScript + Python)

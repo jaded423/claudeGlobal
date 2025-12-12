@@ -60,22 +60,26 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Python automation system
 **Status**: Active business automation
 **Location**: `~/projects/odooReports`
-**Purpose**: Automated daily reporting for Elevated Trading
-**Last Updated**: 2025-11-05
-**Recent Changes**: Refactored credentials management for improved security - removed plaintext API key from crontab, created centralized odoo_credentials.json file
+**Purpose**: Automated reporting for Elevated Trading
+**Last Updated**: 2025-12-12
+**Recent Changes**: Added lastOrder report - weekly customer order history tracking with PDF/Excel output, color-coded status, Fridays 6 AM to joshua/cynthia/shannon
+
+**Reports**:
+- **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
+- **Labels Report**: Stock inventory tracking (Excel) - daily 9 AM weekdays
+- **Last Order Report**: Customer order history for 16 key accounts (PDF + Excel) - Fridays 6 AM
 
 **Key Features**:
-- AR/AP Report: Accounts Receivable/Payable aging (PDF + Excel)
-- Labels Report: Stock inventory tracking (Excel)
 - Gmail OAuth integration for email delivery
-- **Automated execution**: Daily at 9:00 AM weekdays via cron
+- Professional PDF reports with company branding
+- Color-coded status indicators (green/yellow/red)
+- **Automated execution**: Via cron
 - **Secure credentials**: Centralized in gitignored odoo_credentials.json file
 
 **Critical Dependencies**:
 - Python 3.13
-- OAuth credentials in AR_AP/ directory (shared with backup system)
-- Odoo credentials in `odoo_credentials.json` (gitignored, NOT in crontab)
-- Google Drive sync for report output
+- OAuth credentials in AR_AP/ directory (shared across reports)
+- Odoo credentials in `odoo_credentials.json` (gitignored)
 
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 

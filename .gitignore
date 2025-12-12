@@ -19,3 +19,4 @@ settings.local.json
 
 # OS files
 .DS_Store
+.update.lock

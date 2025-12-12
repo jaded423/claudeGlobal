@@ -62,12 +62,15 @@ Detailed descriptions of all active projects in your workspace.
 **Location**: `~/projects/odooReports`
 **Purpose**: Automated reporting for Elevated Trading
 **Last Updated**: 2025-12-12
-**Recent Changes**: Added new Manufacturing Report - weekly production tracking with SKU, pricing, and profit margin analysis (Profit/Unit, Margin %, Total Profit). Runs Mondays 6 AM, emails to cynthia, shannon, joshua.
+**Recent Changes**: Added sales rep-specific Last Order reports for Brad Bush and Joe Gibson. Each report finds all customers assigned to the rep, filters to 365-day active customers, separates paying vs sample-only customers, and emails PDF/Excel summaries.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
 - **Labels Report**: Stock inventory tracking (Excel) - daily 9 AM weekdays
-- **Last Order Report**: Customer order history for 16 key accounts (PDF + Excel) - Fridays 6 AM
+- **Last Order Reports**: Customer order history (PDF + Excel) - Fridays 6 AM
+  - Justin's: 16 named key accounts → joshua, cynthia, shannon
+  - Brad's: All Brad Bush customers (78 paying, 21 sample) → joshua, brad
+  - Joe's: All Joe Gibson customers (65 paying, 20 sample) → joshua, joe
 - **Manufacturing Report**: Weekly production with profit analysis (Excel) - Mondays 6 AM
 
 **Key Features**:

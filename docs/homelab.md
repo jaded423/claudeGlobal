@@ -94,9 +94,11 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │       ├── Docker + All Services:
 │       │   ├── Jellyfin media server (port 8096)
 │       │   ├── qBittorrent torrent client (port 8080)
-│       │   ├── ClamAV antivirus (port 3310)
+│       │   ├── ClamAV antivirus (scans downloads automatically)
 │       │   ├── Open WebUI (Ollama interface, port 3000)
 │       │   └── Ollama with 9 LLMs (port 11434)
+│       ├── Media Pipeline: qBit downloads → ClamAV scan → auto-sort to Jellyfin
+│       │   └── scan-and-move.sh (cron every 10min) → Movies/TV Shows/Music
 │       ├── oh-my-zsh + powerlevel10k theme
 │       ├── Configs restored: .zshrc, .p10k.zsh, nvim, rclone
 │       └── Auto-starts on boot ✅
@@ -1614,6 +1616,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-12 | **Media pipeline:** qBit→ClamAV→Jellyfin automation, scan-and-move script, expanded VM storage 100GB→297GB |
 | 2025-12-12 | **Major rebuild:** prox-tower LVM→ZFS conversion, VM 101 fresh Ubuntu Server (40GB RAM, 6 cores), 9 ollama models, 4 Docker containers |
 | 2025-12-10 | Created phi4.16k custom Ollama model (14B @ 16K ctx), pre-loaded for commits |
 | 2025-12-09 | VM 102 resource upgrade: RAM 20→40GB, cores 3→6, swap 44→20GB |
@@ -1622,6 +1625,33 @@ curl http://localhost:8080  # Should return HTML
 | 2025-12-01 | 2-node Proxmox cluster creation, VM migration to prox-tower |
 | 2025-11-29 | Migrated from bare-metal CachyOS to Proxmox VE |
 | 2025-11-28 | Personal router setup (192.168.2.x subnet) |
+
+### 2025-12-12 - Media Pipeline Setup & Storage Expansion
+
+**Changes:**
+- Set up automated media scanning pipeline: qBittorrent → ClamAV → Jellyfin
+- Recreated containers with proper volume mounts:
+  - qBittorrent: Added `/media` mount for direct media folder access
+  - ClamAV: Added `/scan/downloads` and `/scan/media` mounts
+- Created `/home/jaded/scripts/scan-and-move.sh`:
+  - Scans completed downloads with ClamAV (via `docker exec clamdscan`)
+  - Auto-sorts into Movies, TV Shows, or Music based on filename patterns
+  - Quarantines infected files to `/home/jaded/quarantine/`
+  - Detection: S01E01/1x01 → TV Shows, .mp3/.flac → Music, else → Movies
+- Set up cron job: `*/10 * * * *` runs scan-and-move every 10 minutes
+- Expanded Ubuntu VM LVM storage from 100GB → 297GB (full disk allocation)
+- Explained ZFS refreservation (thick provisioning) vs actual data usage
+
+**Files created:**
+- `/home/jaded/scripts/scan-and-move.sh` - Media scanning and sorting script
+- `/home/jaded/scripts/scan.log` - Scan activity log
+
+**Impact:**
+- Downloads automatically scanned for viruses before reaching Jellyfin
+- Media auto-sorted into correct folders (Movies/TV Shows/Music)
+- VM now has 204GB free (was 30GB) - room for large media downloads
+
+---
 
 ### 2025-12-12 - prox-tower Storage Conversion & VM 101 Rebuild
 

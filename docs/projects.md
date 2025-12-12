@@ -243,7 +243,7 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
 **Last Updated**: 2025-12-12
-**Recent Changes**: Major rebuild - converted prox-tower storage from LVM to ZFS, rebuilt VM 101 (ubuntu-server) with 40GB RAM/6 cores, restored all services including 9 ollama models and 4 Docker containers (open-webui, jellyfin, qbittorrent, clamav)
+**Recent Changes**: Set up automated media pipeline (qBittorrent → ClamAV scan → Jellyfin), created scan-and-move.sh for auto-sorting downloads into Movies/TV Shows/Music, expanded VM storage from 100GB to 297GB
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-1620 v4, ZFS storage, hosts CT 201 + VM 101)

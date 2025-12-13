@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 12, 2025 (Twingate systemd migration, NIC fix, storage rename)
+**Last Updated:** December 13, 2025 (Dual-NIC setup, VM 101 migrated to 2.5GbE network)
 
 ---
 
@@ -46,9 +46,9 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 | **Proxmox Cluster "home-cluster"** | | 2-node HA cluster | 100-180W | ✅ Active |
 | **├─ prox-book5 (node 1)** | 192.168.2.250 | Samsung Galaxy Book5 Pro, 16GB RAM | 50-100W | ✅ Active |
 | **│  └─ VM 100: Omarchy** | 192.168.2.161 | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
-| **└─ prox-tower (node 2)** | 192.168.2.249 | ThinkStation 510, 32GB RAM, Xeon E5-1620 | 50-80W | ✅ Active |
+| **└─ prox-tower (node 2)** | 192.168.2.249 / 192.168.1.249 | ThinkStation 510, 32GB RAM, Xeon E5-1620, **Dual-NIC** | 50-80W | ✅ Active |
 |    **├─ Twingate (systemd)** | (host) | Native systemd service (no container) | - | ✅ Auto-start |
-|    **└─ VM 101: Ubuntu Server** | 192.168.2.126 | Ubuntu 24.04 Server (all services) | - | ✅ Auto-start |
+|    **└─ VM 101: Ubuntu Server** | **192.168.1.126** | Ubuntu 24.04 Server (2.5GbE network) | - | ✅ Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, Twingate backup, MagicMirror kiosk | 3-4W | ✅ Active |
 
 **Total Power:** ~105-185W (~$15-28/month electricity)

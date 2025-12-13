@@ -34,10 +34,19 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 
 ### Network Architecture
 
-**Router Configuration:** Personal router added to bypass Spectrum limitations
-- **Network Subnet:** 192.168.2.0/24 (changed from 192.168.1.x)
-- **Purpose:** Enable Pi-hole DNS and full network control
-- **Gateway:** 192.168.2.1
+**Dual-Network Configuration (Dec 13, 2025):**
+
+| Network | Subnet | Router | Speed | Purpose |
+|---------|--------|--------|-------|---------|
+| **Primary** | 192.168.1.0/24 | Main router (gateway .1.1) | 2.5 Gbps | VMs, fast traffic, media |
+| **Management** | 192.168.2.0/24 | Backup router (gateway .2.1) | 1 Gbps | Twingate, AMT, legacy |
+
+**Why Two Networks:**
+- Main router (192.168.1.x) has 2.5GbE port for high-speed traffic
+- Backup router (192.168.2.x) connects to main router, provides management network
+- Twingate connector runs on management network (192.168.2.249)
+- VMs run on primary network (192.168.1.x) for faster media streaming
+- Intel AMT will be configured on management network for out-of-band access
 
 ### Active Devices
 
@@ -81,15 +90,20 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │       ├── Auto-mount Samba share with Google Drive access (via fstab)
 │       └── Auto-starts on boot ✅
 │
-├── NODE 2: prox-tower @ 192.168.2.249 (ThinkStation 510)
+├── NODE 2: prox-tower (ThinkStation 510) - DUAL-NIC SETUP
 │   ├── Hardware: 32GB RAM, Xeon E5-1620 v4 (4c/8t), NVIDIA Quadro M4000
-│   ├── Network: Intel I218-LM (TSO/GSO/GRO disabled - see Known Issues)
-│   ├── Intel AMT/vPro: Available but not configured (needs monitor to press Ctrl+P in MEBx)
+│   ├── Network (Dual-NIC Dec 13, 2025):
+│   │   ├── vmbr0 @ 192.168.2.249 - Intel I218-LM (1GbE) - Management/Twingate/AMT
+│   │   │   └── TSO/GSO/GRO disabled (see Known Issues)
+│   │   └── vmbr1 @ 192.168.1.249 - Realtek RTL8125 (2.5GbE) - Primary/VMs
+│   │       └── Connected to main router 2.5G port
+│   ├── Intel AMT/vPro: Available on 192.168.2.x (needs MEBx config - see AMT section)
 │   ├── ZFS storage (rpool-tower, ~370GB available) - converted from LVM Dec 12, 2025
 │   ├── Twingate Connector (systemd) - Native host service, auto-start ✅
 │   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
-│   └── VM 101: Ubuntu Server 24.04 @ 192.168.2.126 (40GB RAM, 6 cores, 300GB disk)
+│   └── VM 101: Ubuntu Server 24.04 @ 192.168.1.126 (40GB RAM, 6 cores, 300GB disk)
+│       └── On vmbr1 (2.5GbE) for fast media streaming
 │       ├── UEFI boot, SSH enabled
 │       ├── Rebuilt Dec 12, 2025 (fresh install after storage conversion)
 │       ├── Docker + All Services:
@@ -254,14 +268,16 @@ The home lab now runs as a Type 1 hypervisor with 3 VMs providing isolated servi
 # Proxmox Node 1 (prox-book5)
 ssh root@192.168.2.250
 
-# Proxmox Node 2 (prox-tower)
+# Proxmox Node 2 (prox-tower) - Management network
 ssh root@192.168.2.249
+# Or via 2.5GbE network (faster)
+ssh root@192.168.1.249
 
 # VM 100 - Omarchy Desktop (via automatic ProxyJump through prox-book5)
 ssh jaded@192.168.2.161
 
-# VM 102 - Ubuntu Server (via automatic ProxyJump through prox-tower)
-ssh jaded@192.168.2.126
+# VM 101 - Ubuntu Server (on 2.5GbE network, via ProxyJump through prox-tower)
+ssh jaded@192.168.1.126
 ```
 
 **ProxyJump Configuration for VMs:**
@@ -280,8 +296,17 @@ Host 192.168.2.250
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# Proxmox Node 2 - prox-tower
-Host 192.168.2.249
+# Proxmox Node 2 - prox-tower (management network)
+Host 192.168.2.249 prox-tower tower
+  User root
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Proxmox Node 2 - prox-tower (2.5GbE primary network)
+Host 192.168.1.249 prox-tower-fast tower-fast
   User root
   AddKeysToAgent yes
   UseKeychain yes
@@ -290,7 +315,7 @@ Host 192.168.2.249
   ServerAliveCountMax 3
 
 # VM 100 - Omarchy Desktop (ProxyJump through prox-book5)
-Host 192.168.2.161
+Host 192.168.2.161 omarchy vm100
   User jaded
   ProxyJump 192.168.2.250
   AddKeysToAgent yes
@@ -299,8 +324,8 @@ Host 192.168.2.161
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# VM 102 - Ubuntu Server (ProxyJump through prox-tower)
-Host 192.168.2.126
+# VM 101 - Ubuntu Server (on 2.5GbE network, ProxyJump through prox-tower)
+Host 192.168.1.126 ubuntu-server ubuntu vm101
   User jaded
   ProxyJump 192.168.2.249
   AddKeysToAgent yes
@@ -313,10 +338,11 @@ Host 192.168.2.126
 **How it works:**
 - Both Proxmox hosts (.249 and .250) are configured as Twingate resources
 - VM access uses ProxyJump: Mac → host → VM
-  - VM 100: Mac → .250 (prox-book5) → .161
-  - VM 102: Mac → .249 (prox-tower) → .126
+  - VM 100: Mac → .250 (prox-book5) → .161 (192.168.2.x network)
+  - VM 101: Mac → .249 (prox-tower) → 192.168.1.126 (2.5GbE network)
+- prox-tower has dual NICs: management (.249) and primary (.1.249)
+- Twingate connects via management network, then reaches VM on primary network
 - Automated scripts (gitBackup.sh, ollamaSummary.py) work without modification
-- No Twingate routing conflicts
 - **Critical:** Without Twingate resources configured, remote SSH will timeout!
 
 **Service Management:**
@@ -1546,16 +1572,18 @@ ssh root@192.168.2.249 "ethtool -k nic0 | grep -E 'tcp-segmentation|generic-segm
 
 ---
 
-### Pending Hardware Upgrades (prox-tower)
+### Hardware Upgrades (prox-tower)
 
-| Component | Current | Upgrade | Status |
-|-----------|---------|---------|--------|
+| Component | Previous | Current | Status |
+|-----------|----------|---------|--------|
 | **CPU** | Xeon E5-1620 v4 (4c/8t) | Intel Xeon E5-2683 V4 (16c/32t, 40MB cache) | Ordered |
-| **NIC** | Intel I218-LM (1GbE, buggy) | TP-Link TX201 (2.5GbE, Realtek RTL8125) | Ordered |
+| **NIC** | Intel I218-LM only (1GbE, buggy) | **Dual-NIC: Intel I218-LM + Realtek RTL8125 (2.5GbE)** | ✅ Installed Dec 13, 2025 |
 
-**Benefits:**
-- CPU: 4x more cores for VMs, better multi-tenancy
-- NIC: Eliminates TSO hang bug, 2.5x faster network
+**NIC Upgrade Complete (Dec 13, 2025):**
+- Installed TP-Link TX201 (Realtek RTL8125 2.5GbE) as secondary NIC
+- Intel I218-LM retained for management/Twingate/AMT (with TSO disabled)
+- New NIC connected to main router's 2.5G port
+- VM 101 migrated to 2.5GbE network for faster media streaming
 
 **Upgrade Documentation:** `/root/nic-upgrade-tplink-tx201.md` on prox-tower
 
@@ -1675,6 +1703,8 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-13 | **Dual-NIC setup:** Installed Realtek RTL8125 2.5GbE, configured dual-network (management + primary) |
+| 2025-12-13 | **VM 101 migration:** Moved from 192.168.2.126 to 192.168.1.126 on 2.5GbE network |
 | 2025-12-12 | **Twingate migration:** Moved both hosts from LXC/Docker to native systemd services |
 | 2025-12-12 | **NIC fix:** Disabled TSO/GSO/GRO on prox-tower Intel I218-LM to prevent hangs |
 | 2025-12-12 | **Storage rename:** local-zfs → local-zfs-book5/local-zfs-tower for cluster clarity |
@@ -1687,6 +1717,39 @@ curl http://localhost:8080  # Should return HTML
 | 2025-12-01 | 2-node Proxmox cluster creation, VM migration to prox-tower |
 | 2025-11-29 | Migrated from bare-metal CachyOS to Proxmox VE |
 | 2025-11-28 | Personal router setup (192.168.2.x subnet) |
+
+### 2025-12-13 - Dual-NIC Setup & VM Migration to 2.5GbE
+
+**Hardware Installed:**
+- TP-Link TX201 PCIe NIC (Realtek RTL8125 chipset)
+- 2.5 Gbps Full Duplex, connected to main router's 2.5G port
+
+**Network Configuration:**
+- **vmbr0** (Intel I218-LM, 1GbE) @ 192.168.2.249
+  - Management network, Twingate connector, future AMT
+  - No default gateway (management only)
+- **vmbr1** (Realtek RTL8125, 2.5GbE) @ 192.168.1.249
+  - Primary network for VMs and fast traffic
+  - Default gateway: 192.168.1.1 (main router)
+
+**VM 101 Migration:**
+- Changed VM network bridge: vmbr0 → vmbr1
+- Updated IP: 192.168.2.126 → 192.168.1.126
+- Updated gateway: 192.168.2.1 → 192.168.1.1
+- Now benefits from 2.5 Gbps for Jellyfin media streaming
+
+**Files Changed:**
+- `/etc/network/interfaces` on prox-tower (added vmbr1 bridge)
+- `/etc/netplan/00-installer-config.yaml` on VM 101 (new IP/gateway)
+- `~/.ssh/config` on Mac (updated VM 101 to 192.168.1.126)
+- Added prox-tower-fast alias for 192.168.1.249 SSH access
+
+**Impact:**
+- Media streaming now uses 2.5 Gbps link (was 1 Gbps)
+- Remote access unchanged (Twingate still uses 192.168.2.249)
+- SSH to VM 101 via ProxyJump through management network works seamlessly
+
+---
 
 ### 2025-12-12 - Twingate Systemd Migration & NIC Fix
 

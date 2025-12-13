@@ -2,7 +2,7 @@
 
 Quick reference for accessing all machines in the multi-location network.
 
-**Last Updated:** December 12, 2025
+**Last Updated:** December 13, 2025 (Dual-NIC setup, VM 101 on 2.5GbE)
 
 ---
 
@@ -13,11 +13,12 @@ Quick reference for accessing all machines in the multi-location network.
 ```bash
 # Proxmox Hosts (direct access)
 ssh root@192.168.2.250      # prox-book5 (Node 1)
-ssh root@192.168.2.249      # prox-tower (Node 2)
+ssh root@192.168.2.249      # prox-tower (Node 2) - Management network
+ssh root@192.168.1.249      # prox-tower (Node 2) - 2.5GbE primary network
 
 # VMs (auto ProxyJump configured)
 ssh jaded@192.168.2.161     # VM 100 - Omarchy Desktop (via prox-book5)
-ssh jaded@192.168.2.126     # VM 102 - Ubuntu Server (via prox-tower)
+ssh jaded@192.168.1.126     # VM 101 - Ubuntu Server (via prox-tower, on 2.5GbE)
 
 # Raspberry Pi
 ssh jaded@192.168.2.131     # magic-pihole (Pi-hole, Twingate, MagicMirror)
@@ -47,20 +48,20 @@ ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
 └───────┬───────┘              └───────┬───────┘              └───────────────┘
         │                               │
         ▼                               ▼
-┌───────────────────┐          ┌───────────────────┐
-│ prox-book5        │          │ prox-tower        │
-│ 192.168.2.250     │          │ 192.168.2.249     │
-│ Proxmox Node 1    │          │ Proxmox Node 2    │
-│ User: root        │          │ User: root        │
-├───────────────────┤          ├───────────────────┤
-│ └─ VM 100         │          │ └─ VM 101         │
-│    192.168.2.161  │          │    192.168.2.126  │
-│    Omarchy        │          │    Ubuntu Server  │
-│    User: jaded    │          │    User: jaded    │
-└───────────────────┘          └───────────────────┘
+┌───────────────────┐          ┌─────────────────────────────────┐
+│ prox-book5        │          │ prox-tower (DUAL-NIC)           │
+│ 192.168.2.250     │          │ Management: 192.168.2.249 (1G)  │
+│ Proxmox Node 1    │          │ Primary:    192.168.1.249 (2.5G)│
+│ User: root        │          │ Proxmox Node 2 | User: root     │
+├───────────────────┤          ├─────────────────────────────────┤
+│ └─ VM 100         │          │ └─ VM 101 (on 2.5GbE network)   │
+│    192.168.2.161  │          │    192.168.1.126                │
+│    Omarchy        │          │    Ubuntu Server                │
+│    User: jaded    │          │    User: jaded                  │
+└───────────────────┘          └─────────────────────────────────┘
 ```
 
-**Note (Dec 12, 2025):** Twingate connectors migrated from LXC containers (CT 200, CT 201) to native systemd services running directly on the Proxmox hosts. More reliable, lower overhead.
+**Note (Dec 13, 2025):** prox-tower now has dual NICs - Intel I218-LM (1GbE, management/Twingate) and Realtek RTL8125 (2.5GbE, VMs/primary). VM 101 runs on the faster 2.5GbE network.
 
 ---
 
@@ -69,9 +70,10 @@ ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
 | Device | IP | User | Access Method | Services |
 |--------|-----|------|---------------|----------|
 | **prox-book5** | 192.168.2.250 | root | Direct SSH | Proxmox Node 1, Twingate (systemd) |
-| **prox-tower** | 192.168.2.249 | root | Direct SSH | Proxmox Node 2, Twingate (systemd), VM 101 |
+| **prox-tower** | 192.168.2.249 (mgmt) | root | Direct SSH | Proxmox Node 2, Twingate (systemd) |
+| **prox-tower** | 192.168.1.249 (2.5G) | root | Direct SSH | Primary network, VM bridge |
 | **VM 100 (Omarchy)** | 192.168.2.161 | jaded | ProxyJump via .250 | Arch Desktop |
-| **VM 101 (Ubuntu)** | 192.168.2.126 | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin, Samba |
+| **VM 101 (Ubuntu)** | **192.168.1.126** | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin (2.5GbE) |
 | **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
 | **Mac** | host.docker.internal | joshuabrown | Twingate resource | Development |
 | **Work PC** | TBD | TBD | Twingate (planned) | RustDesk, Dev |
@@ -88,7 +90,7 @@ Host github.com
   IdentityFile ~/.ssh/id_ed25519
 
 # Proxmox Node 1 - prox-book5
-Host 192.168.2.250 prox-book5
+Host 192.168.2.250 prox-book5 book5
   HostName 192.168.2.250
   User root
   AddKeysToAgent yes
@@ -97,9 +99,19 @@ Host 192.168.2.250 prox-book5
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# Proxmox Node 2 - prox-tower  
-Host 192.168.2.249 prox-tower
+# Proxmox Node 2 - prox-tower (management network)
+Host 192.168.2.249 prox-tower tower
   HostName 192.168.2.249
+  User root
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Proxmox Node 2 - prox-tower (2.5GbE primary network)
+Host 192.168.1.249 prox-tower-fast tower-fast
+  HostName 192.168.1.249
   User root
   AddKeysToAgent yes
   UseKeychain yes
@@ -118,9 +130,9 @@ Host 192.168.2.161 omarchy vm100
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# VM 101 - Ubuntu Server (ProxyJump through prox-tower)
-Host 192.168.2.126 ubuntu-server vm101
-  HostName 192.168.2.126
+# VM 101 - Ubuntu Server (on 2.5GbE network, ProxyJump through prox-tower)
+Host 192.168.1.126 ubuntu-server ubuntu vm101
+  HostName 192.168.1.126
   User jaded
   ProxyJump 192.168.2.249
   AddKeysToAgent yes
@@ -140,10 +152,9 @@ Host 192.168.2.131 pihole pi
   ServerAliveCountMax 3
 
 # Mac (via Twingate from homelab)
-Host mac macbook
+Host mac macbook host.docker.internal
   HostName host.docker.internal
   User joshuabrown
-  AddKeysToAgent yes
   IdentityFile ~/.ssh/id_ed25519
 ```
 
@@ -252,11 +263,13 @@ With the SSH config above, you can use short names:
 
 ```bash
 ssh prox-book5    # → root@192.168.2.250
-ssh prox-tower    # → root@192.168.2.249
+ssh prox-tower    # → root@192.168.2.249 (management)
+ssh tower-fast    # → root@192.168.1.249 (2.5GbE)
 ssh omarchy       # → jaded@192.168.2.161 (via ProxyJump)
 ssh vm100         # → jaded@192.168.2.161 (via ProxyJump)
-ssh ubuntu-server # → jaded@192.168.2.126 (via ProxyJump)
-ssh vm101         # → jaded@192.168.2.126 (via ProxyJump)
+ssh ubuntu-server # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
+ssh ubuntu        # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
+ssh vm101         # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
 ssh pihole        # → jaded@192.168.2.131
 ssh pi            # → jaded@192.168.2.131
 ssh mac           # → joshuabrown@host.docker.internal
@@ -284,20 +297,28 @@ When setting up the Windows PC at work:
 
 **Copy file TO Ubuntu Server:**
 ```bash
-scp file.txt jaded@192.168.2.126:~/
+scp file.txt jaded@192.168.1.126:~/
+# Or use alias:
+scp file.txt ubuntu-server:~/
 ```
 
 **Copy file FROM Ubuntu Server:**
 ```bash
-scp jaded@192.168.2.126:~/file.txt ./
+scp jaded@192.168.1.126:~/file.txt ./
+# Or use alias:
+scp ubuntu-server:~/file.txt ./
 ```
 
 **Rsync to Ubuntu Server:**
 ```bash
-rsync -avz ./folder/ jaded@192.168.2.126:~/folder/
+rsync -avz ./folder/ jaded@192.168.1.126:~/folder/
+# Or use alias:
+rsync -avz ./folder/ ubuntu-server:~/folder/
 ```
 
 **Execute remote command:**
 ```bash
-ssh jaded@192.168.2.126 "docker ps"
+ssh jaded@192.168.1.126 "docker ps"
+# Or use alias:
+ssh ubuntu-server "docker ps"
 ```

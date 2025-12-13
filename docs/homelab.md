@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 12, 2025 (prox-tower storage conversion & VM 101 rebuild)
+**Last Updated:** December 12, 2025 (Twingate systemd migration, NIC fix, storage rename)
 
 ---
 
@@ -47,7 +47,7 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 | **├─ prox-book5 (node 1)** | 192.168.2.250 | Samsung Galaxy Book5 Pro, 16GB RAM | 50-100W | ✅ Active |
 | **│  └─ VM 100: Omarchy** | 192.168.2.161 | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
 | **└─ prox-tower (node 2)** | 192.168.2.249 | ThinkStation 510, 32GB RAM, Xeon E5-1620 | 50-80W | ✅ Active |
-|    **├─ CT 201: Twingate Connector** | (LXC) | Debian 12, Docker, Twingate | - | ✅ Auto-start |
+|    **├─ Twingate (systemd)** | (host) | Native systemd service (no container) | - | ✅ Auto-start |
 |    **└─ VM 101: Ubuntu Server** | 192.168.2.126 | Ubuntu 24.04 Server (all services) | - | ✅ Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, Twingate backup, MagicMirror kiosk | 3-4W | ✅ Active |
 
@@ -72,7 +72,7 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │   ├── IOMMU/VT-d enabled for GPU passthrough
 │   ├── Lid-close handling (stays running, screen off)
 │   ├── Cluster role: Node 1 (ID: 0x00000001)
-│   ├── CT 200: Twingate Connector (LXC) @ 192.168.2.246 - Debian 12, Docker, auto-start ✅
+│   ├── Twingate Connector (systemd) - Native host service, auto-start ✅
 │   └── VM 100: Omarchy Desktop @ 192.168.2.161 (8GB RAM, 4 cores, 120GB disk)
 │       ├── SeaBIOS boot (legacy BIOS for compatibility)
 │       ├── VirtIO display (accessible via Proxmox web console)
@@ -83,9 +83,10 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │
 ├── NODE 2: prox-tower @ 192.168.2.249 (ThinkStation 510)
 │   ├── Hardware: 32GB RAM, Xeon E5-1620 v4 (4c/8t), NVIDIA Quadro M4000
+│   ├── Network: Intel I218-LM (TSO/GSO/GRO disabled - see Known Issues)
 │   ├── Intel AMT/vPro: Available but not configured (needs monitor to press Ctrl+P in MEBx)
 │   ├── ZFS storage (rpool-tower, ~370GB available) - converted from LVM Dec 12, 2025
-│   ├── CT 201: Twingate Connector (LXC) - Debian 12, Docker, auto-start ✅
+│   ├── Twingate Connector (systemd) - Native host service, auto-start ✅
 │   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
 │   └── VM 101: Ubuntu Server 24.04 @ 192.168.2.126 (40GB RAM, 6 cores, 300GB disk)
@@ -121,8 +122,9 @@ Cluster Details:
 - Nodes: 2/2 online + QDevice (192.168.2.131)
 - Quorum: 3 votes total (2 Proxmox nodes + 1 QDevice), requires 2 for quorum
 - HA Capable: Yes (survives single node failure, can distribute services)
-- Remote Access: Twingate on both prox-tower and VM 102
+- Remote Access: Twingate systemd services on both Proxmox hosts (no containers)
 - CPU Protection: VMs limited to 75% CPU, watchdog auto-suspends at 90%
+- Storage: local-zfs-book5 (node 1), local-zfs-tower (node 2) - renamed for clarity
 ```
 
 **Future Expansion:**
@@ -379,34 +381,45 @@ testparm -s                     # Test configuration
 ### 3. Twingate Connector
 
 **Purpose:** Secure remote access without port forwarding or VPN
-**Deployment:** Docker container with host networking
+**Deployment:** Native systemd service on both Proxmox hosts
 **Network:** jaded423
-**Status Check:** `docker ps | grep twingate`
+**Status Check:** `systemctl status twingate-connector`
 
-**Configuration Files:**
-- `~/setup/docker-compose.yml` - Container config
-- `~/setup/.env` - Access tokens (sensitive, chmod 600)
-- `~/setup/twingate-tokens.sh` - Token export script
+**Architecture (Dec 12, 2025):**
+- **prox-tower (192.168.2.249):** systemd service on host
+- **prox-book5 (192.168.2.250):** systemd service on host
+- **Previous:** LXC containers (CT 200, CT 201) with Docker - removed
 
-**Container Settings:**
-- Network mode: host
-- Log level: 3 (debug)
-- Auto-restart: enabled
-- Image: twingate/connector:latest
+**Configuration:**
+- Config file: `/etc/twingate/connector.conf`
+- Service: `/usr/lib/systemd/system/twingate-connector.service`
+- Tokens: Stored in config file (auto-renewed)
 
 **Service Management:**
 ```bash
-cd ~/setup
-docker-compose ps              # Check status
-docker-compose restart         # Restart connector
-docker-compose logs -f         # View logs
-docker-compose pull            # Update to latest version
-docker-compose up -d           # Start with new version
+# Check status
+systemctl status twingate-connector
+
+# Restart if needed
+systemctl restart twingate-connector
+
+# View logs
+journalctl -u twingate-connector -f
+
+# View config
+cat /etc/twingate/connector.conf
 ```
 
 **Admin Console:** https://jaded423.twingate.com
 
-**Setup Script:** `~/setup/install-twingate-docker.sh`
+**Setup Documentation:** `/root/twin-connect-systemd.md` on prox-tower
+
+**Why systemd instead of Docker:**
+- Lower overhead (no container runtime)
+- More robust automatic token renewal
+- Starts on boot without Docker dependency
+- Easier to manage with standard systemctl
+- Config persists in `/etc/twingate/connector.conf`
 
 **Expansion Plan - Dual Connector Architecture:**
 
@@ -1502,6 +1515,52 @@ cat ~/.config/hypr/hyprpaper.conf
 hyprctl reload
 ```
 
+### Known Issues
+
+#### prox-tower Intel I218-LM NIC (e1000e driver)
+
+**Problem:** The onboard Intel I218-LM NIC has a known bug with the e1000e driver. When TCP Segmentation Offload (TSO) is enabled, the NIC can experience hardware hangs that freeze the entire network stack, requiring a physical reboot.
+
+**Symptoms:**
+- Complete loss of SSH access
+- Proxmox web UI unreachable
+- Server unresponsive on network
+- Occurred: Dec 11, 2025 ~10:57 AM; Dec 12, 2025 ~11:28 AM
+
+**Fix Applied:**
+```bash
+# /etc/network/interfaces on prox-tower
+iface nic0 inet manual
+    post-up /usr/sbin/ethtool -K nic0 tso off gso off gro off
+```
+
+**Verification:**
+```bash
+ssh root@192.168.2.249 "ethtool -k nic0 | grep -E 'tcp-segmentation|generic-segmentation|generic-receive'"
+# Should show: off for all three
+```
+
+**Planned Permanent Fix:** Replace with TP-Link TX201 (2.5GbE, Realtek RTL8125) which doesn't have this bug.
+
+**Documentation:** `/root/nic-upgrade-tplink-tx201.md` on prox-tower
+
+---
+
+### Pending Hardware Upgrades (prox-tower)
+
+| Component | Current | Upgrade | Status |
+|-----------|---------|---------|--------|
+| **CPU** | Xeon E5-1620 v4 (4c/8t) | Intel Xeon E5-2683 V4 (16c/32t, 40MB cache) | Ordered |
+| **NIC** | Intel I218-LM (1GbE, buggy) | TP-Link TX201 (2.5GbE, Realtek RTL8125) | Ordered |
+
+**Benefits:**
+- CPU: 4x more cores for VMs, better multi-tenancy
+- NIC: Eliminates TSO hang bug, 2.5x faster network
+
+**Upgrade Documentation:** `/root/nic-upgrade-tplink-tx201.md` on prox-tower
+
+---
+
 ### Intel AMT / Out-of-Band Management (prox-tower)
 
 **Intel AMT provides remote access even when Proxmox is frozen/crashed:**
@@ -1616,6 +1675,9 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-12 | **Twingate migration:** Moved both hosts from LXC/Docker to native systemd services |
+| 2025-12-12 | **NIC fix:** Disabled TSO/GSO/GRO on prox-tower Intel I218-LM to prevent hangs |
+| 2025-12-12 | **Storage rename:** local-zfs → local-zfs-book5/local-zfs-tower for cluster clarity |
 | 2025-12-12 | **Media pipeline:** qBit→ClamAV→Jellyfin automation, scan-and-move script, expanded VM storage 100GB→297GB |
 | 2025-12-12 | **Major rebuild:** prox-tower LVM→ZFS conversion, VM 101 fresh Ubuntu Server (40GB RAM, 6 cores), 9 ollama models, 4 Docker containers |
 | 2025-12-10 | Created phi4.16k custom Ollama model (14B @ 16K ctx), pre-loaded for commits |
@@ -1625,6 +1687,46 @@ curl http://localhost:8080  # Should return HTML
 | 2025-12-01 | 2-node Proxmox cluster creation, VM migration to prox-tower |
 | 2025-11-29 | Migrated from bare-metal CachyOS to Proxmox VE |
 | 2025-11-28 | Personal router setup (192.168.2.x subnet) |
+
+### 2025-12-12 - Twingate Systemd Migration & NIC Fix
+
+**Problem Investigated:**
+- prox-tower lost SSH and Proxmox web UI access twice (Dec 11 ~10:57 AM, Dec 12 ~11:28 AM)
+- Root cause: Intel I218-LM onboard NIC experiencing hardware hangs (e1000e driver TSO bug)
+
+**Twingate Issues:**
+- Docker container stuck in `Offline → Authentication → Error` loop since Dec 3
+- Root cause: Connector was unregistered from Twingate admin console
+- Solution: Migrated from Docker/LXC containers to native systemd services on both hosts
+
+**Changes Made:**
+
+**prox-tower (192.168.2.249):**
+- Added `post-up /usr/sbin/ethtool -K nic0 tso off gso off gro off` to `/etc/network/interfaces`
+- Removed Docker container `twingate-prox-tower`
+- Removed LXC 201 (twingate-tower)
+- Installed Twingate systemd service on host
+- Updated VM 101 config: `local-zfs:` → `local-zfs-tower:`
+
+**prox-book5 (192.168.2.250):**
+- Installed Twingate systemd service on host (via SSH from tower)
+- Removed LXC 200 (twingate-connector)
+- Updated VM 100 config: `local-zfs:` → `local-zfs-book5:`
+
+**Cluster-wide:**
+- Renamed storage in `/etc/pve/storage.cfg`:
+  - `local-zfs` (book5) → `local-zfs-book5`
+  - `local-zfs` (tower) → `local-zfs-tower`
+
+**Files Created on prox-tower:**
+- `/root/twin-connect-systemd.md` - Twingate systemd setup instructions
+- `/root/nic-upgrade-tplink-tx201.md` - Network card upgrade instructions
+
+**Pending Hardware Upgrades:**
+- CPU: Intel Xeon E5-2683 V4 (16 core)
+- NIC: TP-Link TX201 (2.5GbE, Realtek RTL8125)
+
+---
 
 ### 2025-12-12 - Media Pipeline Setup & Storage Expansion
 

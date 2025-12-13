@@ -2,6 +2,43 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## December 12, 2025 - Homelab Twingate Systemd Migration & NIC Fix
+
+**Summary:**
+Major infrastructure changes to home lab Proxmox cluster - migrated Twingate connectors from LXC containers to native systemd services and fixed Intel NIC hardware hang bug.
+
+**Problem Investigated:**
+- prox-tower lost SSH and Proxmox web UI access twice (Dec 11 ~10:57 AM, Dec 12 ~11:28 AM)
+- Root cause: Intel I218-LM onboard NIC experiencing hardware hangs (e1000e driver TSO bug)
+- Twingate connector stuck in authentication loop since Dec 3 (connector was unregistered from admin console)
+
+**Changes Made:**
+
+Infrastructure:
+- **prox-tower:** Added TSO/GSO/GRO disable to `/etc/network/interfaces`, installed Twingate systemd service, removed LXC 201 and Docker container
+- **prox-book5:** Installed Twingate systemd service (via SSH from tower), removed LXC 200
+- **Cluster-wide:** Renamed ZFS storage pools (`local-zfs` → `local-zfs-book5` / `local-zfs-tower`)
+
+Documentation Updated:
+- `docs/homelab.md` - Complete rewrite of Twingate section, added Known Issues section, added Pending Hardware Upgrades table
+- `docs/ssh-access-cheatsheet.md` - Updated network diagram (systemd instead of LXC), fixed VM numbering (VM 101 not VM 102)
+
+Files Created on prox-tower:
+- `/root/twin-connect-systemd.md` - Twingate systemd setup instructions
+- `/root/nic-upgrade-tplink-tx201.md` - Network card upgrade instructions
+
+**Pending Hardware Upgrades:**
+- CPU: Intel Xeon E5-2683 V4 (16 core, 40MB cache)
+- NIC: TP-Link TX201 (2.5GbE, Realtek RTL8125)
+
+**Impact:**
+- Twingate connectors now more reliable (systemd vs Docker/LXC)
+- Network stability improved with offloading disabled
+- Storage naming clearer for multi-node cluster
+- Documentation accurately reflects current infrastructure
+
+---
+
 ## December 5, 2025 - Cross-Machine Conversation History Sync
 
 **Changes:**

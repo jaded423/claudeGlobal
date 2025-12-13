@@ -2,7 +2,7 @@
 
 Quick reference for accessing all machines in the multi-location network.
 
-**Last Updated:** December 3, 2025
+**Last Updated:** December 12, 2025
 
 ---
 
@@ -42,8 +42,8 @@ ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
 ┌───────────────┐              ┌───────────────┐              ┌───────────────┐
 │  CONNECTOR 1  │              │  CONNECTOR 2  │              │  CONNECTOR 3  │
 │ prox-book5    │              │ prox-tower    │              │ magic-pihole  │
-│ CT 200 (LXC)  │              │ CT 201 (LXC)  │              │ Docker        │
-│ 192.168.2.246 │              │ (DHCP)        │              │ 192.168.2.131 │
+│ systemd svc   │              │ systemd svc   │              │ Docker        │
+│ (on host)     │              │ (on host)     │              │ 192.168.2.131 │
 └───────┬───────┘              └───────┬───────┘              └───────────────┘
         │                               │
         ▼                               ▼
@@ -53,12 +53,14 @@ ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
 │ Proxmox Node 1    │          │ Proxmox Node 2    │
 │ User: root        │          │ User: root        │
 ├───────────────────┤          ├───────────────────┤
-│ └─ VM 100         │          │ └─ VM 102         │
+│ └─ VM 100         │          │ └─ VM 101         │
 │    192.168.2.161  │          │    192.168.2.126  │
 │    Omarchy        │          │    Ubuntu Server  │
 │    User: jaded    │          │    User: jaded    │
 └───────────────────┘          └───────────────────┘
 ```
+
+**Note (Dec 12, 2025):** Twingate connectors migrated from LXC containers (CT 200, CT 201) to native systemd services running directly on the Proxmox hosts. More reliable, lower overhead.
 
 ---
 
@@ -66,10 +68,10 @@ ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
 
 | Device | IP | User | Access Method | Services |
 |--------|-----|------|---------------|----------|
-| **prox-book5** | 192.168.2.250 | root | Direct SSH | Proxmox Node 1, CT 200 |
-| **prox-tower** | 192.168.2.249 | root | Direct SSH | Proxmox Node 2, CT 201, VM 102 |
+| **prox-book5** | 192.168.2.250 | root | Direct SSH | Proxmox Node 1, Twingate (systemd) |
+| **prox-tower** | 192.168.2.249 | root | Direct SSH | Proxmox Node 2, Twingate (systemd), VM 101 |
 | **VM 100 (Omarchy)** | 192.168.2.161 | jaded | ProxyJump via .250 | Arch Desktop |
-| **VM 102 (Ubuntu)** | 192.168.2.126 | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin, Samba |
+| **VM 101 (Ubuntu)** | 192.168.2.126 | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin, Samba |
 | **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
 | **Mac** | host.docker.internal | joshuabrown | Twingate resource | Development |
 | **Work PC** | TBD | TBD | Twingate (planned) | RustDesk, Dev |
@@ -116,8 +118,8 @@ Host 192.168.2.161 omarchy vm100
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# VM 102 - Ubuntu Server (ProxyJump through prox-tower)
-Host 192.168.2.126 ubuntu-server vm102
+# VM 101 - Ubuntu Server (ProxyJump through prox-tower)
+Host 192.168.2.126 ubuntu-server vm101
   HostName 192.168.2.126
   User jaded
   ProxyJump 192.168.2.249
@@ -254,7 +256,7 @@ ssh prox-tower    # → root@192.168.2.249
 ssh omarchy       # → jaded@192.168.2.161 (via ProxyJump)
 ssh vm100         # → jaded@192.168.2.161 (via ProxyJump)
 ssh ubuntu-server # → jaded@192.168.2.126 (via ProxyJump)
-ssh vm102         # → jaded@192.168.2.126 (via ProxyJump)
+ssh vm101         # → jaded@192.168.2.126 (via ProxyJump)
 ssh pihole        # → jaded@192.168.2.131
 ssh pi            # → jaded@192.168.2.131
 ssh mac           # → joshuabrown@host.docker.internal

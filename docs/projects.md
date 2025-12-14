@@ -250,11 +250,11 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-12
-**Recent Changes**: Set up automated media pipeline (qBittorrent → ClamAV scan → Jellyfin), created scan-and-move.sh for auto-sorting downloads into Movies/TV Shows/Music, expanded VM storage from 100GB to 297GB
+**Last Updated**: 2025-12-13
+**Recent Changes**: Verified hardware upgrades (16c Xeon, 78GB RAM, 2.5GbE @ 1.36 Gbps), set up cross-subnet NFS from book5 (847GB) to VM 101 for Jellyfin storage expansion, moved 22GB movies to NFS, migrated Jellyfin to docker-compose
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
-  - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-1620 v4, ZFS storage, hosts CT 201 + VM 101)
+  - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c, 2.5GbE, ZFS storage, hosts VM 101)
 **Purpose**: Clustered home lab infrastructure with HA capabilities, hosting development and production services
 
 **Key Services**:

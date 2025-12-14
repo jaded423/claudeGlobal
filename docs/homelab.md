@@ -1703,6 +1703,8 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-13 | **NFS storage expansion:** Set up cross-subnet NFS from book5 (847GB) to VM 101 for Jellyfin, moved 22GB movies |
+| 2025-12-13 | **Hardware benchmarks:** Verified CPU upgrade (16c Xeon E5-2683 v4), 78GB RAM, 2.5GbE (1.36 Gbps confirmed) |
 | 2025-12-13 | **Dual-NIC setup:** Installed Realtek RTL8125 2.5GbE, configured dual-network (management + primary) |
 | 2025-12-13 | **VM 101 migration:** Moved from 192.168.2.126 to 192.168.1.126 on 2.5GbE network |
 | 2025-12-12 | **Twingate migration:** Moved both hosts from LXC/Docker to native systemd services |
@@ -1717,6 +1719,48 @@ curl http://localhost:8080  # Should return HTML
 | 2025-12-01 | 2-node Proxmox cluster creation, VM migration to prox-tower |
 | 2025-11-29 | Migrated from bare-metal CachyOS to Proxmox VE |
 | 2025-11-28 | Personal router setup (192.168.2.x subnet) |
+
+### 2025-12-13 - NFS Storage Expansion & Hardware Benchmarks
+
+**Hardware Verification (prox-tower upgrades):**
+- **CPU:** Intel Xeon E5-2683 v4 (16 cores, 32 threads @ 2.1GHz) - confirmed
+- **RAM:** 78GB on host, 40GB allocated to VM 101 - confirmed
+- **NIC:** 2.5GbE working - speed test showed **1.36 Gbps download** (ISP is bottleneck, not hardware)
+
+**NFS Storage Setup (cross-subnet):**
+- Created `/srv/media` on prox-book5 with **847GB available**
+- Configured NFS export to 192.168.1.0/24 and 192.168.2.0/24 networks
+- **Challenge:** VM 101 (192.168.1.126) couldn't reach book5 (192.168.2.250) - different subnets
+- **Solution:** Set up routing through prox-tower (has interfaces on both networks):
+  - Added iptables forwarding rules on prox-tower (vmbr0 ↔ vmbr1)
+  - Added route on VM 101: `192.168.2.0/24 via 192.168.1.249` (persistent in netplan)
+  - Added route on book5: `192.168.1.0/24 via 192.168.2.249`
+- Mounted NFS on VM 101 at `/mnt/book5-media` (persistent in fstab)
+
+**Jellyfin Docker Compose:**
+- Created `~/docker/docker-compose.yml` on VM 101 for easier management
+- Added new volume: `/mnt/book5-media:/media/book5`
+- Migrated from `docker run` to `docker compose` for future maintainability
+
+**Media Migration:**
+- Moved **22GB of Star Wars movies** (9 films) from VM 101 to book5
+- Transfer speed: ~380 MB/s over NFS
+- Movies now accessible in Jellyfin at `/media/book5/Movies`
+- TV Shows remain on VM 101 local storage
+
+**Files Changed:**
+- `/etc/exports` on book5 - NFS export configuration
+- `/etc/netplan/00-installer-config.yaml` on VM 101 - added route to 192.168.2.0/24
+- `/etc/network/interfaces` on book5 - added route to 192.168.1.0/24
+- `/etc/network/if-pre-up.d/iptables-nfs` on prox-tower - iptables forwarding rules
+- `~/docker/docker-compose.yml` on VM 101 - Jellyfin with NFS mount
+
+**Impact:**
+- VM 101 now has 847GB additional storage via NFS from book5
+- Jellyfin can serve media from both local and NFS storage
+- Future movies/media can go on book5, leaving VM 101 for shows and services
+
+---
 
 ### 2025-12-13 - Dual-NIC Setup & VM Migration to 2.5GbE
 

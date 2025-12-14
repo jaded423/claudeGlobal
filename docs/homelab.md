@@ -1703,6 +1703,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-14 | **Plex migration:** Replaced Jellyfin with Plex, fixed Twingate route conflict causing NFS hangs |
 | 2025-12-13 | **NFS storage expansion:** Set up cross-subnet NFS from book5 (847GB) to VM 101 for Jellyfin, moved 22GB movies |
 | 2025-12-13 | **Hardware benchmarks:** Verified CPU upgrade (16c Xeon E5-2683 v4), 78GB RAM, 2.5GbE (1.36 Gbps confirmed) |
 | 2025-12-13 | **Dual-NIC setup:** Installed Realtek RTL8125 2.5GbE, configured dual-network (management + primary) |
@@ -1719,6 +1720,41 @@ curl http://localhost:8080  # Should return HTML
 | 2025-12-01 | 2-node Proxmox cluster creation, VM migration to prox-tower |
 | 2025-11-29 | Migrated from bare-metal CachyOS to Proxmox VE |
 | 2025-11-28 | Personal router setup (192.168.2.x subnet) |
+
+### 2025-12-14 - Plex Migration & Twingate Route Fix
+
+**Jellyfin → Plex Migration:**
+- Removed Jellyfin container and volumes (user had ongoing stability issues)
+- Installed Plex (`lscr.io/linuxserver/plex:latest`) via docker-compose
+- Plex accessible at `http://192.168.1.126:32400/web`
+
+**Twingate Route Conflict (Critical Fix):**
+- **Problem:** NFS mounts hanging, Docker containers wouldn't start
+- **Root cause:** Twingate added host route `192.168.1.126 dev sdwan0` that overrode our network route
+- Traffic was going through Twingate cloud (980ms latency!) instead of direct LAN (0.5ms)
+- **Solution:** Created systemd service + cron job on book5 to override Twingate's route
+
+**Files Created on book5:**
+- `/etc/systemd/system/fix-vm101-route.service` - Runs after Twingate, fixes route
+- `/etc/cron.d/fix-vm101-route` - Runs every 5 minutes as backup
+
+**Route Fix Details:**
+```bash
+# Removes Twingate route, adds direct route
+ip route del 192.168.1.126 dev sdwan0
+ip route add 192.168.1.126 via 192.168.2.249 dev vmbr0
+```
+
+**Docker Compose Updated (VM 101):**
+- `~/docker/docker-compose.yml` now uses Plex instead of Jellyfin
+- Same volume mounts: `/home/jaded/media:/media` and `/mnt/book5-media:/media/book5`
+
+**Impact:**
+- Plex running stably (Jellyfin had persistent issues)
+- NFS mount reliable with Twingate route override in place
+- Media server accessible for streaming Star Wars collection
+
+---
 
 ### 2025-12-13 - NFS Storage Expansion & Hardware Benchmarks
 

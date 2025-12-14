@@ -250,8 +250,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-13
-**Recent Changes**: Verified hardware upgrades (16c Xeon, 78GB RAM, 2.5GbE @ 1.36 Gbps), set up cross-subnet NFS from book5 (847GB) to VM 101 for Jellyfin storage expansion, moved 22GB movies to NFS, migrated Jellyfin to docker-compose
+**Last Updated**: 2025-12-14
+**Recent Changes**: Migrated from Jellyfin to Plex (stability issues), fixed critical Twingate route conflict that was causing NFS hangs (980ms→0.5ms), created systemd service + cron to permanently override Twingate's VM 101 route on book5
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c, 2.5GbE, ZFS storage, hosts VM 101)

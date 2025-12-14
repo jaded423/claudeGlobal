@@ -88,8 +88,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-12
-**Recent Changes:** Added Claude Sonnet API fallback (v3.3.0) - when Ollama server is unreachable, falls back to Claude API with full diff for better commit messages
+**Last Updated:** 2025-12-13
+**Recent Changes:** Switched to code16 model (v3.6.0) - 28x faster commits (~10s vs ~5min), smart truncation sends actual code to model, VM 101 upgraded to 12 cores/40GB RAM with new NIC
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -99,21 +99,20 @@ Detailed descriptions of all active projects in your workspace.
 
 **Key Features**:
 - Dotfiles backup system (backs up 14 repos hourly)
-- **AI commit messages** - Hybrid approach (v3.3.0):
-  - Primary: phi4.16k (phi4:14b with 16K context, local Ollama)
+- **AI commit messages** - Hybrid approach (v3.6.0):
+  - Primary: code16 (qwen2.5-coder:7b with 16K context, local Ollama)
   - Fallback: Claude Sonnet API (200K context, full diff for better results)
-  - Pre-loaded with 60m keepalive (73ms load time vs 20s cold)
-  - Condensed summaries for diffs >50 lines (Ollama only)
-  - Claude History repo uses instant file-count commits (no AI)
-  - Commit time: ~40s Ollama, ~7s Claude API
-- Smart diff parsing for large commits
+  - Pre-loaded with 24h keepalive via systemd service
+  - Smart truncation: diffs >175 lines truncated to ~150 lines of actual code
+  - Sends real code changes to model, not just file names
+  - Commit time: ~10s with model loaded (28x faster than phi4.16k)
 - Gmail OAuth email sender (shared credentials with odooReports)
 - Email reminder system (AppleScript + Python)
 - **Automated backup**: Self-backed-up hourly via launchd
 
 **Critical Scripts**:
 - `gitBackup.sh` - Hourly backup of 14 git repositories
-- `ollamaSummary.py` - Ollama-powered commit generator (phi4.16k)
+- `ollamaSummary.py` - Ollama-powered commit generator (code16)
 - `send_gmail_oauth.py` - Reusable Gmail API email sender
 - `email-reminder.scpt` - AppleScript for Gmail notifications
 - `gmail-reminder.py` - Python script for Gmail API queries

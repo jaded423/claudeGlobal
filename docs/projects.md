@@ -61,13 +61,13 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active business automation
 **Location**: `~/projects/odooReports`
 **Purpose**: Automated reporting for Elevated Trading
-**Last Updated**: 2025-12-12
-**Recent Changes**: Added sales rep-specific Last Order reports for Brad Bush and Joe Gibson. Each report finds all customers assigned to the rep, filters to 365-day active customers, separates paying vs sample-only customers, and emails PDF/Excel summaries.
+**Last Updated**: 2025-12-15
+**Recent Changes**: Added Monday email to Labels report (joshua, cynthia, shannon). Reorganized crontab - Labels now runs at 6 AM daily (email on Mondays only), AR/AP stays at 9 AM. Moved Last Order from Friday to Monday. Deleted run_all_reports.sh.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
-- **Labels Report**: Stock inventory tracking (Excel) - daily 9 AM weekdays
-- **Last Order Reports**: Customer order history (PDF + Excel) - Fridays 6 AM
+- **Labels Report**: Stock inventory tracking (Excel) - daily 6 AM weekdays, Monday email
+- **Last Order Reports**: Customer order history (PDF + Excel) - Mondays 6 AM
   - Justin's: 16 named key accounts → joshua, cynthia, shannon
   - Brad's: All Brad Bush customers (78 paying, 21 sample) → joshua, brad
   - Joe's: All Joe Gibson customers (65 paying, 20 sample) → joshua, joe

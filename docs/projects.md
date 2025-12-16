@@ -37,16 +37,21 @@ Detailed descriptions of all active projects in your workspace.
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2025-12-09
-**Recent Changes**: Replaced `claudegit` alias with `claude()` wrapper function - now typing `claude` automatically syncs global config and conversation history before launch
+**Last Updated**: 2025-12-15
+**Recent Changes**: Refactored .zshrc from 575→125 lines with modular `functions/` directory containing 5 categorized function files (claude, git, backup, docs, utils)
 **Location**: `~/projects/zshConfig`
-**Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`
+**Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`, `~/.zsh/functions/`
 **Purpose**: Shell configuration with split-file security model
 
 **Key Features**:
 - Oh My Zsh + Powerlevel10k theme
 - Secrets in `~/.zshrc.local` (local only, not committed)
-- Custom functions: `backup-nvim()`, `backup-dotfiles()`, `check-all-repos()`
+- **Modular functions**: 5 files in `functions/` directory
+  - `claude.zsh` - Auto-update wrapper for Claude Code
+  - `git-functions.zsh` - `gitall`, `gitrepos` repository status
+  - `backup-functions.zsh` - `gitvi`, `gitdot` backup functions
+  - `doc-functions.zsh` - `doc-check`, `doc-metrics`
+  - `utils.zsh` - `docxdiff` for Office file comparison
 - **Automated backup**: Hourly via launchd
 
 **Security Model**:
@@ -54,7 +59,7 @@ Detailed descriptions of all active projects in your workspace.
 - `.zshrc.local` contains API keys and sensitive data (gitignored)
 - `.zshrc` automatically sources `.zshrc.local` if it exists
 
-**Documentation**: See `~/projects/dotfilesPrivate/CLAUDE.md`
+**Documentation**: See `~/projects/zshConfig/CLAUDE.md`
 
 ## odooReports
 **Type**: Python automation system

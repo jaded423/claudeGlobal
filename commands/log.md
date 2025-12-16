@@ -74,7 +74,33 @@ The user has a multi-layered documentation system:
 
    For minor project updates, just updating docs/projects.md is sufficient.
 
-7. **Summary for user**
+7. **Log token usage for this /log command**
+   Append a one-liner to `~/.claude/logs/log-command-tokens.csv` with:
+   - Timestamp (ISO format)
+   - Project name
+   - Tokens used running this /log command
+
+   **To get token count**: Check the token usage displayed in the Claude Code interface or use the session stats.
+
+   **Format** (CSV for easy analysis):
+   ```
+   timestamp,project,tokens_used
+   2025-11-06T14:30:00,scripts,1250
+   2025-11-06T15:45:00,nvimConfig,980
+   ```
+
+   **First time**: Create the file with header if it doesn't exist:
+   ```bash
+   mkdir -p ~/.claude/logs
+   echo "timestamp,project,tokens_used" > ~/.claude/logs/log-command-tokens.csv
+   ```
+
+   **Append entry**:
+   ```bash
+   echo "$(date -Iseconds),PROJECT_NAME,TOKEN_COUNT" >> ~/.claude/logs/log-command-tokens.csv
+   ```
+
+8. **Summary for user**
    After updating documentation, show:
    ```
    📝 Session documented:
@@ -84,6 +110,8 @@ The user has a multi-layered documentation system:
 
    Global changes:
    - ~/.claude/docs/projects.md - Updated [project-name] section
+
+   Token usage logged: X tokens → ~/.claude/logs/log-command-tokens.csv
 
    Note: Changes saved locally. Your hourly backup will commit with AI-generated message.
    ```

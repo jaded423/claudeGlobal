@@ -2,6 +2,43 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## December 15, 2025 - Token Usage Tracking for /log Command
+
+**Changes:**
+- Added step 7 to `/log` command for token usage tracking
+- Created `~/.claude/logs/log-command-tokens.csv` for analysis
+- CSV format: timestamp, project, tokens_used
+
+**Impact:**
+- Can now analyze average token consumption per `/log` invocation
+- Data available for optimizing documentation workflows
+- Easy analysis with awk/spreadsheet tools
+
+**Files modified:**
+- `~/.claude/commands/log.md` - Added token logging step
+
+**Files created:**
+- `~/.claude/logs/log-command-tokens.csv` - Token usage log (CSV)
+
+---
+
+## December 15, 2025 - Removed /save and /bye Commands (Non-functional)
+
+**What happened:**
+- Created `/save` and `/bye` commands to auto-document before exit/clear
+- Discovered Claude Code cannot programmatically invoke `/clear` or `/exit`
+- Commands were useless — moved to graveyard
+
+**Lesson learned:**
+- Slash commands can run `/log` but can't trigger CLI commands like `/clear` or `/exit`
+- No hook-based solution exists for "auto-log before exit" with full LLM analysis
+
+**Files moved to graveyard:**
+- `~/projects/graveyard/claude-global/save.md`
+- `~/projects/graveyard/claude-global/bye.md`
+
+---
+
 ## December 12, 2025 - Homelab Twingate Systemd Migration & NIC Fix
 
 **Summary:**

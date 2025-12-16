@@ -1,4 +1,60 @@
 {
   "version": 2,
-  "plugins": {}
+  "plugins": {
+    "greptile@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/greptile/unknown",
+        "version": "unknown",
+        "installedAt": "2025-12-16T17:30:09.960Z",
+        "lastUpdated": "2025-12-16T17:30:09.960Z",
+        "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
+        "isLocal": true
+      }
+    ],
+    "ralph-wiggum@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/ralph-wiggum/unknown",
+        "version": "unknown",
+        "installedAt": "2025-12-16T17:31:37.826Z",
+        "lastUpdated": "2025-12-16T17:31:37.826Z",
+        "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
+        "isLocal": true
+      }
+    ],
+    "commit-commands@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/commit-commands/unknown",
+        "version": "unknown",
+        "installedAt": "2025-12-16T17:32:04.157Z",
+        "lastUpdated": "2025-12-16T17:32:04.157Z",
+        "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
+        "isLocal": true
+      }
+    ],
+    "plugin-dev@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/plugin-dev/unknown",
+        "version": "unknown",
+        "installedAt": "2025-12-16T17:32:28.841Z",
+        "lastUpdated": "2025-12-16T17:32:28.841Z",
+        "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
+        "isLocal": true
+      }
+    ],
+    "context7@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/context7/unknown",
+        "version": "unknown",
+        "installedAt": "2025-12-16T17:33:12.079Z",
+        "lastUpdated": "2025-12-16T17:33:12.079Z",
+        "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
+        "isLocal": true
+      }
+    ]
+  }
 }

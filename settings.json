@@ -4,6 +4,8 @@
       "Bash(ln:*)",
       "Bash(ln -s *:~/projects/*)",
       "Write(*.md)",
+      "Write(*.html)",
+      "Write(~/projects/loom/SOPs/*)",
       "Read(*)",
       "Grep(*)",
       "Glob(*)",

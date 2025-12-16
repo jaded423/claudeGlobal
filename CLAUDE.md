@@ -428,6 +428,7 @@ For detailed project information, see **[docs/projects.md](docs/projects.md)**.
 8. **n8nProd** - n8n production environment (Docker, port 5679)
 9. **graveyard** - Obsolete file archive (6-month retention)
 10. **Home Lab** - CachyOS Linux server (192.168.2.250) with SSH, Samba, Twingate, Ollama
+11. **loom** - Loom video → SOP pipeline (`loom URL topic` command)
 
 All projects have hourly automated backups to GitHub.
 

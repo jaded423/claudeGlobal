@@ -348,6 +348,38 @@ docker logs -f twingate-connector
 
 **Documentation**: See **[~/.claude/docs/homelab.md](homelab.md)** for complete documentation
 
+## loom
+**Type**: Automation pipeline
+**Status**: Active
+**Last Updated**: 2025-12-16
+**Recent Changes**: Created complete Loom → SOP pipeline with hybrid bash/Claude architecture
+**Location**: `~/projects/loom`
+**GitHub**: Private repo with hourly backups
+**Purpose**: Convert Loom training videos into professional SOPs with HTML/PDF exports
+
+**Key Features**:
+- One command pipeline: `loom URL topic-name`
+- Bash handles download (yt-dlp) and transcription (Whisper)
+- Claude creates SOP with minimal context usage
+- Professional HTML/PDF exports for sharing with staff
+- tmux integration for visibility (`tLoom` to watch)
+
+**Workflow**:
+```bash
+loom https://www.loom.com/share/VIDEO_ID topic-name
+tLoom  # Watch Claude work
+```
+
+**Output**:
+- `transcriptions/{topic}-{date}.txt` - Raw transcript
+- `SOPs/{topic}.md` - Markdown SOP
+- `SOPs/{topic}.html` - Styled HTML
+- `SOPs/{topic}.pdf` - Print-ready PDF
+
+**Documentation**: See `~/projects/loom/CLAUDE.md`
+
+---
+
 ## Other Projects (Not Actively Documented)
 
 ### adv360ProZmk

@@ -352,22 +352,24 @@ docker logs -f twingate-connector
 **Type**: Automation pipeline
 **Status**: Active
 **Last Updated**: 2025-12-16
-**Recent Changes**: Created complete Loom → SOP pipeline with hybrid bash/Claude architecture
+**Recent Changes**: Fully autonomous pipeline with auto-exit - monitor detects completion, sends /exit, kills session, returns to terminal
 **Location**: `~/projects/loom`
 **GitHub**: Private repo with hourly backups
 **Purpose**: Convert Loom training videos into professional SOPs with HTML/PDF exports
 
 **Key Features**:
-- One command pipeline: `loom URL topic-name`
+- **Fully hands-off**: One command does everything, returns to prompt when done
 - Bash handles download (yt-dlp) and transcription (Whisper)
-- Claude creates SOP with minimal context usage
+- Claude creates SOP with `--dangerously-skip-permissions` for autonomous file creation
+- Background monitor detects completion and auto-exits Claude
+- Uses subscription tokens (not API) - saves money
 - Professional HTML/PDF exports for sharing with staff
-- tmux integration for visibility (`tLoom` to watch)
 
 **Workflow**:
 ```bash
 loom https://www.loom.com/share/VIDEO_ID topic-name
-tLoom  # Watch Claude work
+# Watch Claude work in your terminal
+# Auto-exits when done, returns to prompt
 ```
 
 **Output**:
@@ -375,6 +377,11 @@ tLoom  # Watch Claude work
 - `SOPs/{topic}.md` - Markdown SOP
 - `SOPs/{topic}.html` - Styled HTML
 - `SOPs/{topic}.pdf` - Print-ready PDF
+
+**Key Files**:
+- `bin/loom` - Main pipeline script
+- `bin/loom-monitor` - Background completion detector
+- `.claude/commands/sop.md` - SOP creation slash command
 
 **Documentation**: See `~/projects/loom/CLAUDE.md`
 

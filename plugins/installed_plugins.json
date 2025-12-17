@@ -4,10 +4,10 @@
     "greptile@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/greptile/4fee769bf4ec",
-        "version": "4fee769bf4ec",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/greptile/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
         "installedAt": "2025-12-16T17:30:09.960Z",
-        "lastUpdated": "2025-12-16T22:19:13.166Z",
+        "lastUpdated": "2025-12-17T14:47:40.798Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }
@@ -15,10 +15,10 @@
     "ralph-wiggum@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/ralph-wiggum/4fee769bf4ec",
-        "version": "4fee769bf4ec",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/ralph-wiggum/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
         "installedAt": "2025-12-16T17:31:37.826Z",
-        "lastUpdated": "2025-12-16T22:19:13.171Z",
+        "lastUpdated": "2025-12-17T14:47:40.791Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }
@@ -26,10 +26,10 @@
     "commit-commands@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/commit-commands/4fee769bf4ec",
-        "version": "4fee769bf4ec",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/commit-commands/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
         "installedAt": "2025-12-16T17:32:04.157Z",
-        "lastUpdated": "2025-12-16T22:19:13.177Z",
+        "lastUpdated": "2025-12-17T14:47:40.806Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }
@@ -37,10 +37,10 @@
     "plugin-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/plugin-dev/4fee769bf4ec",
-        "version": "4fee769bf4ec",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/plugin-dev/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
         "installedAt": "2025-12-16T17:32:28.841Z",
-        "lastUpdated": "2025-12-16T22:19:13.182Z",
+        "lastUpdated": "2025-12-17T14:47:40.832Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }
@@ -48,10 +48,10 @@
     "context7@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/context7/4fee769bf4ec",
-        "version": "4fee769bf4ec",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/context7/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
         "installedAt": "2025-12-16T17:33:12.079Z",
-        "lastUpdated": "2025-12-16T22:19:13.187Z",
+        "lastUpdated": "2025-12-17T14:47:40.838Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }

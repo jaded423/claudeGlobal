@@ -2,6 +2,23 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## December 17, 2025 - Removed Unused Plugins (greptile, context7)
+
+**Changes:**
+- Uninstalled `greptile@claude-plugins-official` plugin
+- Uninstalled `context7@claude-plugins-official` plugin
+- Removed both plugins from enabledPlugins in settings.json
+
+**Impact:**
+- Reduced plugin overhead by removing unused extensions
+- Remaining plugins: ralph-wiggum, commit-commands, plugin-dev
+
+**Files modified:**
+- `plugins/installed_plugins.json` - Removed greptile and context7 entries
+- `settings.json` - Removed greptile and context7 from enabledPlugins
+
+---
+
 ## December 17, 2025 - Plugin Marketplace Refresh & Cleanup
 
 **Changes:**

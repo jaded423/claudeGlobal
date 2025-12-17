@@ -128,7 +128,7 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Claude Code global configuration
 **Status**: Active critical infrastructure
 **Last Updated**: 2025-12-17
-**Recent Changes**: Plugin marketplace timestamp refreshed (automatic metadata update)
+**Recent Changes**: Removed unused plugins (greptile, context7) - keeping only ralph-wiggum, commit-commands, plugin-dev
 **Location**: `~/projects/.claude`
 **Symlinked to**: `~/.claude`
 **Purpose**: Global configuration for Claude Code across all projects

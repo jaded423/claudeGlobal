@@ -2,6 +2,23 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## December 17, 2025 - Plugin Marketplace Refresh & Cleanup
+
+**Changes:**
+- Plugin marketplace timestamp automatically updated during routine refresh
+- Removed unused `logs/log-command-metrics.csv` (empty file with only header row)
+
+**Impact:**
+- No functional changes; standard metadata update and cleanup
+
+**Files modified:**
+- `plugins/known_marketplaces.json` - lastUpdated timestamp refreshed
+
+**Files deleted:**
+- `logs/log-command-metrics.csv` - Unused metrics template removed
+
+---
+
 ## December 15, 2025 - Token Usage Tracking for /log Command
 
 **Changes:**

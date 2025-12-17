@@ -94,7 +94,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-12-17
-**Recent Changes:** Fixed critical email notification bug (v3.3.3) - emails stopped Dec 11 due to parsing bug from v3.0 refactor; also fixed exit code detection for git commands and email sending
+**Recent Changes:** Added --dry-run mode and token metrics tracking to log script (v3.6.1) - preview documentation runs without launching Claude, measure token usage per repo
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -127,8 +127,8 @@ Detailed descriptions of all active projects in your workspace.
 ## claudeGlobal
 **Type**: Claude Code global configuration
 **Status**: Active critical infrastructure
-**Last Updated**: 2025-12-09
-**Recent Changes**: Separated conversation history into dedicated claudeHistory repo, main repo now config-only (removed history.jsonl from tracking)
+**Last Updated**: 2025-12-17
+**Recent Changes**: Plugin marketplace timestamp refreshed (automatic metadata update)
 **Location**: `~/projects/.claude`
 **Symlinked to**: `~/.claude`
 **Purpose**: Global configuration for Claude Code across all projects

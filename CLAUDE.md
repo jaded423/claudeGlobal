@@ -535,10 +535,10 @@ crontab -l  # Check cron jobs
 **Full changelog**: [docs/changelog.md](docs/changelog.md)
 
 **Recent updates**:
+- **Dec 17, 2025** - Plugin marketplace refresh, cleaned up unused metrics file
 - **Nov 6, 2025** - Removed auto-commit from `/log` command, added graveyard system
 - **Nov 5, 2025** - Moved global config to version control with automated backups
 - **Nov 4, 2025** - Documentation restructure for efficiency (1100+ → ~300 lines)
-- **Nov 3, 2025** - Switched to symlinks for multi-AI documentation
 
 ## Resources
 

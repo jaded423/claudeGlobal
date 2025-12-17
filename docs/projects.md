@@ -37,8 +37,8 @@ Detailed descriptions of all active projects in your workspace.
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2025-12-15
-**Recent Changes**: Refactored .zshrc from 575→125 lines with modular `functions/` directory containing 5 categorized function files (claude, git, backup, docs, utils)
+**Last Updated**: 2025-12-17
+**Recent Changes**: Added ssh-functions.zsh - centralized SSH config with SSH_MACHINES array, sshm() function with btop landing, auto-generated aliases (book5, tower, omarchy, ubuntu)
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`, `~/.zsh/functions/`
 **Purpose**: Shell configuration with split-file security model
@@ -93,8 +93,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-13
-**Recent Changes:** Switched to code16 model (v3.6.0) - 28x faster commits (~10s vs ~5min), smart truncation sends actual code to model, VM 101 upgraded to 12 cores/40GB RAM with new NIC
+**Last Updated:** 2025-12-17
+**Recent Changes:** Fixed critical email notification bug (v3.3.3) - emails stopped Dec 11 due to parsing bug from v3.0 refactor; also fixed exit code detection for git commands and email sending
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

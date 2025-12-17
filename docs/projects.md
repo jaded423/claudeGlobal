@@ -38,7 +38,7 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: ZSH configuration
 **Status**: Active shell config
 **Last Updated**: 2025-12-17
-**Recent Changes**: Added ssh-functions.zsh - centralized SSH config with SSH_MACHINES array, sshm() function with btop landing, auto-generated aliases (book5, tower, omarchy, ubuntu)
+**Recent Changes**: Added `commits` function - shows commits across ALL repos chronologically with date filtering (today, yesterday, 7d, date ranges). Fixed shell parsing issues with backticks in commit messages.
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`, `~/.zsh/functions/`
 **Purpose**: Shell configuration with split-file security model
@@ -48,7 +48,7 @@ Detailed descriptions of all active projects in your workspace.
 - Secrets in `~/.zshrc.local` (local only, not committed)
 - **Modular functions**: 5 files in `functions/` directory
   - `claude.zsh` - Auto-update wrapper for Claude Code
-  - `git-functions.zsh` - `gitall`, `gitrepos` repository status
+  - `git-functions.zsh` - `gitall`, `gitrepos`, `commits` (cross-repo commit history)
   - `backup-functions.zsh` - `gitvi`, `gitdot` backup functions
   - `doc-functions.zsh` - `doc-check`, `doc-metrics`
   - `utils.zsh` - `docxdiff` for Office file comparison

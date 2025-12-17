@@ -2,7 +2,55 @@
 
 You are autonomously documenting what **you (Claude)** did during this session.
 
-## Context
+## Execution Environment
+
+**Run this in a persistent tmux session for user visibility.**
+
+Before doing any logging work, set up the tmux environment:
+
+```bash
+# Create session "log" if it doesn't exist (reuse if it does)
+tmux has-session -t log 2>/dev/null || tmux new-session -d -s log
+
+# Get current working directory for context
+CURRENT_DIR=$(pwd)
+```
+
+Then spawn a new Claude instance in that session to do the actual logging:
+
+```bash
+# Launch Claude in the log session with permissions bypass for doc changes
+tmux send-keys -t log "cd $CURRENT_DIR && claude --dangerously-skip-permissions" Enter
+
+# Wait for Claude to initialize
+sleep 5
+
+# Send the logging prompt
+tmux send-keys -t log "Analyze and document recent changes to this project. Run 'git status' and 'git diff' to see what changed. Then: 1) Add a changelog entry to this project's CLAUDE.md (format: ### YYYY-MM-DD - Title, with Changes, Impact, and Files modified sections), 2) Update ~/.claude/docs/projects.md with Last Updated date and Recent Changes for this project, 3) Log metrics (files_read, files_written, messages_tokens or -) to ~/.claude/logs/log-command-metrics.csv. When completely done, type /exit"
+sleep 1
+tmux send-keys -t log Enter
+```
+
+Then tell the user:
+```
+📝 /log spawned in tmux session 'log'
+
+To watch: tmux attach -t log
+
+Session persists after Claude exits - ready for next /log command.
+```
+
+**Important**: The tmux session stays active after Claude exits. User can attach anytime with `tmux attach -t log`.
+
+**Your job ends here** - after spawning and informing the user, you're done. The sections below are reference documentation for the spawned Claude instance.
+
+---
+
+## Reference: Documentation Format (for spawned Claude)
+
+The following sections document the expected format and patterns. The spawned Claude will discover what changed via git and apply these patterns.
+
+### Documentation System
 
 The user has a multi-layered documentation system:
 - **Project CLAUDE.md** - Detailed project-specific documentation with changelog
@@ -12,7 +60,7 @@ The user has a multi-layered documentation system:
 
 **Important**: This command is for documenting **Claude's changes**, not the user's manual work. The user documents their own changes. You document what you did.
 
-## Your Task
+### Task Steps
 
 1. **Analyze what YOU did this session**
    - Review git changes if in a git repo: `git status`, `git diff`
@@ -74,30 +122,34 @@ The user has a multi-layered documentation system:
 
    For minor project updates, just updating docs/projects.md is sufficient.
 
-7. **Log token usage for this /log command**
-   Append a one-liner to `~/.claude/logs/log-command-tokens.csv` with:
+7. **Log session metrics**
+   Append metrics to `~/.claude/logs/log-command-metrics.csv` with:
    - Timestamp (ISO format)
    - Project name
-   - Tokens used running this /log command
+   - Files read (count of Read tool calls you made during /log)
+   - Files written (count of Edit/Write tool calls you made during /log)
+   - Session messages token count (from /context if user provides it)
 
-   **To get token count**: Check the token usage displayed in the Claude Code interface or use the session stats.
+   **How to get accurate token count**:
+   The user can run `/context` before and after `/log` to see the "Messages" delta.
+   If they provide the final Messages token count, log it. Otherwise use "-" for unknown.
 
-   **Format** (CSV for easy analysis):
+   **Format** (CSV):
    ```
-   timestamp,project,tokens_used
-   2025-11-06T14:30:00,scripts,1250
-   2025-11-06T15:45:00,nvimConfig,980
+   timestamp,project,files_read,files_written,messages_tokens
+   2025-12-17T14:30:00-06:00,scripts,3,2,4200
+   2025-12-17T15:45:00-06:00,nvimConfig,2,1,-
    ```
 
    **First time**: Create the file with header if it doesn't exist:
    ```bash
    mkdir -p ~/.claude/logs
-   echo "timestamp,project,tokens_used" > ~/.claude/logs/log-command-tokens.csv
+   echo "timestamp,project,files_read,files_written,messages_tokens" > ~/.claude/logs/log-command-metrics.csv
    ```
 
-   **Append entry**:
+   **Append entry** (count your actual tool usage during this /log run):
    ```bash
-   echo "$(date -Iseconds),PROJECT_NAME,TOKEN_COUNT" >> ~/.claude/logs/log-command-tokens.csv
+   echo "$(date -Iseconds),PROJECT_NAME,FILES_READ,FILES_WRITTEN,MESSAGES_TOKENS" >> ~/.claude/logs/log-command-metrics.csv
    ```
 
 8. **Summary for user**
@@ -111,12 +163,15 @@ The user has a multi-layered documentation system:
    Global changes:
    - ~/.claude/docs/projects.md - Updated [project-name] section
 
-   Token usage logged: X tokens → ~/.claude/logs/log-command-tokens.csv
+   Metrics logged → ~/.claude/logs/log-command-metrics.csv
+   - Files read: X | Files written: Y | Messages tokens: Z (or - if unknown)
+
+   💡 For accurate token tracking: run /context before and after /log, note the "Messages" delta.
 
    Note: Changes saved locally. Your hourly backup will commit with AI-generated message.
    ```
 
-## Important Guidelines
+### Important Guidelines
 
 **Be autonomous:**
 - NO questions - you know what you did during the session
@@ -144,7 +199,7 @@ The user has a multi-layered documentation system:
 - If project not in docs/projects.md: offer to add it
 - If working in global .claude directory: only update global docs
 
-## Example Workflow
+### Example Workflow
 
 ```
 User runs /log in ~/scripts

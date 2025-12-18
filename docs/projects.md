@@ -93,8 +93,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-17
-**Recent Changes:** Added --dry-run mode and token metrics tracking to log script (v3.6.1) - preview documentation runs without launching Claude, measure token usage per repo
+**Last Updated:** 2025-12-18
+**Recent Changes:** Updated hourlyBackup.sh script with version number and enhanced comments.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

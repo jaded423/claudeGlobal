@@ -15,3 +15,5 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2025-12-18T15:43:17-06:00,scripts,230,3336,2496,11.0,qwen-gon-jinn
 2025-12-18T15:43:46-06:00,test-backup-repo,25,378,271,12.9,qwen-gon-jinn
 2025-12-18T16:01:32-06:00,test-backup-repo,29,378,334,13.0,qwen-gon-jinn
+2025-12-18T16:39:26-06:00,.claude,120,1258,1411,12.2,qwen-gon-jinn
+2025-12-18T16:39:56-06:00,test-backup-repo,25,378,289,13.1,qwen-gon-jinn

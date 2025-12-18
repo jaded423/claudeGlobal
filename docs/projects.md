@@ -94,7 +94,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-12-18
-**Recent Changes:** Updated hourlyBackup.sh script with version number and enhanced comments.
+**Recent Changes:** Updated changelog parsing logic to support multiple formats and improve accuracy.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

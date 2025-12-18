@@ -4,10 +4,10 @@
     "ralph-wiggum@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/ralph-wiggum/ab2b6d0cad88",
-        "version": "ab2b6d0cad88",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/ralph-wiggum/68a5c3685fde",
+        "version": "68a5c3685fde",
         "installedAt": "2025-12-16T17:31:37.826Z",
-        "lastUpdated": "2025-12-17T14:47:40.791Z",
+        "lastUpdated": "2025-12-18T20:04:27.500Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }
@@ -15,10 +15,10 @@
     "commit-commands@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/commit-commands/ab2b6d0cad88",
-        "version": "ab2b6d0cad88",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/commit-commands/68a5c3685fde",
+        "version": "68a5c3685fde",
         "installedAt": "2025-12-16T17:32:04.157Z",
-        "lastUpdated": "2025-12-17T14:47:40.806Z",
+        "lastUpdated": "2025-12-18T20:04:27.506Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }
@@ -26,10 +26,10 @@
     "plugin-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/plugin-dev/ab2b6d0cad88",
-        "version": "ab2b6d0cad88",
+        "installPath": "/Users/j/.claude/plugins/cache/claude-plugins-official/plugin-dev/68a5c3685fde",
+        "version": "68a5c3685fde",
         "installedAt": "2025-12-16T17:32:28.841Z",
-        "lastUpdated": "2025-12-17T14:47:40.832Z",
+        "lastUpdated": "2025-12-18T20:04:27.533Z",
         "gitCommitSha": "0f1ab46a66c9822796bf0e0ac1329f14445266b9",
         "isLocal": true
       }

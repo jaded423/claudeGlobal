@@ -94,7 +94,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-12-18
-**Recent Changes:** Updated changelog parsing logic to support multiple formats and improve accuracy.
+**Recent Changes:** The backup workflow was refactored to generate AI-powered documentation before commits, using a more capable model (`qwen3-coder-30b-a3b`) and introduced a new utility script for preparing markdown files for NotebookLM uploads.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

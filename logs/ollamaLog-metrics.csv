@@ -10,3 +10,7 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2025-12-18T09:50:50-06:00,scripts,141,2119,1578,11.5,code16
 2025-12-18T10:41:43-06:00,scripts,48,475,431,9.4,code16
 2025-12-18T11:01:07-06:00,scripts,53,458,447,9.3,code16
+2025-12-18T15:20:06-06:00,.claude,154,1816,1965,12.9,code16-tuned
+2025-12-18T15:39:21-06:00,.claude,184,1949,2035,11.2,qwen-gon-jinn
+2025-12-18T15:43:17-06:00,scripts,230,3336,2496,11.0,qwen-gon-jinn
+2025-12-18T15:43:46-06:00,test-backup-repo,25,378,271,12.9,qwen-gon-jinn

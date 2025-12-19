@@ -93,8 +93,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-18
-**Recent Changes:** The backup workflow was refactored to generate AI-powered documentation before commits, using a more capable model (`qwen3-coder-30b-a3b`) and introduced a new utility script for preparing markdown files for NotebookLM uploads.
+**Last Updated:** 2025-12-19
+**Recent Changes:** Added new todo management scripts in the todo/ directory to help developers track and manage tasks through simple command-line interface. The scripts provide basic functionality for adding, listing, and completing todo items with minimal dependencies.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

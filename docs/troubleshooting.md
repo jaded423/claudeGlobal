@@ -507,6 +507,68 @@ After adding Twingate resources, your automated scripts should work from anywher
 - ✅ `ollamaSummary.py` - Can reach Ollama server at 192.168.2.126
 - ✅ Manual SSH to all hosts and VMs works remotely
 
+### Mac Twingate Client Frequent Disconnections
+
+**Problem:** Receiving frequent "disconnected/reconnected" emails from Twingate even though the Mac is on and active. Twingate client keeps cycling connection state.
+
+**Symptoms:**
+- Multiple disconnect/reconnect emails per day from Twingate
+- Emails show brief disconnections followed by immediate reconnections
+- Mac is not sleeping but Twingate reports connection cycling
+
+**Root Causes Identified:**
+
+1. **Network Service Priority:** USB Ethernet adapters (AX88179A, USB-C Dock Ethernet) are prioritized above Wi-Fi in macOS network service order. During sleep/wake cycles, macOS briefly checks these inactive adapters before falling back to Wi-Fi, causing momentary network drops.
+
+2. **Sleep/Wake Cycling:** macOS undergoes frequent display/disk sleep cycles (potentially hundreds per day). Each cycle can briefly disrupt network connectivity.
+
+3. **Network Over Sleep Disabled:** By default, `networkoversleep = 0`, meaning network connections aren't maintained during sleep states.
+
+**Solution - Fix Both Issues:**
+
+```bash
+# 1. Check current network service order
+networksetup -listnetworkserviceorder
+
+# If Wi-Fi is not #1 and you primarily use Wi-Fi:
+# 2. Move Wi-Fi to top priority
+sudo networksetup -ordernetworkservices "Wi-Fi" "AX88179A" "USB 10/100/1000 LAN" "USB-C Dock Ethernet" "Thunderbolt Bridge" "Twingate"
+
+# 3. Keep network alive during sleep
+sudo pmset -a networkoversleep 1
+```
+
+**Verify Changes:**
+```bash
+# Check network order (Wi-Fi should be #1)
+networksetup -listnetworkserviceorder
+
+# Check networkoversleep (should show 1)
+pmset -g | grep networkoversleep
+```
+
+**Why This Works:**
+- **Wi-Fi priority:** macOS checks Wi-Fi first on wake, avoiding delays from inactive Ethernet adapters
+- **Network over sleep:** Network connection persists through sleep states, preventing Twingate disconnections
+
+**Diagnostic Commands Used:**
+```bash
+# Check sleep/wake frequency
+pmset -g log | grep "Wake from\|Sleep" | tail -30
+
+# Check power settings
+pmset -g
+
+# Check network interfaces and status
+ifconfig en0 | grep status      # Wi-Fi
+networksetup -getinfo "Wi-Fi"   # Wi-Fi details
+route get default               # Active network interface
+```
+
+**Date Fixed:** 2025-12-19
+
+---
+
 ## Getting Help
 
 If you encounter an issue not covered here:

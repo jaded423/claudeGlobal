@@ -55,7 +55,7 @@ See **[~/.claude/CLAUDE.md](../.claude/CLAUDE.md)** for full details on Claude C
 | **Proxmox Cluster "home-cluster"** | | 2-node HA cluster | 100-180W | ✅ Active |
 | **├─ prox-book5 (node 1)** | 192.168.2.250 | Samsung Galaxy Book5 Pro, 16GB RAM | 50-100W | ✅ Active |
 | **│  └─ VM 100: Omarchy** | 192.168.2.161 | Arch Linux desktop (DHH's Omarchy distro) | - | ✅ Auto-start |
-| **└─ prox-tower (node 2)** | 192.168.2.249 / 192.168.1.249 | ThinkStation 510, 32GB RAM, Xeon E5-1620, **Dual-NIC** | 50-80W | ✅ Active |
+| **└─ prox-tower (node 2)** | 192.168.2.249 / 192.168.1.249 | ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 (16c/32t), **Dual-NIC** | 50-80W | ✅ Active |
 |    **├─ Twingate (systemd)** | (host) | Native systemd service (no container) | - | ✅ Auto-start |
 |    **└─ VM 101: Ubuntu Server** | **192.168.1.126** | Ubuntu 24.04 Server (2.5GbE network) | - | ✅ Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, Twingate backup, MagicMirror kiosk | 3-4W | ✅ Active |
@@ -91,7 +91,7 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │       └── Auto-starts on boot ✅
 │
 ├── NODE 2: prox-tower (ThinkStation 510) - DUAL-NIC SETUP
-│   ├── Hardware: 32GB RAM, Xeon E5-1620 v4 (4c/8t), NVIDIA Quadro M4000
+│   ├── Hardware: 78GB RAM, Xeon E5-2683 v4 (16c/32t), NVIDIA Quadro M4000
 │   ├── Network (Dual-NIC Dec 13, 2025):
 │   │   ├── vmbr0 @ 192.168.2.249 - Intel I218-LM (1GbE) - Management/Twingate/AMT
 │   │   │   └── TSO/GSO/GRO disabled (see Known Issues)
@@ -102,8 +102,9 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │   ├── Twingate Connector (systemd) - Native host service, auto-start ✅
 │   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
-│   └── VM 101: Ubuntu Server 24.04 @ 192.168.1.126 (40GB RAM, 6 cores, 300GB disk)
+│   └── VM 101: Ubuntu Server 24.04 @ 192.168.1.126 (40GB RAM, 14 cores, 300GB disk)
 │       └── On vmbr1 (2.5GbE) for fast media streaming
+│       ├── CPU pinning: affinity 2-15,18-31 (host keeps cores 0-1)
 │       ├── UEFI boot, SSH enabled
 │       ├── Rebuilt Dec 12, 2025 (fresh install after storage conversion)
 │       ├── Docker + All Services:
@@ -1703,6 +1704,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-19 | **VM 101 CPU pinning:** Increased cores 12→14, added CPU affinity (cores 2-15,18-31), host reserves cores 0-1 |
 | 2025-12-14 | **Plex migration:** Replaced Jellyfin with Plex, fixed Twingate route conflict causing NFS hangs |
 | 2025-12-13 | **NFS storage expansion:** Set up cross-subnet NFS from book5 (847GB) to VM 101 for Jellyfin, moved 22GB movies |
 | 2025-12-13 | **Hardware benchmarks:** Verified CPU upgrade (16c Xeon E5-2683 v4), 78GB RAM, 2.5GbE (1.36 Gbps confirmed) |
@@ -1995,3 +1997,115 @@ Google Drives:     ~/GoogleDrive/ and ~/elevatedDrive/
 Ollama models:     /usr/share/ollama/.ollama/models/
 Systemd services:  ~/.config/systemd/user/
 ```
+
+---
+
+## GPU Passthrough Setup (In Progress)
+
+**Started:** December 19, 2025
+**Status:** Waiting for BIOS VT-d enable (requires physical access)
+
+### What's Done
+
+1. ✅ **GRUB configured:** `intel_iommu=on iommu=pt` added to kernel params
+2. ✅ **Nouveau blacklisted:** `/etc/modprobe.d/blacklist-nouveau.conf`
+3. ✅ **VFIO configured:** `/etc/modprobe.d/vfio.conf` with GPU IDs `10de:13f1,10de:0fbb`
+4. ✅ **Initramfs updated:** All kernels regenerated
+5. ✅ **VFIO modules loading:** Confirmed `vfio_pci` loaded at boot
+
+### Remaining Steps (When Home)
+
+**Step 1: Enable VT-d in BIOS**
+1. Reboot prox-tower, press **F1** during POST
+2. Navigate to: **Security** → **Virtualization**
+3. Enable **Intel VT-d Feature**
+4. Save and exit (F10)
+
+**Step 2: Verify IOMMU Groups**
+```bash
+ssh root@192.168.2.249 "dmesg | grep -i dmar | head -10"
+# Should show: DMAR: Intel(R) Virtualization Technology for Directed I/O
+
+# Check GPU is in its own IOMMU group
+ssh root@192.168.2.249 "bash -c 'for g in /sys/kernel/iommu_groups/*/; do for d in \$g/devices/*; do echo \"\$(basename \$g): \$(lspci -nns \$(basename \$d))\"; done; done' | grep -i nvidia"
+```
+
+**Step 3: Verify GPU bound to vfio-pci**
+```bash
+ssh root@192.168.2.249 "lspci -nnk -s 01:00"
+# Should show: Kernel driver in use: vfio-pci
+```
+
+**Step 4: Add GPU to VM 101**
+```bash
+# Option A: Via Proxmox Web UI
+# VM 101 → Hardware → Add → PCI Device → Select 01:00.0 (Quadro M4000)
+# Check "All Functions" to include audio device
+
+# Option B: Via command line
+ssh root@192.168.2.249 "qm set 101 -hostpci0 01:00,pcie=1"
+```
+
+**Step 5: Start VM and Install NVIDIA Drivers**
+```bash
+# Start VM
+ssh root@192.168.2.249 "qm start 101"
+
+# Wait for boot, then SSH to VM
+ssh jaded@192.168.1.126
+
+# Install NVIDIA drivers (in VM)
+sudo apt update
+sudo apt install -y nvidia-driver-535 nvidia-utils-535
+
+# Reboot VM
+sudo reboot
+```
+
+**Step 6: Verify GPU in VM**
+```bash
+ssh jaded@192.168.1.126 "nvidia-smi"
+# Should show: Quadro M4000, 8GB VRAM
+```
+
+**Step 7: Configure Ollama for GPU**
+```bash
+# Ollama auto-detects NVIDIA GPUs, just restart it
+ssh jaded@192.168.1.126 "sudo systemctl restart ollama"
+
+# Test GPU inference
+ssh jaded@192.168.1.126 "ollama run llama3.2:3b 'Hello, are you using GPU?' --verbose"
+# Look for: "gpu" in the output stats
+```
+
+### GPU Specs (NVIDIA Quadro M4000)
+
+- **VRAM:** 8GB GDDR5
+- **CUDA Cores:** 1,664
+- **Architecture:** Maxwell (GM204)
+- **Expected speedup:** 10-20x for models ≤7B, 3-5x for 14B models
+
+### Troubleshooting
+
+**GPU not showing in VM:**
+```bash
+# Check if GPU is bound to vfio-pci on host
+lspci -nnk -s 01:00
+
+# If still using nouveau, manually unbind and rebind
+echo "0000:01:00.0" > /sys/bus/pci/drivers/nouveau/unbind
+echo "0000:01:00.0" > /sys/bus/pci/drivers/vfio-pci/bind
+```
+
+**nvidia-smi not working in VM:**
+```bash
+# Check if GPU is visible
+lspci | grep -i nvidia
+
+# Check driver loaded
+lsmod | grep nvidia
+
+# Reinstall drivers if needed
+sudo apt install --reinstall nvidia-driver-535
+```
+

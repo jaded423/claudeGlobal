@@ -93,8 +93,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-19
-**Recent Changes:** Added new todo management scripts in the todo/ directory to help developers track and manage tasks through simple command-line interface. The scripts provide basic functionality for adding, listing, and completing todo items with minimal dependencies.
+**Last Updated:** 2025-12-20
+**Recent Changes:** The email reminder script now respects business hours, avoiding notifications on weekends or outside 8am–6pm. Additionally, the Ollama-based commit summary tool has been updated to use a hybrid GPU/CPU model for faster inference.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -255,8 +255,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-14
-**Recent Changes**: Migrated from Jellyfin to Plex (stability issues), fixed critical Twingate route conflict that was causing NFS hangs (980ms→0.5ms), created systemd service + cron to permanently override Twingate's VM 101 route on book5
+**Last Updated**: 2025-12-19
+**Recent Changes**: Configured OpenCode + remote Ollama access - SSH tunnel LaunchAgent on Mac, Ollama systemd override on VM 101, identified 7 tool-capable models for OpenCode workflows
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c, 2.5GbE, ZFS storage, hosts VM 101)

@@ -1704,6 +1704,8 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-20 | **GPU Passthrough complete:** Quadro M4000 (8GB) passed to VM 101, NVIDIA driver 535, q35 machine type, hybrid GPU/CPU offloading for 14B+ models (2x speedup) |
+| 2025-12-19 | **OpenCode + Ollama remote access:** Configured Ollama to listen externally, set up SSH tunnel LaunchAgent on Mac, created OpenCode config for 7 tool-capable models |
 | 2025-12-19 | **VM 101 CPU pinning:** Increased cores 12→14, added CPU affinity (cores 2-15,18-31), host reserves cores 0-1 |
 | 2025-12-14 | **Plex migration:** Replaced Jellyfin with Plex, fixed Twingate route conflict causing NFS hangs |
 | 2025-12-13 | **NFS storage expansion:** Set up cross-subnet NFS from book5 (847GB) to VM 101 for Jellyfin, moved 22GB movies |
@@ -1722,6 +1724,45 @@ curl http://localhost:8080  # Should return HTML
 | 2025-12-01 | 2-node Proxmox cluster creation, VM migration to prox-tower |
 | 2025-11-29 | Migrated from bare-metal CachyOS to Proxmox VE |
 | 2025-11-28 | Personal router setup (192.168.2.x subnet) |
+
+### 2025-12-19 - OpenCode + Remote Ollama Configuration
+
+**Problem:** User wanted to use OpenCode CLI on Mac with Ollama models running on VM 101 (192.168.1.126).
+
+**Server-Side Changes (VM 101):**
+- Created systemd override: `/etc/systemd/system/ollama.service.d/override.conf`
+- Added `OLLAMA_HOST=0.0.0.0` to listen on all interfaces
+- Added `OLLAMA_ORIGINS=*` to allow external requests
+- Passwordless sudo enabled for jaded user
+
+**Mac-Side Changes:**
+- Created SSH tunnel LaunchAgent: `~/Library/LaunchAgents/com.ollama.tunnel.plist`
+  - Forwards `localhost:11434` → VM 101's Ollama
+  - Auto-starts on login, KeepAlive enabled
+  - Required because Twingate passes TCP but returns empty HTTP replies
+- Created OpenCode config: `~/.config/opencode/opencode.json`
+  - Points to `http://localhost:11434/v1` (via SSH tunnel)
+  - 7 tool-capable models configured
+
+**Tool-Capable Models (OpenCode requires tool/function calling):**
+- Devstral (15GB) - Best for coding
+- devstral-small-2 (15GB)
+- qwen3:14b (9.3GB) - Fast & capable
+- qwen2.5:7b (4.7GB) - Balanced
+- llama3.2 (2GB) - Quick responses
+- llama3.2:3b, llama3.2:1b
+
+**Models NOT tool-capable (still usable via Ollama directly):**
+- qwen-gon-jinn, Qwen3-Pure (base models)
+- DeepCode, deepseek-coder-v2 (coder models without tool templates)
+- phi4, phi3.5, gemma2, qwen2.5-coder
+
+**Impact:**
+- OpenCode on Mac can now use remote Ollama models for AI-assisted coding
+- SSH tunnel provides reliable connection despite Twingate HTTP issues
+- 7 models available for tool-based workflows, 11 more for direct Ollama use
+
+---
 
 ### 2025-12-14 - Plex Migration & Twingate Route Fix
 
@@ -2000,112 +2041,155 @@ Systemd services:  ~/.config/systemd/user/
 
 ---
 
-## GPU Passthrough Setup (In Progress)
+## GPU Passthrough Setup ✅ COMPLETE
 
 **Started:** December 19, 2025
-**Status:** Waiting for BIOS VT-d enable (requires physical access)
+**Completed:** December 20, 2025
+**Status:** Fully operational - Quadro M4000 passed through to VM 101
 
-### What's Done
+### Configuration Summary
 
-1. ✅ **GRUB configured:** `intel_iommu=on iommu=pt` added to kernel params
-2. ✅ **Nouveau blacklisted:** `/etc/modprobe.d/blacklist-nouveau.conf`
-3. ✅ **VFIO configured:** `/etc/modprobe.d/vfio.conf` with GPU IDs `10de:13f1,10de:0fbb`
-4. ✅ **Initramfs updated:** All kernels regenerated
-5. ✅ **VFIO modules loading:** Confirmed `vfio_pci` loaded at boot
+| Component | Setting |
+|-----------|---------|
+| **GPU** | NVIDIA Quadro M4000 (8GB GDDR5, 1664 CUDA cores, Maxwell) |
+| **Host Driver** | vfio-pci (passthrough to VM) |
+| **VM Driver** | nvidia-driver-535.274.02, CUDA 12.2 |
+| **IOMMU Group** | 45 (GPU + Audio isolated together) |
+| **VM Machine Type** | q35 (required for PCIe passthrough) |
+| **VM Network Interface** | Changed from `ens18` to `enp6s18` (q35 effect) |
 
-### Remaining Steps (When Home)
+### Host Configuration (prox-tower)
 
-**Step 1: Enable VT-d in BIOS**
-1. Reboot prox-tower, press **F1** during POST
-2. Navigate to: **Security** → **Virtualization**
-3. Enable **Intel VT-d Feature**
-4. Save and exit (F10)
-
-**Step 2: Verify IOMMU Groups**
-```bash
-ssh root@192.168.2.249 "dmesg | grep -i dmar | head -10"
-# Should show: DMAR: Intel(R) Virtualization Technology for Directed I/O
-
-# Check GPU is in its own IOMMU group
-ssh root@192.168.2.249 "bash -c 'for g in /sys/kernel/iommu_groups/*/; do for d in \$g/devices/*; do echo \"\$(basename \$g): \$(lspci -nns \$(basename \$d))\"; done; done' | grep -i nvidia"
+**GRUB:** `/etc/default/grub`
+```
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"
 ```
 
-**Step 3: Verify GPU bound to vfio-pci**
-```bash
-ssh root@192.168.2.249 "lspci -nnk -s 01:00"
-# Should show: Kernel driver in use: vfio-pci
+**VFIO:** `/etc/modprobe.d/vfio.conf`
+```
+options vfio-pci ids=10de:13f1,10de:0fbb
+softdep nouveau pre: vfio-pci
+softdep snd_hda_intel pre: vfio-pci
 ```
 
-**Step 4: Add GPU to VM 101**
-```bash
-# Option A: Via Proxmox Web UI
-# VM 101 → Hardware → Add → PCI Device → Select 01:00.0 (Quadro M4000)
-# Check "All Functions" to include audio device
-
-# Option B: Via command line
-ssh root@192.168.2.249 "qm set 101 -hostpci0 01:00,pcie=1"
+**Blacklist:** `/etc/modprobe.d/blacklist-nouveau.conf`
+```
+blacklist nouveau
+blacklist nvidiafb
+options nouveau modeset=0
 ```
 
-**Step 5: Start VM and Install NVIDIA Drivers**
-```bash
-# Start VM
-ssh root@192.168.2.249 "qm start 101"
-
-# Wait for boot, then SSH to VM
-ssh jaded@192.168.1.126
-
-# Install NVIDIA drivers (in VM)
-sudo apt update
-sudo apt install -y nvidia-driver-535 nvidia-utils-535
-
-# Reboot VM
-sudo reboot
+**VM 101 PCI Config:**
+```
+hostpci0: 0000:01:00,pcie=1,x-vga=1
+machine: q35
 ```
 
-**Step 6: Verify GPU in VM**
+### Performance Results
+
+**Ollama LLM Inference (GPU-accelerated):**
+
+| Model | VRAM Used | Prompt Eval | Token Gen | Notes |
+|-------|-----------|-------------|-----------|-------|
+| llama3.2:3b | 4.2 GB | 78 tok/s | 25 tok/s | Fast, fits easily |
+| qwen2.5:7b | 6.8 GB | 104 tok/s | 12 tok/s | Near VRAM limit |
+| phi4:14b | N/A | N/A | N/A | ❌ Exceeds 8GB VRAM |
+
+**Model Compatibility:**
+- ✅ **Full GPU:** All models ≤7B (llama3.2, qwen2.5:7b, gemma2:2b, phi3.5, deepseek-coder:6.7b)
+- ✅ **Hybrid GPU/CPU:** 14B+ models via `-hybrid` variants (see below)
+
+### Hybrid GPU Offloading (14B+ Models)
+
+Large models that exceed 8GB VRAM can run in hybrid mode - part on GPU, part on CPU RAM.
+
+**Pre-configured hybrid models:**
+
+| Model | GPU Layers | VRAM Used | Speedup vs CPU |
+|-------|------------|-----------|----------------|
+| `phi4-hybrid` | 24 | ~7.9GB | **2x faster** |
+| `qwen3-hybrid` | 24 | ~7.9GB | ~2x faster |
+| `devstral-hybrid` | 20 | ~6GB | ~1.5x faster |
+
+**Usage:**
 ```bash
+# Use pre-configured hybrid models
+ollama run phi4-hybrid "Your prompt"
+ollama run qwen3-hybrid "Your prompt"
+
+# Or manually specify GPU layers for any model
+ollama run phi4:14b "prompt" --num-gpu 24
+
+# Via API
+curl http://localhost:11434/api/generate -d '{"model": "phi4:14b", "prompt": "...", "options": {"num_gpu": 24}}'
+```
+
+**Creating new hybrid models:**
+```bash
+# Create a Modelfile
+cat > /tmp/Modelfile << EOF
+FROM model-name:tag
+PARAMETER num_gpu 24
+EOF
+
+# Build the hybrid variant
+ollama create model-hybrid -f /tmp/Modelfile
+```
+
+**Finding optimal num_gpu:**
+- Start with 20-24 layers for 14B models
+- Check VRAM: `nvidia-smi --query-gpu=memory.used --format=csv`
+- If OOM crash, reduce layers by 2-3
+- Target: ~7.5-7.9GB of 8GB VRAM for best performance
+
+### Verification Commands
+
+```bash
+# Check GPU status in VM
 ssh jaded@192.168.1.126 "nvidia-smi"
-# Should show: Quadro M4000, 8GB VRAM
+
+# Check VRAM usage
+ssh jaded@192.168.1.126 "nvidia-smi --query-gpu=memory.used,memory.total --format=csv"
+
+# Test Ollama GPU acceleration
+ssh jaded@192.168.1.126 "ollama run llama3.2:3b 'Hello' --verbose 2>&1 | grep 'eval rate'"
+
+# Check host vfio binding
+ssh root@192.168.2.249 "lspci -nnk -s 01:00 | grep 'driver in use'"
+# Should show: vfio-pci
 ```
-
-**Step 7: Configure Ollama for GPU**
-```bash
-# Ollama auto-detects NVIDIA GPUs, just restart it
-ssh jaded@192.168.1.126 "sudo systemctl restart ollama"
-
-# Test GPU inference
-ssh jaded@192.168.1.126 "ollama run llama3.2:3b 'Hello, are you using GPU?' --verbose"
-# Look for: "gpu" in the output stats
-```
-
-### GPU Specs (NVIDIA Quadro M4000)
-
-- **VRAM:** 8GB GDDR5
-- **CUDA Cores:** 1,664
-- **Architecture:** Maxwell (GM204)
-- **Expected speedup:** 10-20x for models ≤7B, 3-5x for 14B models
 
 ### Troubleshooting
 
 **GPU not showing in VM:**
 ```bash
-# Check if GPU is bound to vfio-pci on host
+# On host: Check vfio binding
 lspci -nnk -s 01:00
 
-# If still using nouveau, manually unbind and rebind
-echo "0000:01:00.0" > /sys/bus/pci/drivers/nouveau/unbind
-echo "0000:01:00.0" > /sys/bus/pci/drivers/vfio-pci/bind
+# Verify IOMMU enabled
+dmesg | grep -i dmar
 ```
 
 **nvidia-smi not working in VM:**
 ```bash
-# Check if GPU is visible
+# Check GPU visible
 lspci | grep -i nvidia
 
 # Check driver loaded
 lsmod | grep nvidia
 
-# Reinstall drivers if needed
+# Reinstall if needed
 sudo apt install --reinstall nvidia-driver-535
 ```
+
+**Network broken after GPU passthrough:**
+- q35 machine type changes network device names
+- Check `ip link` for new interface name (likely `enp6s18` instead of `ens18`)
+- Update `/etc/netplan/*.yaml` with correct interface name
+- Run `sudo netplan apply`
+
+**14B models crashing:**
+- Quadro M4000 has 8GB VRAM
+- Models >8GB will fail to load or crash
+- Use quantized versions or smaller models
 

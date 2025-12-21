@@ -2,7 +2,7 @@
 
 Quick reference for accessing all machines in the multi-location network.
 
-**Last Updated:** December 13, 2025 (Dual-NIC setup, VM 101 on 2.5GbE)
+**Last Updated:** December 20, 2025 (Unified SSH to Mac from all machines)
 
 ---
 
@@ -23,8 +23,9 @@ ssh jaded@192.168.1.126     # VM 101 - Ubuntu Server (via prox-tower, on 2.5GbE)
 # Raspberry Pi
 ssh jaded@192.168.2.131     # magic-pihole (Pi-hole, Twingate, MagicMirror)
 
-# Mac (from homelab via Twingate)
-ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
+# Mac (from homelab - direct LAN access)
+ssh j@192.168.2.226                    # Mac direct (from book5, tower)
+ssh mac                                # Using alias (works from book5, tower, termux)
 ```
 
 ---
@@ -75,7 +76,7 @@ ssh joshuabrown@host.docker.internal   # Mac via Twingate resource
 | **VM 100 (Omarchy)** | 192.168.2.161 | jaded | ProxyJump via .250 | Arch Desktop |
 | **VM 101 (Ubuntu)** | **192.168.1.126** | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin (2.5GbE) |
 | **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
-| **Mac** | host.docker.internal | joshuabrown | Twingate resource | Development |
+| **Mac (macAir)** | 192.168.2.226 | j | Direct (book5/tower), ProxyJump (termux) | Development |
 | **Work PC** | TBD | TBD | Twingate (planned) | RustDesk, Dev |
 
 ---
@@ -151,11 +152,23 @@ Host 192.168.2.131 pihole pi
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# Mac (via Twingate from homelab)
-Host mac macbook host.docker.internal
-  HostName host.docker.internal
-  User joshuabrown
-  IdentityFile ~/.ssh/id_ed25519
+# Mac (macAir) - direct LAN access
+Host mac macair macbook 192.168.2.226
+  HostName 192.168.2.226
+  User j
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Samsung S25 Ultra - Termux
+Host s25ultra phone termux
+  HostName 192.168.2.101    # or 192.168.1.96 depending on router
+  User u0_a499
+  Port 8022
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Note: Phone runs zsh with oh-my-zsh + powerlevel10k (configured Dec 20, 2025)
+# Plugins: git, zoxide, fzf, docker, npm, python, colored-man-pages, jsontools, history, sudo
 ```
 
 ---
@@ -183,13 +196,23 @@ ssh jaded@192.168.2.126     # Works via ProxyJump through Twingate
 
 ### Scenario 3: Working from Homelab to Mac
 ```bash
-# From prox-book5 or prox-tower
-ssh joshuabrown@host.docker.internal
+# From prox-book5 or prox-tower (direct LAN)
+ssh j@192.168.2.226
+ssh mac                      # Using alias
 ```
-- Requires Twingate connector running on homelab
-- Mac must be a Twingate resource (host.docker.internal)
+- Direct LAN access (same 192.168.2.x subnet)
+- No Twingate required when on local network
 
-### Scenario 4: Cross-Node Access (Proxmox to Proxmox)
+### Scenario 4: Working from Termux (Phone) to Mac
+```bash
+# Phone on 192.168.1.x network (fast router)
+ssh mac                      # ProxyJump via tower-fast automatically
+```
+- Phone IP varies: 192.168.1.96 (fast) or 192.168.2.101 (management)
+- Mac on 192.168.2.x not directly reachable from 192.168.1.x
+- ProxyJump through tower-fast (192.168.1.249) bridges networks
+
+### Scenario 5: Cross-Node Access (Proxmox to Proxmox)
 ```bash
 # From prox-book5 to prox-tower
 ssh root@192.168.2.249
@@ -209,7 +232,7 @@ ssh root@192.168.2.250
 | prox-book5 SSH | 192.168.2.250 | 22 | SSH to Node 1 + ProxyJump base |
 | prox-tower SSH | 192.168.2.249 | 22 | SSH to Node 2 + ProxyJump base |
 | magic-pihole SSH | 192.168.2.131 | 22 | SSH to Pi |
-| mac-ssh | host.docker.internal | 22 | SSH to Mac from homelab |
+| mac-ssh | 192.168.2.226 | 22 | SSH to Mac (LAN access, no Twingate needed locally) |
 | homeLab Shared | 192.168.2.250 | 139, 445 | Samba file sharing |
 
 **Note:** VMs (.161, .126) do NOT need separate Twingate resources - access them via ProxyJump through the Proxmox hosts.
@@ -272,7 +295,8 @@ ssh ubuntu        # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
 ssh vm101         # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
 ssh pihole        # → jaded@192.168.2.131
 ssh pi            # → jaded@192.168.2.131
-ssh mac           # → joshuabrown@host.docker.internal
+ssh mac           # → j@192.168.2.226
+ssh macair        # → j@192.168.2.226
 ```
 
 ---

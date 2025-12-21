@@ -8,6 +8,7 @@ This directory (`~/.claude/`) contains global configuration and commands that wo
 
 **📚 Detailed Documentation**: For comprehensive information, see the `~/.claude/docs/` directory:
 - **[projects.md](docs/projects.md)** - Detailed descriptions of all active projects
+- **[mac.md](docs/mac.md)** - Work Mac configuration (power management, Twingate client, dev environment)
 - **[homelab.md](docs/homelab.md)** - Home lab server documentation (cachyos-jade @ 192.168.2.250)
 - **[homelab-expansion.md](docs/homelab-expansion.md)** - Infrastructure expansion plans and checklist
 - **[homelab-multi-site-expansion.md](docs/homelab-multi-site-expansion.md)** - Multi-site Proxmox & CEPH architecture with CompTIA certification roadmap

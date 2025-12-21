@@ -2,6 +2,127 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## December 20, 2025 - Phone Terminal Setup (oh-my-zsh + powerlevel10k)
+
+**Summary:**
+Configured phone (Samsung S25 Ultra / Termux) terminal to match Mac's oh-my-zsh + powerlevel10k setup.
+
+**Changes Made (on phone via SSH from Mac):**
+
+Packages Installed:
+- `zsh` (5.9) - Modern shell
+- `zoxide` - Already installed, smart directory navigation
+- `fzf` - Already installed, fuzzy finder
+
+Software Configured:
+- **oh-my-zsh** - Cloned to `~/.oh-my-zsh`
+- **powerlevel10k** - Theme cloned to `~/.oh-my-zsh/custom/themes/powerlevel10k`
+- **~/.zshrc** - New config with powerlevel10k theme and Termux-compatible plugins
+- **~/.p10k.zsh** - Copied from Mac for identical prompt styling
+- **Default shell** - Changed to zsh via `chsh -s zsh`
+
+Plugins Enabled:
+- git, zoxide, fzf, docker, npm, python, colored-man-pages, jsontools, history, sudo
+
+Aliases Configured:
+- `vim`/`vi` → nvim
+- `vz` → edit .zshrc
+- `sz` → source .zshrc
+
+**Files on Phone:**
+- `~/.zshrc` - New zsh configuration
+- `~/.p10k.zsh` - Copied from Mac (~/projects/zshConfig/p10k.zsh)
+- `~/.oh-my-zsh/` - oh-my-zsh installation
+- `~/.oh-my-zsh/custom/themes/powerlevel10k/` - Theme
+- `~/.termux/shell` - Symlink to `/data/data/com.termux/files/usr/bin/zsh`
+
+**Impact:**
+- Phone terminal now matches Mac's prompt appearance
+- Consistent experience across devices
+- zoxide provides smart `z` navigation on phone
+- Git integration in prompt shows repo status
+
+---
+
+## December 20, 2025 - Unified SSH Access to Mac from All Machines
+
+**Summary:**
+Set up reliable SSH access to Mac (192.168.2.226) from all homelab machines, replacing the previous `host.docker.internal` Twingate-based approach with direct LAN access.
+
+**Changes Made:**
+
+Mac Configuration:
+- Added SSH public keys to `~/.ssh/authorized_keys` for:
+  - `root@prox-tower` (ssh-rsa)
+  - `jaded@ubuntu-server` (ssh-ed25519, newly generated)
+  - `termux@s25ultra` (ssh-ed25519)
+
+Remote Machine SSH Configs Updated:
+- **book5** (`~/.ssh/config`) - Mac entry: `192.168.2.226`, user `j`
+- **tower** (`~/.ssh/config`) - Cleaned duplicate entries, Mac entry: `192.168.2.226`, user `j`
+- **termux** (`~/.ssh/config`) - Mac entry with `ProxyJump tower-fast` for cross-network access
+
+Key Generation:
+- Generated new ed25519 SSH key on ubuntu-server (didn't have one)
+
+**Network Architecture:**
+- Mac at 192.168.2.226 (management network)
+- Direct access from book5, tower (same 192.168.2.x subnet)
+- Termux (phone) on 192.168.1.x requires ProxyJump through tower-fast (192.168.1.249)
+
+**Working SSH Access:**
+| Source | Method | Status |
+|--------|--------|--------|
+| book5 | Direct | ✅ |
+| tower | Direct | ✅ |
+| termux | ProxyJump via tower-fast | ✅ |
+| ubuntu-server | Not needed (VM) | Skipped |
+| omarchy | Not needed (VM) | Skipped |
+
+**Impact:**
+- Consistent `ssh mac` command works from all homelab machines
+- No longer dependent on Twingate `host.docker.internal` for local access
+- Phone can SSH to Mac even when on different subnet (via ProxyJump)
+
+**Files Modified:**
+- `~/.ssh/authorized_keys` (Mac) - Added 3 new public keys
+- `~/.ssh/config` (book5) - Updated Mac entry
+- `~/.ssh/config` (tower) - Cleaned up, updated Mac entry
+- `~/.ssh/config` (termux) - Added Mac with ProxyJump
+- `~/.claude/docs/ssh-access-cheatsheet.md` - Updated Mac access documentation
+
+**Note:** omarchy VM was unreachable at session start (encrypted disk needed login after reboot). SSH from VMs to Mac deemed unnecessary since user can ProxyJump through parent Proxmox hosts.
+
+---
+
+## December 20, 2025 - Mac Power Management & Documentation Split
+
+**Changes:**
+- Created `docs/mac.md` for Mac-specific configuration documentation
+- Configured always-on power management to fix Twingate disconnect issues
+- Separated Mac configs from homelab.md for cleaner organization
+
+**Power Settings Applied:**
+```bash
+sudo pmset -a sleep 0           # System never sleeps
+sudo pmset -a disablesleep 1    # Including lid close
+sudo pmset -a displaysleep 10   # Display sleeps after 10 min
+sudo pmset -a lowpowermode 0    # Low Power Mode off
+```
+
+**Problem Solved:**
+- Mac was sleeping after 1 minute on battery (6,466+ sleep/wake cycles)
+- Each sleep caused Twingate disconnect/reconnect emails
+- Now Mac stays awake 24/7, display sleeps after 10 min
+
+**Files created:**
+- `docs/mac.md` - New Mac-specific configuration docs
+
+**Files modified:**
+- `CLAUDE.md` - Added mac.md to docs listing
+
+---
+
 ## December 17, 2025 - Removed Unused Plugins (greptile, context7)
 
 **Changes:**

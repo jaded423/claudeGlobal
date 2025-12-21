@@ -255,8 +255,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-19
-**Recent Changes**: Configured OpenCode + remote Ollama access - SSH tunnel LaunchAgent on Mac, Ollama systemd override on VM 101, identified 7 tool-capable models for OpenCode workflows
+**Last Updated**: 2025-12-20
+**Recent Changes**: Unified SSH access to Mac from all machines - direct access from book5/tower (192.168.2.226), ProxyJump from termux via tower-fast. Replaced host.docker.internal with direct LAN IPs.
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c, 2.5GbE, ZFS storage, hosts VM 101)

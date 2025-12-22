@@ -94,7 +94,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2025-12-22
-**Recent Changes:** Added a new `health-monitor-report.sh` script to aggregate and display network health statistics from Proxmox cluster nodes, providing visibility into service timers, failure counts, and recent activity for troubleshooting.
+**Recent Changes:** The `ollamaSummary.py` script now supports multiple bullet point formats (dash, bullet, and asterisk) when formatting commit messages, improving compatibility with various input styles.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

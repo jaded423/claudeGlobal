@@ -30,3 +30,6 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2025-12-22T08:44:07-06:00,.claude,115,1731,1111,9.9,qwen-gon-jinn-hybrid
 2025-12-22T08:44:57-06:00,scripts,45,1354,412,9.8,qwen-gon-jinn-hybrid
 2025-12-22T08:45:32-06:00,test-backup-repo,30,378,249,9.2,qwen-gon-jinn-hybrid
+2025-12-22T11:14:33-06:00,.claude,121,1794,1064,9.2,qwen-gon-jinn-hybrid
+2025-12-22T11:16:21-06:00,loom,103,3687,1037,10.2,qwen-gon-jinn-hybrid
+2025-12-22T11:16:56-06:00,test-backup-repo,30,378,260,9.9,qwen-gon-jinn-hybrid

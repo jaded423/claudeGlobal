@@ -255,11 +255,11 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-20
-**Recent Changes**: Unified SSH access to Mac from all machines - direct access from book5/tower (192.168.2.226), ProxyJump from termux via tower-fast. Replaced host.docker.internal with direct LAN IPs.
+**Last Updated**: 2025-12-22
+**Recent Changes**: VM 101 CPU upgrade (14→28 vCPUs, affinity 4-31). Created qwen3-pure-hybrid model. Comprehensive LLM benchmark: CPU vs hybrid GPU comparison shows 1.32x speedup with hybrid mode. Fixed devstral-hybrid memory issue (num_gpu 20→18).
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
-  - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c, 2.5GbE, ZFS storage, hosts VM 101)
+  - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)
 **Purpose**: Clustered home lab infrastructure with HA capabilities, hosting development and production services
 
 **Key Services**:
@@ -351,8 +351,8 @@ docker logs -f twingate-connector
 ## loom
 **Type**: Automation pipeline
 **Status**: Active
-**Last Updated**: 2025-12-16
-**Recent Changes**: Fully autonomous pipeline with auto-exit - monitor detects completion, sends /exit, kills session, returns to terminal
+**Last Updated**: 2025-12-22
+**Recent Changes**: Added `--update` and `--transcribed` flags for post-generation editing and existing transcript support. Created man page (`man loom`).
 **Location**: `~/projects/loom`
 **GitHub**: Private repo with hourly backups
 **Purpose**: Convert Loom training videos into professional SOPs with HTML/PDF exports
@@ -364,26 +364,36 @@ docker logs -f twingate-connector
 - Background monitor detects completion and auto-exits Claude
 - Uses subscription tokens (not API) - saves money
 - Professional HTML/PDF exports for sharing with staff
+- **Update mode**: Edit .md, regenerate HTML/PDF (`loom -u topic`)
+- **Transcribed mode**: Skip download, use existing transcript (`loom -t file topic`)
+- **Man page**: Full documentation via `man loom`
 
 **Workflow**:
 ```bash
+# Full pipeline (Loom URL)
 loom https://www.loom.com/share/VIDEO_ID topic-name
-# Watch Claude work in your terminal
-# Auto-exits when done, returns to prompt
+
+# From existing transcript (skip download/transcribe)
+loom -t existing-transcript.txt topic-name
+
+# Edit markdown, regenerate outputs
+loom -u topic-name
 ```
 
 **Output**:
 - `transcriptions/{topic}-{date}.txt` - Raw transcript
-- `SOPs/{topic}.md` - Markdown SOP
+- `SOPs/{topic}.md` - Markdown SOP (source of truth for edits)
 - `SOPs/{topic}.html` - Styled HTML
 - `SOPs/{topic}.pdf` - Print-ready PDF
 
 **Key Files**:
-- `bin/loom` - Main pipeline script
+- `bin/loom` - Main pipeline script (3 modes: full, transcribed, update)
 - `bin/loom-monitor` - Background completion detector
 - `.claude/commands/sop.md` - SOP creation slash command
+- `.claude/commands/sop-update.md` - HTML/PDF regeneration slash command
+- `man/loom.1` - Unix man page
 
-**Documentation**: See `~/projects/loom/CLAUDE.md`
+**Documentation**: See `~/projects/loom/CLAUDE.md` or `man loom`
 
 ---
 

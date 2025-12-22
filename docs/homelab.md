@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 22, 2025 (VM 101 CPU upgrade: 28 vCPUs, affinity 4-31)
+**Last Updated:** December 22, 2025 (Hybrid model benchmarks, qwen3-pure-hybrid created, CPU vs GPU comparison)
 
 ---
 
@@ -1706,6 +1706,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-22 | **Hybrid model benchmarks:** Created qwen3-pure-hybrid (num_gpu=20), fixed devstral-hybrid (num_gpu 20→18). Comprehensive CPU vs GPU comparison: hybrid is 1.32x faster avg, qwen-gon-jinn-hybrid rated best overall |
 | 2025-12-22 | **VM 101 CPU upgrade:** Increased vCPUs 14→28, updated affinity to 4-31 (host reserves cores 0-3). Clarified Proxmox "cores" = vCPUs/threads, not physical cores |
 | 2025-12-20 | **GPU Passthrough complete:** Quadro M4000 (8GB) passed to VM 101, NVIDIA driver 535, q35 machine type, hybrid GPU/CPU offloading for 14B+ models (2x speedup) |
 | 2025-12-19 | **OpenCode + Ollama remote access:** Configured Ollama to listen externally, set up SSH tunnel LaunchAgent on Mac, created OpenCode config for 7 tool-capable models |

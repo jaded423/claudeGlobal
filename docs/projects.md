@@ -93,8 +93,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-20
-**Recent Changes:** The email reminder script now respects business hours, avoiding notifications on weekends or outside 8am–6pm. Additionally, the Ollama-based commit summary tool has been updated to use a hybrid GPU/CPU model for faster inference.
+**Last Updated:** 2025-12-22
+**Recent Changes:** Added a new `health-monitor-report.sh` script to aggregate and display network health statistics from Proxmox cluster nodes, providing visibility into service timers, failure counts, and recent activity for troubleshooting.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

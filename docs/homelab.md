@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 13, 2025 (Dual-NIC setup, VM 101 migrated to 2.5GbE network)
+**Last Updated:** December 22, 2025 (VM 101 CPU upgrade: 28 vCPUs, affinity 4-31)
 
 ---
 
@@ -102,9 +102,9 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │   ├── Twingate Connector (systemd) - Native host service, auto-start ✅
 │   ├── Cluster role: Node 2 (ID: 0x00000002)
 │   │
-│   └── VM 101: Ubuntu Server 24.04 @ 192.168.1.126 (40GB RAM, 14 cores, 300GB disk)
+│   └── VM 101: Ubuntu Server 24.04 @ 192.168.1.126 (40GB RAM, 28 vCPUs, 300GB disk)
 │       └── On vmbr1 (2.5GbE) for fast media streaming
-│       ├── CPU pinning: affinity 2-15,18-31 (host keeps cores 0-1)
+│       ├── CPU pinning: affinity 4-31 (host keeps cores 0-3)
 │       ├── UEFI boot, SSH enabled
 │       ├── Rebuilt Dec 12, 2025 (fresh install after storage conversion)
 │       ├── Docker + All Services:
@@ -163,8 +163,10 @@ The home lab now runs as a Type 1 hypervisor with VMs providing isolated service
 **Ubuntu Server VM (VM 101) @ 192.168.1.126:**
 **User:** jaded
 **OS:** Ubuntu Server 24.04 LTS
-**Specs:** 40GB RAM, 14 cores, 300GB disk, Quadro M4000 GPU passthrough
+**Specs:** 40GB RAM, 28 vCPUs, 300GB disk, Quadro M4000 GPU passthrough
 **Purpose:** All server services (Docker, Ollama, Plex, etc.)
+
+**Note on Proxmox CPU allocation:** Proxmox "cores" setting = vCPUs (threads), not physical cores. The E5-2683 v4 has 16 physical cores with hyperthreading = 32 logical CPUs. So "28 cores" in Proxmox = 28 vCPUs = ~14 physical cores worth of compute.
 
 **Key Services:**
 - SSH remote access (port 22)
@@ -1704,6 +1706,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-22 | **VM 101 CPU upgrade:** Increased vCPUs 14→28, updated affinity to 4-31 (host reserves cores 0-3). Clarified Proxmox "cores" = vCPUs/threads, not physical cores |
 | 2025-12-20 | **GPU Passthrough complete:** Quadro M4000 (8GB) passed to VM 101, NVIDIA driver 535, q35 machine type, hybrid GPU/CPU offloading for 14B+ models (2x speedup) |
 | 2025-12-19 | **OpenCode + Ollama remote access:** Configured Ollama to listen externally, set up SSH tunnel LaunchAgent on Mac, created OpenCode config for 7 tool-capable models |
 | 2025-12-19 | **VM 101 CPU pinning:** Increased cores 12→14, added CPU affinity (cores 2-15,18-31), host reserves cores 0-1 |

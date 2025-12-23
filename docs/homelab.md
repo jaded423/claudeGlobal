@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 22, 2025 (Hybrid model benchmarks, qwen3-pure-hybrid created, CPU vs GPU comparison)
+**Last Updated:** December 23, 2025 (GPU limit discovery: 18GB max for hybrid mode, model cleanup: 22→6 models, freed 70GB)
 
 ---
 
@@ -590,65 +590,47 @@ sudo ufw disable                # Disable firewall
 **API Endpoint:** `http://127.0.0.1:11434`
 **Open WebUI:** http://192.168.2.250:3000 (web interface for model interaction)
 
-**Installed Models (Total: ~30GB):**
+**Installed Models (Total: ~71GB, 6 models after Dec 23 cleanup):**
 
-*High-Quality Models (14B parameters):*
+*Large Hybrid Models (GPU+CPU offload, ~10-14 tok/s):*
 
-- **`phi4:14b`** (9.1GB) ⭐ **DEFAULT for git commits**
-  - **Best for:** Git commit messages, code analysis, complex reasoning
-  - **Speed:** Moderate (~15-20s for commits)
-  - **Notes:** Clean output, accurate conventional commit format, excellent code understanding
+- **`qwen3-pure-hybrid`** (18GB) ⭐ **Best overall performance**
+  - **Best for:** Complex reasoning, coding, analysis
+  - **Speed:** ~13.8 tok/s (GPU hybrid mode)
+  - **Notes:** Custom variant with num_gpu=20 for optimal GPU utilization
 
-- **`qwen3:14b`** (9.0GB)
-  - **Best for:** General reasoning, chat, analysis
-  - **Speed:** Moderate
-  - **Notes:** Has "thinking" mode that outputs reasoning before answers (not ideal for automation)
+- **`Qwen3-Pure`** (18GB)
+  - **Base model** for qwen3-pure-hybrid
+  - **Speed:** ~10 tok/s (auto GPU offload)
 
-*General Use Models:*
+- **`qwen-gon-jinn-hybrid`** (14GB) ⭐ **Best quality/speed balance**
+  - **Best for:** General tasks, coding, chat
+  - **Speed:** ~12 tok/s (GPU hybrid mode)
+  - **Notes:** Custom variant, excellent for everyday use
 
-- **`llama3.2:3b`** (2.0GB)
-  - **Best for:** General chat, summarization, Q&A, writing assistance
-  - **Speed:** Fast (3B parameters)
+- **`qwen-gon-jinn`** (14GB)
+  - **Base model** for qwen-gon-jinn-hybrid
 
-- **`phi3.5:3.8b`** (2.2GB)
-  - **Best for:** Mathematical reasoning, logical problems, structured tasks
-  - **Speed:** Fast (3.8B parameters)
-
-- **`qwen2.5:7b`** (4.7GB)
-  - **Best for:** Multilingual tasks, coding help, complex reasoning
-  - **Speed:** Moderate (7B parameters)
-
-*Coding-Focused Models:*
+*Fast Small Models (full GPU acceleration):*
 
 - **`qwen2.5-coder:7b`** (4.7GB)
-  - **Best for:** Code generation, refactoring, algorithm design, debugging
-  - **Speed:** Moderate (7B parameters)
+  - **Best for:** Code generation, refactoring, quick coding tasks
+  - **Speed:** Very fast (fits entirely in 8GB VRAM)
 
-- **`deepseek-coder:6.7b`** (3.8GB)
-  - **Best for:** Code completion, filling in code gaps, autocomplete-style suggestions
-  - **Speed:** Moderate (6.7B parameters)
+- **`llama3.2:3b`** (2.0GB)
+  - **Best for:** Quick queries, simple tasks, chat
+  - **Speed:** Extremely fast
 
-*Specialized Models:*
+**GPU Limits (Quadro M4000 - 8GB VRAM):**
+- ✅ **≤18GB models:** Work in hybrid GPU+CPU mode (~10-14 tok/s)
+- ❌ **19GB+ models:** CUDA crashes, require CPU-only variants (num_gpu 0)
+- CPU-only performance: 70B=1.47 tok/s, 32B=2.64 tok/s (usable but slow)
 
-- **`tavernari/git-commit-message:sp_commit_pro`** (4.7GB)
-  - **Best for:** Git commit message generation (specialized fine-tune)
-  - **Speed:** Moderate
-  - **Notes:** Good quality but phi4:14b produces more accurate terminology
-
-*Ultra-Lightweight Models:*
-
-- **`gemma2:2b`** (1.6GB)
-  - **Best for:** Quick queries, simple tasks, running multiple instances
-  - **Speed:** Very fast (2B parameters)
-
-- **`llama3.2:1b`** (1.3GB)
-  - **Best for:** Lightning-fast responses, basic chat, simple classifications
-  - **Speed:** Extremely fast (1B parameters)
-
-**Hardware Acceleration:**
-- GPU: Intel Arc Graphics 130V/140V (integrated)
-- Compute Runtime: Intel compute-runtime with OpenCL
-- CPU Governor: Performance mode (turbo to 4.8GHz)
+**Hardware Acceleration (VM 101):**
+- GPU: NVIDIA Quadro M4000 (8GB VRAM, Maxwell architecture, passed through from host)
+- Driver: nvidia-driver-535, CUDA 12.2
+- Limitation: Maxwell compute capability 5.2 has CUDA kernel issues with 19GB+ models
+- CPU: 28 vCPUs (Xeon E5-2683 v4), used for hybrid offloading
 
 **Service Management:**
 ```bash
@@ -1706,6 +1688,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-23 | **GPU limit discovery & model cleanup:** Found Quadro M4000 hard limit at ~18GB for hybrid mode. 19GB+ models (qwen2.5:32b, llama3.1:70b) crash on GPU, require CPU-only variants (num_gpu 0). CPU-only: 70B=1.47 tok/s, 32B=2.64 tok/s. Cleaned up model hoarding: 22→6 models (qwen3-pure-hybrid, Qwen3-Pure, qwen-gon-jinn-hybrid, qwen-gon-jinn, qwen2.5-coder:7b, llama3.2:3b). Freed 70GB disk space (90%→65%) |
 | 2025-12-22 | **Hybrid model benchmarks:** Created qwen3-pure-hybrid (num_gpu=20), fixed devstral-hybrid (num_gpu 20→18). Comprehensive CPU vs GPU comparison: hybrid is 1.32x faster avg, qwen-gon-jinn-hybrid rated best overall |
 | 2025-12-22 | **VM 101 CPU upgrade:** Increased vCPUs 14→28, updated affinity to 4-31 (host reserves cores 0-3). Clarified Proxmox "cores" = vCPUs/threads, not physical cores |
 | 2025-12-20 | **GPU Passthrough complete:** Quadro M4000 (8GB) passed to VM 101, NVIDIA driver 535, q35 machine type, hybrid GPU/CPU offloading for 14B+ models (2x speedup) |

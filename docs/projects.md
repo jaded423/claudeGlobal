@@ -257,8 +257,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-22
-**Recent Changes**: VM 101 CPU upgrade (14→28 vCPUs, affinity 4-31). Created qwen3-pure-hybrid model. Comprehensive LLM benchmark: CPU vs hybrid GPU comparison shows 1.32x speedup with hybrid mode. Fixed devstral-hybrid memory issue (num_gpu 20→18).
+**Last Updated**: 2025-12-23
+**Recent Changes**: GPU limit discovery - Quadro M4000 maxes at ~18GB models for hybrid mode. 19GB+ models crash, require CPU-only (num_gpu 0). Model cleanup: 22→6 models kept (qwen3-pure-hybrid, qwen-gon-jinn + variants, qwen2.5-coder:7b, llama3.2:3b). Freed 70GB disk (90%→65%).
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)

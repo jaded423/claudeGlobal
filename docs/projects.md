@@ -37,8 +37,8 @@ Detailed descriptions of all active projects in your workspace.
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2025-12-17
-**Recent Changes**: Added `commits` function - shows commits across ALL repos chronologically with date filtering (today, yesterday, 7d, date ranges). Fixed shell parsing issues with backticks in commit messages.
+**Last Updated**: 2025-12-23
+**Recent Changes**: Added modular `fzf.zsh` config with preview windows for files/directories/history. Changed `Alt+C` to `Ctrl+F` for directory navigation (matches nvim). Uses `bat` for syntax-highlighted previews.
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`, `~/.zsh/functions/`
 **Purpose**: Shell configuration with split-file security model
@@ -46,11 +46,13 @@ Detailed descriptions of all active projects in your workspace.
 **Key Features**:
 - Oh My Zsh + Powerlevel10k theme
 - Secrets in `~/.zshrc.local` (local only, not committed)
-- **Modular functions**: 5 files in `functions/` directory
+- **Modular functions**: 7 files in `functions/` directory
   - `claude.zsh` - Auto-update wrapper for Claude Code
   - `git-functions.zsh` - `gitall`, `gitrepos`, `commits` (cross-repo commit history)
   - `backup-functions.zsh` - `gitvi`, `gitdot` backup functions
   - `doc-functions.zsh` - `doc-check`, `doc-metrics`
+  - `fzf.zsh` - FZF config with previews (`Ctrl+F` dir nav, `Ctrl+T` files, `Ctrl+R` history)
+  - `ssh-functions.zsh` - SSH machine shortcuts
   - `utils.zsh` - `docxdiff` for Office file comparison
 - **Automated backup**: Hourly via launchd
 

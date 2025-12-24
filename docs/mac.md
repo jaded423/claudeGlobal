@@ -2,70 +2,69 @@
 
 **Machine:** MacBook Pro (Apple Silicon)
 **OS:** macOS
-**Last Updated:** December 20, 2025
+**Last Updated:** December 24, 2025
 
 ---
 
 ## Power Management
 
-### Always-On Configuration (Dec 20, 2025)
+### Power-Source-Specific Configuration (Dec 24, 2025)
 
-**Purpose:** Keep Mac running 24/7 to maintain Twingate connectivity and prevent disconnect/reconnect cycles.
+**Purpose:** Keep Mac awake on AC power for Twingate connectivity, but allow sleep on battery to prevent drain.
 
-**Problem Solved:** Twingate connector was sending frequent disconnect/reconnect emails because the Mac was sleeping after 1 minute of inactivity on battery power (6,466+ sleep/wake cycles since boot).
+**Problem Solved:**
+- Original issue (Dec 20): Twingate disconnect/reconnect emails from Mac sleeping on battery
+- Follow-up issue (Dec 24): Always-on settings drained battery overnight (100% → 2%)
 
 **Current Settings:**
-```
-SleepDisabled        1      # System NEVER sleeps automatically
-sleep                0      # No auto-sleep timer
-displaysleep         10     # Display sleeps after 10 minutes
-disksleep            10     # Disk sleep after 10 minutes (irrelevant for SSD)
-lowpowermode         0      # Low Power Mode disabled
-```
+
+| Setting | Battery | AC Power | Purpose |
+|---------|---------|----------|---------|
+| `sleep` | 10 min | 0 (never) | Battery sleeps, AC stays awake |
+| `displaysleep` | 10 min | 10 min | Display always sleeps after 10 min |
+| `disksleep` | 10 min | 10 min | Irrelevant for SSD |
+| `powernap` | 0 (off) | 1 (on) | Save battery, allow background tasks on AC |
+| `lowpowermode` | 0 | 0 | Disabled |
 
 **Commands Applied:**
 ```bash
-# System never sleeps (including lid close)
-sudo pmset -a sleep 0
-sudo pmset -a disablesleep 1
+# AC Power: System stays awake for Twingate
+sudo pmset -c sleep 0
+sudo pmset -c disablesleep 1
+sudo pmset -c powernap 1
 
-# Display sleeps after 10 minutes
+# Battery: System sleeps after 10 minutes to preserve battery
+sudo pmset -b sleep 10
+sudo pmset -b disablesleep 0
+sudo pmset -b powernap 0
+
+# Both: Display sleeps after 10 minutes
 sudo pmset -a displaysleep 10
-
-# Disable Low Power Mode (prevents aggressive power saving)
-sudo pmset -a lowpowermode 0
 ```
 
 **Behavior:**
-- Closing the lid: Display turns off, system stays awake
-- Idle for 10 minutes: Display turns off, system stays awake
-- Manual sleep: Still works with Apple menu → Sleep
-- Reboot/shutdown: Still works normally
+- **On AC power**: System stays awake indefinitely, display sleeps after 10 min
+- **On battery**: System sleeps after 10 min idle, preserving battery
+- **Closing lid on AC**: Display off, system stays awake
+- **Closing lid on battery**: System sleeps normally
+- Manual sleep/reboot/shutdown: Works normally
 
 **To Restore Default Sleep Behavior:**
 ```bash
-sudo pmset -a disablesleep 0
-sudo pmset -a sleep 1
-# Or reset to defaults:
 sudo pmset restoredefaults
 ```
 
 **Verification:**
 ```bash
-pmset -g                    # Show current settings
+pmset -g custom             # Show AC and battery settings separately
+pmset -g                    # Show current active settings
 pmset -g assertions         # Show what's preventing sleep
-pmset -g log | tail -20     # Recent power events
 ```
 
-**Battery Impact:**
-- With display off, Apple Silicon draws ~2-4W (vs ~0.5W in sleep)
-- Estimated 2-4 hours less standby time
-- Negligible impact when plugged in
-
-**Thermal Consideration:**
-- MacBooks use keyboard area for heat dissipation
-- Running with lid closed is fine for light tasks (Twingate, background services)
-- For intensive tasks with lid closed, monitor thermals
+**Why This Works:**
+- Twingate stays connected when plugged in (common use case)
+- Battery protected when unplugged overnight
+- Display always sleeps to save power regardless of power source
 
 ---
 
@@ -173,4 +172,5 @@ crontab -e    # Edit crontab
 
 | Date | Change |
 |------|--------|
+| 2025-12-24 | **Power-source-specific config:** AC stays awake (Twingate), battery sleeps after 10 min. Fixes overnight battery drain from previous always-on config. |
 | 2025-12-20 | **Always-on power config:** Disabled sleep, Low Power Mode off, display sleeps after 10 min. Fixes Twingate disconnect emails. |

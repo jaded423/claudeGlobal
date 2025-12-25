@@ -108,13 +108,16 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │       ├── UEFI boot, SSH enabled
 │       ├── Rebuilt Dec 12, 2025 (fresh install after storage conversion)
 │       ├── Docker + All Services:
+│       │   ├── Plex media server (port 32400)
 │       │   ├── Jellyfin media server (port 8096)
 │       │   ├── qBittorrent torrent client (port 8080)
 │       │   ├── ClamAV antivirus (scans downloads automatically)
 │       │   ├── Open WebUI (Ollama interface, port 3000)
-│       │   └── Ollama with 9 LLMs (port 11434)
-│       ├── Media Pipeline: qBit downloads → ClamAV scan → auto-sort to Jellyfin
-│       │   └── scan-and-move.sh (cron every 10min) → Movies/TV Shows/Music
+│       │   └── Ollama with 6 LLMs (port 11434)
+│       ├── Media Pipeline: qBit downloads → ClamAV scan → quality score → auto-sort
+│       │   ├── scan-and-move.sh (cron every 10min) → NFS mount on book5
+│       │   ├── weekly-quality-report.py (Sundays 9AM) → email via Gmail OAuth2
+│       │   └── Storage: /mnt/book5-media (NFS from prox-book5:/srv/media)
 │       ├── oh-my-zsh + powerlevel10k theme
 │       ├── Configs restored: .zshrc, .p10k.zsh, nvim, rclone
 │       └── Auto-starts on boot ✅
@@ -1688,6 +1691,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-25 | **Media pipeline overhaul on ubuntu-server:** Migrated TV Shows (109GB) to book5 NFS storage (/srv/media/Serials). Updated scan-and-move.sh with NFS mount check, ffprobe quality scoring (resolution+bitrate+audio, max 180 points), and duplicate handling. Created weekly-quality-report.py for email reports via Gmail OAuth2. Set up msmtp with XOAUTH2 auth, gmail-oauth.py helper for token management. Added Plex container, scored existing media library. Organized Stranger Things S01 (moved missing episodes). |
 | 2025-12-23 | **GPU limit discovery & model cleanup:** Found Quadro M4000 hard limit at ~18GB for hybrid mode. 19GB+ models (qwen2.5:32b, llama3.1:70b) crash on GPU, require CPU-only variants (num_gpu 0). CPU-only: 70B=1.47 tok/s, 32B=2.64 tok/s. Cleaned up model hoarding: 22→6 models (qwen3-pure-hybrid, Qwen3-Pure, qwen-gon-jinn-hybrid, qwen-gon-jinn, qwen2.5-coder:7b, llama3.2:3b). Freed 70GB disk space (90%→65%) |
 | 2025-12-22 | **Hybrid model benchmarks:** Created qwen3-pure-hybrid (num_gpu=20), fixed devstral-hybrid (num_gpu 20→18). Comprehensive CPU vs GPU comparison: hybrid is 1.32x faster avg, qwen-gon-jinn-hybrid rated best overall |
 | 2025-12-22 | **VM 101 CPU upgrade:** Increased vCPUs 14→28, updated affinity to 4-31 (host reserves cores 0-3). Clarified Proxmox "cores" = vCPUs/threads, not physical cores |

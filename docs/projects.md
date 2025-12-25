@@ -258,7 +258,7 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
 **Last Updated**: 2025-12-25
-**Recent Changes**: Media pipeline overhaul on ubuntu-server (VM 101). Migrated TV Shows (109GB) to book5 NFS storage. Updated scan-and-move.sh with ffprobe quality scoring (resolution+bitrate+audio=180 max). Added weekly-quality-report.py with Gmail OAuth2 email. Set up msmtp with XOAUTH2, gmail-oauth.py for token management. Added Plex container. Organized Stranger Things S01.
+**Recent Changes**: Twingate connector automation - upgraded 3 homelab connectors to v1.82.0, created weekly auto-update cron jobs (Sundays 3:00/3:15/3:30 AM). Documented all 5 connectors across networks. Earlier: Media pipeline overhaul, ffprobe quality scoring, Gmail OAuth2 reports.
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)

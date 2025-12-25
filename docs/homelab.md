@@ -417,10 +417,35 @@ testparm -s                     # Test configuration
 **Network:** jaded423
 **Status Check:** `systemctl status twingate-connector`
 
-**Architecture (Dec 12, 2025):**
-- **prox-tower (192.168.2.249):** systemd service on host
-- **prox-book5 (192.168.2.250):** systemd service on host
-- **Previous:** LXC containers (CT 200, CT 201) with Docker - removed
+**Architecture (Dec 25, 2025) - 5 Connectors Total:**
+
+| Connector | Host | Type | Network | Version |
+|-----------|------|------|---------|---------|
+| **Magic-pihole** | 192.168.2.131 (Pi) | Docker | Homelab Network | v1.82.0 |
+| **prox-tower-systemd** | 192.168.2.249 | systemd | Homelab Network | v1.82.0 |
+| **prox-book5-systemd** | 192.168.2.250 | systemd | Homelab Network | v1.82.0 |
+| **mac-ssh** | Mac | macOS | Mac-Remote | v1.80.0 |
+| **PC** | Windows PC | Windows | Elevated | v1.80.0 |
+
+**Automated Weekly Updates (as of Dec 25, 2025):**
+
+| Time (Sunday) | Connector | Script Location | Log File |
+|---------------|-----------|-----------------|----------|
+| 3:00 AM | Magic-pihole | `/home/jaded/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
+| 3:15 AM | prox-tower | `/root/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
+| 3:30 AM | prox-book5 | `/root/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
+
+**Check upgrade logs:**
+```bash
+# Magic-pihole (Docker)
+ssh jaded@192.168.2.131 "tail -50 /var/log/twingate-upgrade.log"
+
+# Proxmox nodes (systemd)
+ssh root@192.168.2.249 "tail -50 /var/log/twingate-upgrade.log"
+ssh root@192.168.2.250 "tail -50 /var/log/twingate-upgrade.log"
+```
+
+**Previous:** LXC containers (CT 200, CT 201) with Docker - removed Dec 12, 2025
 
 **Configuration:**
 - Config file: `/etc/twingate/connector.conf`
@@ -1691,6 +1716,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-25 | **Twingate connector automation:** Upgraded 3 homelab connectors (Magic-pihole, prox-tower, prox-book5) from v1.80/v1.81 to v1.82.0. Created automated weekly upgrade scripts and cron jobs (Sundays 3:00/3:15/3:30 AM, staggered). Docker script for Pi, apt-based for Proxmox nodes. Logs to `/var/log/twingate-upgrade.log`. Documented all 5 connectors (including mac-ssh and PC on other networks). |
 | 2025-12-25 | **Media pipeline overhaul on ubuntu-server:** Migrated TV Shows (109GB) to book5 NFS storage (/srv/media/Serials). Updated scan-and-move.sh with NFS mount check, ffprobe quality scoring (resolution+bitrate+audio, max 180 points), and duplicate handling. Created weekly-quality-report.py for email reports via Gmail OAuth2. Set up msmtp with XOAUTH2 auth, gmail-oauth.py helper for token management. Added Plex container, scored existing media library. Organized Stranger Things S01 (moved missing episodes). |
 | 2025-12-23 | **GPU limit discovery & model cleanup:** Found Quadro M4000 hard limit at ~18GB for hybrid mode. 19GB+ models (qwen2.5:32b, llama3.1:70b) crash on GPU, require CPU-only variants (num_gpu 0). CPU-only: 70B=1.47 tok/s, 32B=2.64 tok/s. Cleaned up model hoarding: 22→6 models (qwen3-pure-hybrid, Qwen3-Pure, qwen-gon-jinn-hybrid, qwen-gon-jinn, qwen2.5-coder:7b, llama3.2:3b). Freed 70GB disk space (90%→65%) |
 | 2025-12-22 | **Hybrid model benchmarks:** Created qwen3-pure-hybrid (num_gpu=20), fixed devstral-hybrid (num_gpu 20→18). Comprehensive CPU vs GPU comparison: hybrid is 1.32x faster avg, qwen-gon-jinn-hybrid rated best overall |

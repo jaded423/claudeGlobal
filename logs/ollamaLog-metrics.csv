@@ -48,3 +48,4 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2025-12-24T23:03:28-06:00,zshConfig,30,442,201,8.9,qwen-gon-jinn-hybrid
 2025-12-25T02:02:45-06:00,.claude,158,3022,1472,9.4,qwen-gon-jinn-hybrid
 2025-12-26T12:04:00-06:00,.claude,216,7719,1353,6.4,qwen-gon-jinn-hybrid
+2025-12-26T15:01:43-06:00,zshConfig,79,927,768,10.7,qwen-gon-jinn-hybrid

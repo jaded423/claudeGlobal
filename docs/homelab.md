@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 23, 2025 (GPU limit discovery: 18GB max for hybrid mode, model cleanup: 22→6 models, freed 70GB)
+**Last Updated:** December 26, 2025 (Script reorganization: twingate-upgrade.sh moved to scripts/ dirs on all nodes, media symlinks on book5)
 
 ---
 
@@ -427,13 +427,13 @@ testparm -s                     # Test configuration
 | **mac-ssh** | Mac | macOS | Mac-Remote | v1.80.0 |
 | **PC** | Windows PC | Windows | Elevated | v1.80.0 |
 
-**Automated Weekly Updates (as of Dec 25, 2025):**
+**Automated Weekly Updates (as of Dec 26, 2025):**
 
 | Time (Sunday) | Connector | Script Location | Log File |
 |---------------|-----------|-----------------|----------|
-| 3:00 AM | Magic-pihole | `/home/jaded/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
-| 3:15 AM | prox-tower | `/root/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
-| 3:30 AM | prox-book5 | `/root/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
+| 3:00 AM | Magic-pihole | `/home/jaded/scripts/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
+| 3:15 AM | prox-tower | `/root/scripts/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
+| 3:30 AM | prox-book5 | `/root/scripts/twingate-upgrade.sh` | `/var/log/twingate-upgrade.log` |
 
 **Check upgrade logs:**
 ```bash
@@ -444,6 +444,22 @@ ssh jaded@192.168.2.131 "tail -50 /var/log/twingate-upgrade.log"
 ssh root@192.168.2.249 "tail -50 /var/log/twingate-upgrade.log"
 ssh root@192.168.2.250 "tail -50 /var/log/twingate-upgrade.log"
 ```
+
+**Skip Next Upgrade (OOO - Out of Office):**
+
+All upgrade scripts support a skip file mechanism for safe travel. If `/tmp/skip-twingate-upgrade` exists, the script skips that week's upgrade, removes the file, and exits. Next week runs normally.
+
+```bash
+# From Mac: Skip next Sunday's upgrades on all 3 nodes
+OOO
+
+# Manual skip (individual nodes)
+ssh root@192.168.2.250 "touch /tmp/skip-twingate-upgrade"  # book5
+ssh root@192.168.2.249 "touch /tmp/skip-twingate-upgrade"  # tower
+ssh jaded@192.168.2.131 "touch /tmp/skip-twingate-upgrade" # magic-pi
+```
+
+**Use case:** Run `OOO` before leaving town when your trip crosses a Sunday. Prevents upgrades from potentially breaking remote access while away.
 
 **Previous:** LXC containers (CT 200, CT 201) with Docker - removed Dec 12, 2025
 
@@ -923,6 +939,94 @@ ls /mnt/shared/ElevatedDrive/     # Work Google Drive
 - Writes: cached and uploaded in background
 - Best for: documents, configs, backups
 - Not ideal for: video editing, databases
+
+---
+
+## Media Server Organization
+
+**Location**: `/srv/media/` on prox-book5
+**Last Updated**: December 26, 2025
+
+### Serials (TV Shows)
+
+**Path**: `/srv/media/Serials/`
+**Structure**: `Show Name/Season XX/episodes...`
+
+**Current shows**:
+```
+/srv/media/Serials/
+├── Friends/
+│   ├── Season 01/
+│   ├── Season 02/
+│   └── ... Season 10/
+├── Futurama/
+│   ├── Season 01/
+│   ├── Season 02/
+│   └── ... Season 08/
+└── Stranger Things/
+    ├── Season 01/
+    ├── Season 02/
+    ├── Season 03/
+    └── Season 04/
+```
+
+### Movies
+
+**Path**: `/srv/media/Movies/`
+**Structure**: Standalone movies at root, franchises in parent folders
+
+**Current collections**:
+```
+/srv/media/Movies/
+├── Evan Almighty (2007) [1080p]/
+├── Futurama/
+│   ├── Futurama - Benders Big Score (2007) [1080p].mkv
+│   ├── Futurama - Benders Game (2008) [1080p].mkv
+│   ├── Futurama - Into the Wild Green Yonder (2009) [1080p].mkv
+│   └── Futurama - The Beast with a Billion Backs (2008) [1080p].mkv
+└── Star Wars/
+    ├── 01 - Episode I - The Phantom Menace (1999)/
+    ├── 02 - Episode II - Attack of the Clones (2002)/
+    ├── 03 - Episode III - Revenge of the Sith (2005)/
+    ├── 04 - Solo - A Star Wars Story (2018)/
+    ├── 05 - Rogue One - A Star Wars Story (2016)/
+    ├── 06 - Episode IV - A New Hope (1977)/
+    ├── 07 - Episode V - The Empire Strikes Back (1980)/
+    ├── 08 - Episode VI - Return of the Jedi (1983)/
+    ├── 09 - Episode VII - The Force Awakens (2015)/
+    ├── 10 - Episode VIII - The Last Jedi (2017)/
+    └── 11 - Episode IX - The Rise of Skywalker (2019)/
+```
+
+**Star Wars Chronological Order**: Movies are numbered by in-universe chronology, not release date:
+- Episodes I-III (Prequel Trilogy)
+- Solo & Rogue One (Anthology films set between III and IV)
+- Episodes IV-VI (Original Trilogy)
+- Episodes VII-IX (Sequel Trilogy)
+
+**Futurama Note**: The 4 theatrical movies are in Movies/Futurama/, while their TV episode versions (each movie split into 4 episodes) remain in Serials/Futurama/Season 05/.
+
+### Download Automation
+
+The `scan-and-move.sh` script on ubuntu-server (192.168.1.126):
+- Runs every 10 minutes via cron
+- Scans `/home/jaded/downloads/` for completed downloads
+- **qBittorrent API Integration**: Queries WebUI API to verify torrent completion
+  - Checks torrent state (downloading, stalledDL, queuedDL, etc.)
+  - Verifies progress is 100% before processing
+- **Incomplete File Detection**: Fallback check for `.!qB`, `.part`, `.crdownload`, etc.
+- Runs ClamAV virus scan on all files
+- Auto-organizes TV shows into `Show/Season XX/` structure
+- Moves to appropriate media folder on prox-book5 via NFS mount
+
+**Key functions in scan-and-move.sh**:
+- `refresh_qb_cache()` - Fetches and caches qBittorrent torrent info
+- `is_torrent_incomplete()` - Returns true if torrent still downloading
+- `has_incomplete_files()` - Checks for incomplete file patterns
+- `is_download_complete()` - Combined check before processing
+- `extract_show_name()` - Parses show names from various filename formats
+- `extract_season_number()` - Gets zero-padded season numbers (e.g., "01", "02")
+- `organize_tv_show()` - Places content into Show/Season structure
 
 ---
 
@@ -1716,6 +1820,9 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-26 | **Script reorganization:** Moved twingate-upgrade.sh scripts to dedicated scripts directories on all 3 nodes (prox-book5: `/root/scripts/`, prox-tower: `/root/scripts/`, magic-pihole: `/home/jaded/scripts/`). Updated crontab entries accordingly. Created symlinks on prox-book5: `/root/Movies`, `/root/Music`, `/root/Serials` → `/srv/media/`. |
+| 2025-12-26 | **Media server reorganization:** Reorganized `/srv/media/Serials/` to consistent Show/Season hierarchy (Friends, Futurama, Stranger Things). Grouped Movies by franchise with Star Wars chronologically numbered 01-11. Enhanced `scan-and-move.sh` with qBittorrent API integration for download completion detection, incomplete file pattern checks, and auto TV show organization. Fixed boolean logic bug in completion check. Moved Futurama movies to Movies/Futurama/ while keeping TV episode versions in Serials. |
+| 2025-12-26 | **OOO skip mechanism:** Added skip file support to all 3 Twingate upgrade scripts. If `/tmp/skip-twingate-upgrade` exists, script skips upgrade, removes file, exits. Created `OOO` zsh function on Mac to create skip files on all nodes before travel. Self-healing - following week runs normally. |
 | 2025-12-25 | **Twingate connector automation:** Upgraded 3 homelab connectors (Magic-pihole, prox-tower, prox-book5) from v1.80/v1.81 to v1.82.0. Created automated weekly upgrade scripts and cron jobs (Sundays 3:00/3:15/3:30 AM, staggered). Docker script for Pi, apt-based for Proxmox nodes. Logs to `/var/log/twingate-upgrade.log`. Documented all 5 connectors (including mac-ssh and PC on other networks). |
 | 2025-12-25 | **Media pipeline overhaul on ubuntu-server:** Migrated TV Shows (109GB) to book5 NFS storage (/srv/media/Serials). Updated scan-and-move.sh with NFS mount check, ffprobe quality scoring (resolution+bitrate+audio, max 180 points), and duplicate handling. Created weekly-quality-report.py for email reports via Gmail OAuth2. Set up msmtp with XOAUTH2 auth, gmail-oauth.py helper for token management. Added Plex container, scored existing media library. Organized Stranger Things S01 (moved missing episodes). |
 | 2025-12-23 | **GPU limit discovery & model cleanup:** Found Quadro M4000 hard limit at ~18GB for hybrid mode. 19GB+ models (qwen2.5:32b, llama3.1:70b) crash on GPU, require CPU-only variants (num_gpu 0). CPU-only: 70B=1.47 tok/s, 32B=2.64 tok/s. Cleaned up model hoarding: 22→6 models (qwen3-pure-hybrid, Qwen3-Pure, qwen-gon-jinn-hybrid, qwen-gon-jinn, qwen2.5-coder:7b, llama3.2:3b). Freed 70GB disk space (90%→65%) |

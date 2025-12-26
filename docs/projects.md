@@ -37,8 +37,8 @@ Detailed descriptions of all active projects in your workspace.
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2025-12-23
-**Recent Changes**: Added modular `fzf.zsh` config with preview windows for files/directories/history. Changed `Alt+C` to `Ctrl+F` for directory navigation (matches nvim). Uses `bat` for syntax-highlighted previews.
+**Last Updated**: 2025-12-26
+**Recent Changes**: Added `OOO` function to skip Twingate upgrades on all 3 homelab nodes before travel. Creates skip files that are self-cleaning (consumed on first run).
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`, `~/.zsh/functions/`
 **Purpose**: Shell configuration with split-file security model
@@ -52,7 +52,7 @@ Detailed descriptions of all active projects in your workspace.
   - `backup-functions.zsh` - `gitvi`, `gitdot` backup functions
   - `doc-functions.zsh` - `doc-check`, `doc-metrics`
   - `fzf.zsh` - FZF config with previews (`Ctrl+F` dir nav, `Ctrl+T` files, `Ctrl+R` history)
-  - `ssh-functions.zsh` - SSH machine shortcuts
+  - `ssh-functions.zsh` - SSH machine shortcuts, `OOO` travel safety function
   - `utils.zsh` - `docxdiff` for Office file comparison
 - **Automated backup**: Hourly via launchd
 
@@ -257,8 +257,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-25
-**Recent Changes**: Twingate connector automation - upgraded 3 homelab connectors to v1.82.0, created weekly auto-update cron jobs (Sundays 3:00/3:15/3:30 AM). Documented all 5 connectors across networks. Earlier: Media pipeline overhaul, ffprobe quality scoring, Gmail OAuth2 reports.
+**Last Updated**: 2025-12-26
+**Recent Changes**: Script reorganization - moved twingate-upgrade.sh to scripts/ directories on all 3 nodes (book5, tower, pi), updated crontab entries. Created media symlinks on book5 (/root/Movies, Music, Serials → /srv/media/). Earlier: Media server reorganization, Twingate connector automation.
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)

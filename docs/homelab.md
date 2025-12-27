@@ -1009,7 +1009,7 @@ ls /mnt/shared/ElevatedDrive/     # Work Google Drive
 ### Download Automation
 
 The `scan-and-move.sh` script on ubuntu-server (192.168.1.126):
-- Runs every 10 minutes via cron
+- **⚠️ CRON DISABLED** (Dec 27, 2025) - Script needs rework, user will fix after trip
 - Scans `/home/jaded/downloads/` for completed downloads
 - **qBittorrent API Integration**: Queries WebUI API to verify torrent completion
   - Checks torrent state (downloading, stalledDL, queuedDL, etc.)
@@ -1017,16 +1017,40 @@ The `scan-and-move.sh` script on ubuntu-server (192.168.1.126):
 - **Incomplete File Detection**: Fallback check for `.!qB`, `.part`, `.crdownload`, etc.
 - Runs ClamAV virus scan on all files
 - Auto-organizes TV shows into `Show/Season XX/` structure
-- Moves to appropriate media folder on prox-book5 via NFS mount
+- Copies to appropriate media folder on prox-book5 via NFS mount
+
+**Bug Fixes (Dec 27, 2025):**
+- Fixed `is_download_complete()` - was returning 0 in all cases (even incomplete)
+- Fixed `is_torrent_incomplete()` - progress check returned wrong value
+- Added `safe_move()` - copy→verify→delete pattern instead of direct mv
+- Added `is_file_valid()` - checks MKV/MP4 magic bytes (1a45 dfa3 / 6674 7970)
+- Added `verify_media_files()` - validates all media files in directory
+- Added `count_media_files()` - counts media files for 1:1 verification
+- Added torrent site prefix stripping to `extract_show_name()` (strips www.UIndex.org etc.)
+
+**Known Issues (needs rework):**
+- Return value logic in `is_download_complete()` still has issues
+- Script proceeds even when logging "SKIPPING"
+- User will address after trip
 
 **Key functions in scan-and-move.sh**:
 - `refresh_qb_cache()` - Fetches and caches qBittorrent torrent info
-- `is_torrent_incomplete()` - Returns true if torrent still downloading
+- `is_torrent_incomplete()` - Returns 0 if incomplete, 1 if complete
 - `has_incomplete_files()` - Checks for incomplete file patterns
 - `is_download_complete()` - Combined check before processing
-- `extract_show_name()` - Parses show names from various filename formats
+- `is_file_valid()` - Validates MKV/MP4 headers
+- `verify_media_files()` - Checks all media files in directory
+- `count_media_files()` - Counts media files for 1:1 matching
+- `safe_move()` - Copy, verify 1:1 match, then delete source
+- `extract_show_name()` - Parses show names (strips torrent site prefixes)
 - `extract_season_number()` - Gets zero-padded season numbers (e.g., "01", "02")
 - `organize_tv_show()` - Places content into Show/Season structure
+
+**qBittorrent Optimization (Dec 27, 2025):**
+- Removed 1 MB/s download speed limit (was throttling downloads)
+- Enabled UPnP and port forwarding
+- Increased max connections to 500
+- Config at: `/var/lib/docker/volumes/qbit-config/_data/qBittorrent/qBittorrent.conf`
 
 ---
 
@@ -1820,6 +1844,7 @@ curl http://localhost:8080  # Should return HTML
 
 | Date | Change |
 |------|--------|
+| 2025-12-27 | **scan-and-move.sh bug fixes & qBittorrent optimization:** Fixed critical bugs causing incomplete file moves - `is_download_complete()` returned 0 in all cases, `is_torrent_incomplete()` progress check wrong. Added `safe_move()` with copy→verify→delete pattern, `is_file_valid()` for MKV/MP4 header validation, `verify_media_files()` and `count_media_files()` for 1:1 verification. Added torrent site prefix stripping. Removed qBittorrent 1 MB/s speed limit, enabled UPnP, increased connections to 500. Manually recovered Futurama S01-S07 (138 files verified). **Cron disabled** pending script rework. |
 | 2025-12-26 | **Script reorganization:** Moved twingate-upgrade.sh scripts to dedicated scripts directories on all 3 nodes (prox-book5: `/root/scripts/`, prox-tower: `/root/scripts/`, magic-pihole: `/home/jaded/scripts/`). Updated crontab entries accordingly. Created symlinks on prox-book5: `/root/Movies`, `/root/Music`, `/root/Serials` → `/srv/media/`. |
 | 2025-12-26 | **Media server reorganization:** Reorganized `/srv/media/Serials/` to consistent Show/Season hierarchy (Friends, Futurama, Stranger Things). Grouped Movies by franchise with Star Wars chronologically numbered 01-11. Enhanced `scan-and-move.sh` with qBittorrent API integration for download completion detection, incomplete file pattern checks, and auto TV show organization. Fixed boolean logic bug in completion check. Moved Futurama movies to Movies/Futurama/ while keeping TV episode versions in Serials. |
 | 2025-12-26 | **OOO skip mechanism:** Added skip file support to all 3 Twingate upgrade scripts. If `/tmp/skip-twingate-upgrade` exists, script skips upgrade, removes file, exits. Created `OOO` zsh function on Mac to create skip files on all nodes before travel. Self-healing - following week runs normally. |

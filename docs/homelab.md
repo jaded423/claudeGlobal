@@ -1,7 +1,7 @@
 # Home Lab Documentation
 
 **Primary Infrastructure:** 2-node Proxmox Cluster "home-cluster" with QDevice quorum
-**Last Updated:** December 26, 2025 (Script reorganization: twingate-upgrade.sh moved to scripts/ dirs on all nodes, media symlinks on book5)
+**Last Updated:** December 27, 2025 (scan-and-move.sh bug fixes, safe_move verification, qBittorrent optimization)
 
 ---
 

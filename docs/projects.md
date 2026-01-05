@@ -257,8 +257,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2025-12-27
-**Recent Changes**: Fixed scan-and-move.sh bugs (was moving incomplete files), added safe_move with file verification, optimized qBittorrent speed settings. Cron disabled pending script rework. Manually recovered Futurama S01-S07 (138 files verified).
+**Last Updated**: 2026-01-04
+**Recent Changes**: Installed Frigate NVR on VM 101 with Tapo C210 camera, NVIDIA Container Toolkit for GPU-accelerated video decoding, Mosquitto MQTT broker. Detection uses CPU (TensorRT deprecated on amd64), Coral TPU recommended for future.
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)
@@ -272,6 +272,7 @@ Detailed descriptions of all active projects in your workspace.
 - **Hyprland Desktop** - Wayland compositor with Osaka-Jade theme
 - **Google Drive Integration** - Two rclone FUSE mounts (personal + elevated)
 - **Pi-hole DNS** - Network-wide ad blocking on Raspberry Pi 1 B+ (192.168.1.191) with DNS-over-TLS support
+- **Frigate NVR** - AI camera system on VM 101 (port 5000), CUDA video decode, Tapo C210 camera
 
 **Hardware**:
 - RAM: 16GB (3.6GB used, 11GB available)

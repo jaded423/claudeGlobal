@@ -113,7 +113,9 @@ Proxmox Cluster Infrastructure (Dec 2025) - "home-cluster"
 │       │   ├── qBittorrent torrent client (port 8080)
 │       │   ├── ClamAV antivirus (scans downloads automatically)
 │       │   ├── Open WebUI (Ollama interface, port 3000)
-│       │   └── Ollama with 6 LLMs (port 11434)
+│       │   ├── Ollama with 6 LLMs (port 11434)
+│       │   ├── **Frigate NVR (port 5000)** - AI object detection, GPU-accelerated
+│       │   └── Mosquitto MQTT broker (port 1883)
 │       ├── Media Pipeline: qBit downloads → ClamAV scan → quality score → auto-sort
 │       │   ├── scan-and-move.sh (cron every 10min) → NFS mount on book5
 │       │   ├── weekly-quality-report.py (Sundays 9AM) → email via Gmail OAuth2
@@ -700,6 +702,83 @@ curl http://localhost:11434/api/generate -d '{
 ```
 
 **Documentation:** [Ollama Docs](https://github.com/ollama/ollama)
+
+### 9. Frigate NVR (AI Camera System)
+
+**Purpose:** Network Video Recorder with real-time AI object detection
+**Port:** 5000 (Web UI), 8554 (RTSP restream), 8555 (WebRTC), 1883 (MQTT via Mosquitto)
+**Location:** VM 101 (192.168.1.126)
+**Status Check:** `docker ps | grep frigate`
+**Web UI:** http://192.168.1.126:5000
+
+**Cameras:**
+
+| Camera | Model | IP | Location | Features |
+|--------|-------|-----|----------|----------|
+| tapo_360_living_room | TP-Link Tapo C210 | 192.168.1.245 | Living Room | Pan/tilt, 2K resolution |
+
+**Detection Objects:** person, dog, cat, car
+
+**Configuration Files (on VM 101):**
+```
+~/frigate/
+├── docker-compose.yml    # Frigate + Mosquitto services
+├── .env                  # RTSP credentials (chmod 600)
+├── config/
+│   └── config.yml        # Frigate configuration
+├── media/                # Recordings and snapshots
+└── mosquitto/
+    └── config/mosquitto.conf
+```
+
+**Recording Settings:**
+- Continuous recording: 7 days retention
+- Event clips: 30 days retention
+- Snapshots: 30 days retention
+- Storage: ~/frigate/media (~200GB available)
+
+**Hardware Acceleration:**
+- Video decoding: NVIDIA CUDA (Quadro M4000)
+- Object detection: CPU (TensorFlow Lite) - GPU detection planned
+
+**Service Management:**
+```bash
+# SSH to VM 101
+ssh jaded@192.168.1.126
+
+# Check status
+docker ps | grep -E 'frigate|mosquitto'
+
+# View logs
+docker logs frigate -f
+
+# Restart
+cd ~/frigate && docker compose restart frigate
+
+# Update credentials (after changing in Tapo app)
+nano ~/frigate/.env
+docker compose up -d --force-recreate frigate
+```
+
+**Adding New Cameras:**
+1. Enable Camera Account in Tapo app (Advanced Settings → Camera Account)
+2. Note the camera IP and RTSP credentials
+3. Add camera section to `~/frigate/config/config.yml`
+4. Restart Frigate: `docker compose restart frigate`
+
+**RTSP URL Format (Tapo cameras):**
+- High quality: `rtsp://user:pass@camera-ip:554/stream1`
+- Low quality: `rtsp://user:pass@camera-ip:554/stream2`
+
+**MQTT Integration:**
+Frigate publishes events to Mosquitto broker (port 1883) for:
+- Object detection events
+- Camera status updates
+- Recording events
+
+Can integrate with Home Assistant, Node-RED, or custom automations.
+
+**Installed:** January 4, 2026
 
 ---
 

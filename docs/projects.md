@@ -68,8 +68,8 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active business automation
 **Location**: `~/projects/odooReports`
 **Purpose**: Automated reporting for Elevated Trading
-**Last Updated**: 2025-12-15
-**Recent Changes**: Added Monday email to Labels report (joshua, cynthia, shannon). Reorganized crontab - Labels now runs at 6 AM daily (email on Mondays only), AR/AP stays at 9 AM. Moved Last Order from Friday to Monday. Deleted run_all_reports.sh.
+**Last Updated**: 2026-01-06
+**Recent Changes**: Added `active_customers_no_email.py` utility - finds active customers (ordered in last N days) without email addresses. Uses optimized batch API calls (3 total). Also added Buying Patterns Report for analyzing purchasing patterns.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
@@ -79,6 +79,7 @@ Detailed descriptions of all active projects in your workspace.
   - Brad's: All Brad Bush customers (78 paying, 21 sample) → joshua, brad
   - Joe's: All Joe Gibson customers (65 paying, 20 sample) → joshua, joe
 - **Manufacturing Report**: Weekly production with profit analysis (Excel) - Mondays 6 AM
+- **Buying Patterns Report**: Pounds vs partials analysis (Excel) - manual run only
 
 **Key Features**:
 - Gmail OAuth integration for email delivery

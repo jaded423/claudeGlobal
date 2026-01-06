@@ -95,6 +95,29 @@ Detailed descriptions of all active projects in your workspace.
 
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
 
+## odooModules
+**Type**: Odoo 17 module development
+**Status**: Active development
+**Last Updated**: 2026-01-06
+**Recent Changes**: Built DB Explorer module (Phase 1 & 2) - Model Browser, SQL Query Runner, saved queries, CSV export
+**Location**: `~/projects/odooModules`
+**Server**: VM 101 (Ubuntu) @ 192.168.1.126, Odoo on port 8069
+**Purpose**: Custom Odoo module development for self-hosted instance
+
+**Key Features**:
+- DB Explorer module - browse models, fields, run SQL queries
+- Server aliases: `odooUp` (restart Odoo), `odooLogs` (view logs)
+- Development reference docs for Odoo 17
+
+**Current Modules**:
+- `db_explorer` - Database exploration and SQL query tool (Phase 1 & 2 complete)
+- `library_app` - First learning module (books)
+
+**Installed OCA Modules**:
+- mis_builder, account_financial_report, report_xlsx, date_range, web_responsive
+
+**Documentation**: See `~/projects/odooModules/CLAUDE.md`
+
 ## scripts
 **Last Updated:** 2025-12-22
 **Recent Changes:** The `ollamaSummary.py` script now supports multiple bullet point formats (dash, bullet, and asterisk) when formatting commit messages, improving compatibility with various input styles.

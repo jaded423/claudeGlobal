@@ -34,6 +34,28 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-07 - Updated Claude Configuration and Image Cache Cleanup
+
+**What changed:**
+- Updated shell configuration to explicitly use zsh instead of bash in CLAUDE.md
+- Removed three image cache files (1.png, 2.png, 3.png) from the image-cache directory
+- Updated lastUpdated timestamp in plugins/known_marketplaces.json
+
+**Why:**
+- Clarified that all systems use zsh, ensuring proper configuration file updates
+- Cleaned up stale image cache entries that are no longer needed
+- Updated marketplace plugin timestamp to reflect recent changes
+
+**Files modified:**
+- `CLAUDE.md` - Added shell configuration note
+- `image-cache/df22ef64-0bdf-47fa-a3eb-ac2b1c6b5fc7/1.png` - Deleted
+- `image-cache/df22ef64-0bdf-47fa-a3eb-ac2b1c6b5fc7/2.png` - Deleted
+- `image-cache/df22ef64-0bdf-47fa-a3eb-ac2b1c6b5fc7/3.png` - Deleted
+- `plugins/known_marketplaces.json` - Updated lastUpdated timestamp
+
+---
+
+
 ## 2026-01-07 - PC WSL Fixes and nvim Downgrade
 
 **What changed:**

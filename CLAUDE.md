@@ -27,6 +27,8 @@ This directory (`~/.claude/`) contains global configuration and commands for Cla
 
 **File Path References**: "my Vault" or "the Vault" = `/Users/joshuabrown/Library/CloudStorage/GoogleDrive-joshua@elevatedtrading.com/My Drive/Elevated Vault/`
 
+**Shell**: All systems use **zsh** (not bash). Always modify `~/.zshrc`, not `~/.bashrc`.
+
 ---
 
 ## Claude Code Limitations

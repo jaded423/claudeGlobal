@@ -2,6 +2,54 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## January 6, 2026 - Documentation System Overhaul
+
+**Summary:**
+Major restructure of homelab documentation and revamp of /log command to prevent future doc bloat.
+
+**What changed:**
+
+1. **Homelab Documentation Restructure:**
+   - Reduced homelab.md from 2,282 lines to 271 lines (88% reduction)
+   - Created `docs/homelab/` subdirectory with 6 detailed reference files:
+     - `services.md` (295 lines) - Full service configurations
+     - `troubleshooting.md` (344 lines) - Complete troubleshooting guide
+     - `setup-guides.md` (173 lines) - Installation procedures
+     - `gpu-passthrough.md` (192 lines) - Quadro M4000 passthrough docs
+     - `google-drive.md` (174 lines) - rclone FUSE mount configuration
+     - `media-server.md` (142 lines) - Plex/Jellyfin organization
+   - Archived original to `docs/backups/homelab-20260106-*.md`
+
+2. **Revamped /log Command:**
+   - Smart routing: current state → CLAUDE.md, details → changelog.md
+   - Separate changelog.md files per project (append-only paper trail)
+   - Document health checks with size warnings
+   - Clear categorization rules (Category A/B/C)
+   - Anti-patterns to avoid (no journey narratives in main docs)
+
+**Why:**
+- Original homelab.md exceeded Claude's read limit (25K tokens)
+- Documentation was mixing "current state" with "journey/history"
+- No systematic approach to prevent bloat
+- User kept forgetting to run /sum
+
+**New documentation pattern:**
+```
+project/
+├── CLAUDE.md           # Current state ONLY (200-400 lines)
+├── docs/
+│   ├── changelog.md    # Append-only history (paper trail)
+│   └── [topic].md      # Detailed reference docs
+```
+
+**Files modified:**
+- `docs/homelab.md` - Complete rewrite (lean version)
+- `docs/homelab/*.md` - 6 new detailed reference files
+- `commands/log.md` - Complete rewrite with smart routing
+- `docs/changelog.md` - This entry
+
+---
+
 ## December 20, 2025 - Phone Terminal Setup (oh-my-zsh + powerlevel10k)
 
 **Summary:**

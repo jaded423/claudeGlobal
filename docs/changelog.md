@@ -50,6 +50,23 @@ project/
 
 ---
 
+## 2026-01-07 - Updated marketplace timestamp and cleaned image cache
+
+**What changed:**
+- Updated the `lastUpdated` timestamp in `plugins/known_marketplaces.json` to reflect the latest update time
+- Removed an image file from the cache directory (`image-cache/c7218a46-43c8-484e-9d4d-8c7ab055a52e/1.png`)
+
+**Why:**
+- The timestamp update ensures that the marketplace plugin's last update time is correctly recorded
+- The image file deletion indicates cleanup or migration of cached assets, likely related to a refresh or update in the image handling system
+
+**Files modified:**
+- `plugins/known_marketplaces.json` - Updated the `lastUpdated` field to reflect the current timestamp
+- `image-cache/c7218a46-43c8-484e-9d4d-8c7ab055a52e/1.png` - File was removed from the cache
+
+---
+
+
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ```changelog
 ## 2026-01-06 - Updated documentation structure and routing rules
 

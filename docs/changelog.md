@@ -34,6 +34,27 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-07 - Image cache cleanup and marketplace update
+
+**What changed:**
+- Deleted image cache files for session 5ce70ade-69b8-4b61-a0b0-0a9c117a5831 (1.png and 2.png)
+- Updated lastUpdated timestamp in plugins/known_marketplaces.json
+- Updated subproject commit for claude-plugins-official marketplace
+
+**Why:**
+- The image cache files were likely outdated or no longer needed, triggering their deletion
+- The marketplace metadata was updated to reflect the current state of the official Claude plugins repository
+- The subproject commit was updated to point to the latest version of the claude-plugins-official repository
+
+**Files modified:**
+- `image-cache/5ce70ade-69b8-4b61-a0b0-0a9c117a5831/1.png` - Deleted
+- `image-cache/5ce70ade-69b8-4b61-a0b0-0a9c117a5831/2.png` - Deleted
+- `plugins/known_marketplaces.json` - Updated lastUpdated timestamp
+- `plugins/marketplaces/claude-plugins-official` - Updated subproject commit
+
+---
+
+
 ## 2026-01-07 - Image cache cleanup and marketplace metadata update
 
 **What changed:**

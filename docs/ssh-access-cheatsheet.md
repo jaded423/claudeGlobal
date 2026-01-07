@@ -2,7 +2,7 @@
 
 Quick reference for accessing all machines in the multi-location network.
 
-**Last Updated:** December 20, 2025 (Unified SSH to Mac from all machines)
+**Last Updated:** January 7, 2026 (Added Windows PC etintake - WSL Ubuntu SSH)
 
 ---
 
@@ -26,6 +26,9 @@ ssh jaded@192.168.2.131     # magic-pihole (Pi-hole, Twingate, MagicMirror)
 # Mac (from homelab - direct LAN access)
 ssh j@192.168.2.226                    # Mac direct (from book5, tower)
 ssh mac                                # Using alias (works from book5, tower, termux)
+
+# Windows PC - WSL Ubuntu (aliases: etintake, wsl, pc)
+ssh etintake                           # Port 2222, user joshua
 ```
 
 ---
@@ -77,7 +80,7 @@ ssh mac                                # Using alias (works from book5, tower, t
 | **VM 101 (Ubuntu)** | **192.168.1.126** | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin (2.5GbE) |
 | **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
 | **Mac (macAir)** | 192.168.2.226 | j | Direct (book5/tower), ProxyJump (termux) | Development |
-| **Work PC** | TBD | TBD | Twingate (planned) | RustDesk, Dev |
+| **etintake (Win PC)** | 192.168.1.193:2222 | joshua | Direct/Twingate | WSL Ubuntu, Twingate connector |
 
 ---
 
@@ -297,23 +300,46 @@ ssh pihole        # → jaded@192.168.2.131
 ssh pi            # → jaded@192.168.2.131
 ssh mac           # → j@192.168.2.226
 ssh macair        # → j@192.168.2.226
+ssh etintake      # → joshua@192.168.1.193:2222
+ssh wsl           # → joshua@192.168.1.193:2222
+ssh pc            # → joshua@192.168.1.193:2222
 ```
 
 ---
 
-## Future: Work PC Setup
+## Windows PC (etintake) Setup
 
-When setting up the Windows PC at work:
+**Completed January 7, 2026**
 
-1. Install Twingate connector on Work PC
-2. Add Twingate resource for Work PC (RustDesk ports 21115-21119)
-3. Add SSH config entry (if SSH server installed):
-   ```
-   Host work-pc
-     HostName <work-pc-twingate-address>
-     User <username>
-   ```
-4. Access via RustDesk or SSH through Twingate
+| Component | Details |
+|-----------|---------|
+| Hostname | etintake |
+| Windows IP | 192.168.1.193 (DHCP) |
+| WSL IP | Dynamic (172.20.x.x) |
+| SSH Port | 2222 |
+| User | joshua |
+| Twingate | "Elevated" network, "PC" connector (Docker in WSL) |
+
+**SSH Access:**
+```bash
+ssh etintake          # Uses aliases: etintake, wsl, pc
+ssh -p 2222 joshua@192.168.1.193
+```
+
+**Architecture:**
+```
+Mac → Twingate → Windows:2222 → portproxy → WSL:2222 → SSH
+```
+
+**Auto-start:** `/etc/wsl.conf` runs `/etc/wsl-ssh-startup.sh` on WSL boot:
+- Creates /run/sshd
+- Removes /run/nologin
+- Starts sshd
+- Updates Windows port forwarding to current WSL IP
+
+**Troubleshooting:**
+- If SSH fails after reboot: Run `sudo /usr/local/bin/fix-wsl-ssh` in WSL
+- If Windows IP changed: Update Twingate resource in admin console
 
 ---
 

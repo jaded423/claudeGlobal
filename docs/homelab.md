@@ -1,6 +1,6 @@
 # Home Lab Documentation
 
-**Last Updated:** January 6, 2026
+**Last Updated:** January 7, 2026
 **Cluster:** 2-node Proxmox "home-cluster" with QDevice quorum
 
 **Detailed Docs:** See `homelab/` subdirectory for services, troubleshooting, and setup guides.
@@ -25,6 +25,7 @@
 | **prox-tower** | 192.168.2.249 / 192.168.1.249 | Proxmox node 2 (ThinkStation, 78GB, Xeon 16c/32t) | Active |
 | └─ VM 101: Ubuntu Server | 192.168.1.126 | Docker, Ollama, Plex, Frigate (40GB RAM, 28 vCPU) | Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, QDevice, MagicMirror | Active |
+| **etintake (Windows PC)** | 192.168.1.193 | WSL Ubuntu, Twingate connector (Docker) | Active |
 
 **Storage:**
 - prox-book5: 880GB NVMe (ZFS)
@@ -48,10 +49,15 @@ Proxmox Cluster "home-cluster" (3 votes: 2 nodes + QDevice)
 │       ├── Ollama (6 LLMs, 40GB, GPU-accelerated via Quadro M4000)
 │       └── Google Drive mounts (rclone FUSE)
 │
-└── Raspberry Pi @ 192.168.2.131
-    ├── Pi-hole DNS
-    ├── Corosync QDevice (cluster quorum)
-    └── MagicMirror kiosk
+├── Raspberry Pi @ 192.168.2.131
+│   ├── Pi-hole DNS
+│   ├── Corosync QDevice (cluster quorum)
+│   └── MagicMirror kiosk
+│
+└── etintake (Windows PC) @ 192.168.1.193
+    ├── WSL Ubuntu (SSH on port 2222)
+    ├── Twingate Connector (Docker in WSL)
+    └── RustDesk remote access
 ```
 
 ---
@@ -69,6 +75,9 @@ ssh root@192.168.1.249          # prox-tower (2.5GbE, faster)
 # VMs (via ProxyJump - automatic)
 ssh jaded@192.168.2.161         # VM 100 - Omarchy
 ssh jaded@192.168.1.126         # VM 101 - Ubuntu Server
+
+# Windows PC - WSL Ubuntu (aliases: etintake, wsl, pc)
+ssh etintake                    # Port 2222, user joshua
 ```
 
 ### SSH Config (~/.ssh/config on Mac)
@@ -106,9 +115,12 @@ Host 192.168.1.126 ubuntu-server ubuntu vm101
 
 ### Remote Access (Twingate)
 
-- **Network:** jaded423
+- **Network:** jaded423 + Elevated
 - **Admin Console:** https://jaded423.twingate.com
-- **Connectors:** 3 homelab (prox-book5, prox-tower, magic-pihole)
+- **Connectors:**
+  - jaded423: prox-book5, prox-tower, magic-pihole
+  - Elevated: PC (Docker in WSL on etintake)
+- **Resources:** zWindows SSH (192.168.1.193, ports 22/2222/3389)
 - **Critical:** Both Proxmox hosts must be Twingate resources for VM access to work
 
 ---
@@ -184,6 +196,18 @@ Host 192.168.1.126 ubuntu-server ubuntu vm101
 **Status:** Cron disabled (Dec 27, 2025) - script needs rework
 **Issue:** Return value logic bugs causing incomplete file moves
 **Location:** VM 101 `~/scripts/scan-and-move.sh`
+
+### Windows PC (etintake) SSH Issues
+
+**Problem:** WSL IP changes on reboot, breaking port forwarding.
+**Auto-Fix:** `/etc/wsl-ssh-startup.sh` runs on boot and updates port forwarding.
+**Manual Fix (if needed):** Run in WSL: `sudo /usr/local/bin/fix-wsl-ssh`
+
+**Problem:** Windows IP changes (DHCP).
+**Fix:** Update Twingate resource in admin console, or set DHCP reservation on router.
+
+**Problem:** SSH fails with "System is booting up" error.
+**Fix:** `sudo rm -f /run/nologin /etc/nologin` (startup script handles this)
 
 ---
 
@@ -261,6 +285,7 @@ OOO  # Creates skip files on all 3 nodes
 
 | Date | Change |
 |------|--------|
+| 2026-01-07 | Windows PC (etintake) SSH setup: WSL Ubuntu, port 2222, auto port forwarding |
 | 2026-01-06 | 4TB HDD ZFS pool, media migration to prox-tower, Ollama models to HDD |
 | 2025-12-27 | scan-and-move.sh bug fixes, qBittorrent optimization, cron disabled |
 | 2025-12-25 | Twingate automated weekly upgrades, OOO skip mechanism |

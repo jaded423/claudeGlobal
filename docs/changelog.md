@@ -50,6 +50,29 @@ project/
 
 ---
 
+## 2026-01-07 - Windows PC SSH Access Setup and Documentation Update
+
+**What changed:**
+- Added documentation for accessing Windows PC via SSH through Twingate
+- Updated `ssh` configuration to support Windows PC access via Twingate
+- Introduced automated startup script (`/etc/wsl-ssh-startup.sh`) for WSL SSH server
+- Updated `known_marketplaces.json` with new timestamp
+
+**Why:**
+- To enable secure remote access to Windows PC via SSH through Twingate
+- To automate WSL SSH server startup and port forwarding on boot
+- To maintain accurate documentation of remote access setup
+
+**Files modified:**
+- `docs/ssh.md` - Added Windows PC SSH access instructions and configuration
+- `docs/changelog.md` - Updated with new entry for Windows PC SSH setup
+- `docs/known_issues.md` - Added note about WSL SSH access gotchas
+- `plugins/known_marketplaces.json` - Updated lastUpdated timestamp
+- `image-cache/...` - Removed image cache files (likely temporary or obsolete)
+
+---
+
+
 ## 2026-01-07 - Updated marketplace timestamp and cleaned image cache
 
 **What changed:**

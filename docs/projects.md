@@ -282,7 +282,7 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
 **Last Updated**: 2026-01-06
-**Recent Changes**: Installed 4TB Seagate HDD on prox-tower as ZFS `media-pool`. Migrated media library (220GB Movies+Serials) from book5 with checksum verification. Moved Ollama models (40GB) to HDD via NFS, freeing 37GB on VM 101 SSD. Frigate stays on SSD to avoid I/O contention.
+**Recent Changes**: Fixed NFS export for ZFS child datasets (added `crossmnt` option). Updated Plex docker-compose to use new media mount at `/media/tower/`.
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)

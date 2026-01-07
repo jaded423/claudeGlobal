@@ -99,6 +99,10 @@ Movies/
 ### Plex
 **Port:** 32400
 **Web UI:** http://192.168.1.126:32400/web
+**Container Path:** `/media/tower/` → `/mnt/media-pool/` on host
+**Library Paths (inside container):**
+- Movies: `/media/tower/Movies/`
+- TV Shows: `/media/tower/Serials/`
 
 ### Jellyfin
 **Port:** 8096
@@ -109,13 +113,15 @@ Movies/
 
 ## NFS Configuration
 
-**Export from prox-tower:**
+**Export from prox-tower** (`/etc/exports`):
 ```bash
-/media-pool/media  192.168.1.0/24(rw,sync,no_subtree_check)
-/media-pool/ollama 192.168.1.0/24(rw,sync,no_subtree_check)
+/media-pool/media 192.168.1.126(rw,sync,no_subtree_check,no_root_squash,crossmnt)
+/media-pool/ollama 192.168.1.126(rw,sync,no_subtree_check,no_root_squash)
 ```
 
-**Mount on VM 101:**
+**Critical:** `crossmnt` is required for `/media-pool/media` because Movies and Serials are separate ZFS child datasets. Without it, those directories appear empty via NFS.
+
+**Mount on VM 101** (`/etc/fstab`):
 ```bash
 192.168.1.249:/media-pool/media /mnt/media-pool nfs defaults 0 0
 192.168.1.249:/media-pool/ollama /mnt/ollama nfs defaults 0 0

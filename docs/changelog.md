@@ -50,6 +50,35 @@ project/
 
 ---
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ```changelog
+## 2026-01-06 - Updated documentation structure and routing rules
+
+**What changed:**
+- Restructured global documentation directory layout
+- Updated CLAUDE.md with new directory structure and command definitions
+- Added SMART DOCUMENTATION ROUTING guidelines
+- Updated slash command definitions and usage patterns
+- Improved tmux session usage instructions
+- Enhanced persistent session management for system-changing operations
+
+**Why:**
+- Standardized documentation structure for better maintainability
+- Clarified when and where changes should be documented
+- Improved consistency across all projects using the CLAUDE.md pattern
+- Enhanced transparency for system-changing operations via tmux sessions
+- Streamlined global command definitions and usage
+
+**Files modified:**
+- `~/.claude/CLAUDE.md` - Updated with new structure and routing rules
+- `~/.claude/commands/init.md` - Updated with lean structure pattern
+- `~/.claude/commands/log.md` - Updated with new documentation routing
+- `~/.claude/commands/sum.md` - Updated with new archive patterns
+- `~/.claude/docs/homelab/` - Updated with new homelab documentation structure
+- `~/.claude/docs/` - Added new documentation categories and files
+
+---
+
+
 ## December 20, 2025 - Phone Terminal Setup (oh-my-zsh + powerlevel10k)
 
 **Summary:**
@@ -608,3 +637,30 @@ Large context files (1000+ lines) increase hallucination risk and make it harder
 - Automatic synchronization through filesystem symlinks
 - Eliminated manual sync step from workflow
 - Single source of truth maintained automatically
+
+---
+
+## 2026-01-06 - Fixed NFS Export for ZFS Child Datasets + Plex Media Path Update
+
+**What changed:**
+- Added `crossmnt` option to NFS export on prox-tower (`/etc/exports`)
+- Remounted NFS on VM 101 to pick up changes
+- Updated Plex docker-compose to use new mount path `/mnt/media-pool:/media/tower`
+- Recreated Plex container with new volume mapping
+
+**Why:**
+- User moved Plex media from prox-book5 (`/srv/media/`) to prox-tower's new 4TB HDD (`/media-pool/media/`)
+- ZFS child datasets (`media-pool/media/Movies`, `media-pool/media/Serials`) weren't visible via NFS
+- Root cause: NFS exports of parent ZFS dataset don't automatically include child datasets
+- `crossmnt` option tells NFS to traverse child filesystem mount points
+
+**Files modified:**
+- prox-tower `/etc/exports` - Added `crossmnt` to media-pool export
+- VM 101 `~/docker/docker-compose.yml` - Changed `/mnt/book5-media:/media/book5` → `/mnt/media-pool:/media/tower`
+
+**Technical notes:**
+- ZFS creates separate mount points for child datasets (unlike traditional directories)
+- Without `crossmnt`, NFS clients see empty directories where child datasets mount
+- New Plex library paths: `/media/tower/Movies/`, `/media/tower/Serials/`
+- User still needs to update Plex library paths in web UI
+

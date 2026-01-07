@@ -22,6 +22,7 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active daily driver
 **Location**: `~/projects/nvimConfig`
 **Symlinked to**: `~/.config/nvim`
+**Also on**: Windows PC (WSL) - synced 2026-01-07
 **Purpose**: Modern, feature-rich Neovim setup
 
 **Key Features**:
@@ -32,15 +33,18 @@ Detailed descriptions of all active projects in your workspace.
 - AI assistance: GitHub Copilot
 - **Automated backup**: Hourly via launchd
 
+**PC Notes**: nvim 0.11.5 (AppImage), deno for peek.nvim, fd/rg for telescope, ascii-image-converter for dashboard
+
 **Documentation**: See `~/projects/nvimConfig/CLAUDE.md`
 
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2025-12-26
-**Recent Changes**: Added `OOO` function to skip Twingate upgrades on all 3 homelab nodes before travel. Creates skip files that are self-cleaning (consumed on first run).
+**Last Updated**: 2026-01-07
+**Recent Changes**: Synced to Windows PC (WSL) with Linux adaptations (xclip, date -d syntax)
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`, `~/.zsh/functions/`
+**Also on**: Windows PC (WSL) - synced 2026-01-07
 **Purpose**: Shell configuration with split-file security model
 
 **Key Features**:

@@ -2,6 +2,102 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## 2026-01-07 - PC WSL Fixes and nvim Downgrade
+
+**What changed:**
+- Fixed WSL startup error by removing invalid Z: drive mount from `/etc/fstab`
+- Installed ascii-image-converter to `/usr/local/bin/` for nvim snacks dashboard
+- Downgraded nvim from 0.12.0-dev to 0.11.5 (AppImage at `~/.local/bin/nvim`)
+- Pinned nvim-treesitter to commit 42fc28ba (master branch, matches Mac)
+- Updated snacks.lua to use `vim.fn.exepath()` for cross-platform binary lookup
+- Created convenience symlinks: `~/C` → `/mnt/c`, `~/Documents` → `/mnt/c/Users/joshu/Documents`
+- Added `~/.local/bin` to PATH in `~/.zshenv`
+- Added ls alias to suppress Windows system file permission errors
+
+**Why:**
+- fstab had stale Z: drive mount causing "mount -a failed" on WSL startup
+- nvim 0.12.0-dev (nightly) had breaking changes with treesitter
+- snacks dashboard couldn't find ascii-image-converter (PATH issue in spawned shells)
+- Needed quick access to Windows C: drive and Documents from WSL
+
+**Technical notes:**
+- nvim 0.11.5 installed via AppImage, takes precedence over apt-installed 0.12-dev
+- nvim-treesitter removed `configs.lua` module in main branch; pinned to last master commit
+- Windows system files (hiberfil.sys, pagefile.sys, etc.) cause permission errors in WSL - normal behavior
+- `vim.fn.exepath()` resolves full binary path at runtime, works cross-platform
+
+**PC now has:**
+- nvim 0.11.5 (matches Mac)
+- ascii-image-converter for dashboard snake art
+- Symlinks: ~/C, ~/Documents
+- Clean ls output (suppresses permission errors)
+
+---
+
+## 2026-01-07 - PC WSL Fixes and nvim Downgrade
+
+**What changed:**
+- Fixed WSL startup error by removing invalid Z: drive mount from `/etc/fstab`
+- Installed ascii-image-converter to `/usr/local/bin/` for nvim snacks dashboard
+- Downgraded nvim from 0.12.0-dev to 0.11.5 (AppImage at `~/.local/bin/nvim`)
+- Pinned nvim-treesitter to commit 42fc28ba (master branch, matches Mac)
+- Updated snacks.lua to use `vim.fn.exepath()` for cross-platform binary lookup
+- Created convenience symlinks: `~/C` → `/mnt/c`, `~/Documents` → `/mnt/c/Users/joshu/Documents`
+- Added `~/.local/bin` to PATH in `~/.zshenv`
+- Added ls alias to suppress Windows system file permission errors
+
+**Why:**
+- fstab had stale Z: drive mount causing "mount -a failed" on WSL startup
+- nvim 0.12.0-dev (nightly) had breaking changes with treesitter
+- snacks dashboard couldn't find ascii-image-converter (PATH issue in spawned shells)
+- Needed quick access to Windows C: drive and Documents from WSL
+
+**Files modified:**
+- `docs/changelog.md` - Added detailed entry for WSL fixes
+- `docs/machine-context.md` - Added Windows PC entry to machine table
+- `docs/projects.md` - Updated nvimConfig and zshConfig entries with PC sync info
+
+---
+
+
+## 2026-01-07 - Synced nvim and zsh Configs to Windows PC (WSL)
+
+**What changed:**
+- Copied full nvim config from Mac to PC (`~/.config/nvim/`)
+- Upgraded nvim on PC from 0.9.5 to 0.12.0 (via neovim-ppa/unstable)
+- Installed deno and built peek.nvim for markdown preview
+- Installed fd-find (symlinked as `fd`) and ripgrep for telescope.nvim
+- Copied and adapted zshrc from Mac to PC with Linux-specific changes
+- Created `~/.zsh/functions/` on PC with adapted function files:
+  - `claude.zsh` - Claude Code wrapper
+  - `fzf.zsh` - FZF config (pbcopy → xclip)
+  - `ssh-functions.zsh` - SSH machine aliases
+  - `git-functions.zsh` - gitall, commits (date -v → date -d)
+  - `utils.zsh` - docxdiff, xlsxdiff
+- Copied p10k.zsh config for consistent prompt styling
+- Installed powerlevel10k in oh-my-zsh custom themes
+
+**Why:**
+- User wanted consistent development environment across Mac and PC
+- Telescope.nvim requires fd and rg for file finding
+- peek.nvim requires deno for markdown preview
+- zsh functions needed Linux adaptations (clipboard, date syntax)
+
+**Technical notes:**
+- PC access via `ssh pc` (configured in earlier session via Twingate)
+- Mac-specific items removed: brew plugin, macos plugin, homebrew paths, Vault path
+- Linux adaptations: `pbcopy` → `xclip -selection clipboard`, `date -v-1d` → `date -d "1 day ago"`
+- fd-find on Ubuntu installs as `fdfind`, symlinked to `~/.local/bin/fd`
+
+**PC now has:**
+- nvim 0.12.0 with full plugin config
+- zsh with oh-my-zsh + powerlevel10k
+- Same prompt styling as Mac
+- SSH aliases (book5, tower, omarchy, ubuntu)
+- Git status functions (gitall, commits)
+
+---
+
 ## January 6, 2026 - Documentation System Overhaul
 
 **Summary:**

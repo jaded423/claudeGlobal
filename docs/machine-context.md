@@ -22,8 +22,9 @@ pwd               # Shows if you're in a Mac or Linux path structure
 
 | Machine | OS | Hostname | Home Dir | Purpose |
 |---------|-----|----------|----------|---------|
-| **Work Mac** | Darwin (macOS) | joshuabrown-macbook (or similar) | `/Users/joshuabrown` | Primary development, work projects |
+| **Work Mac** | Darwin (macOS) | joshuabrown-macbook (or similar) | `/Users/j` | Primary development, work projects |
 | **Home Lab** | Linux (CachyOS) | cachyos-jade | `/home/jaded` | Server, file sharing, remote access |
+| **Windows PC** | Linux (Ubuntu WSL) | `ssh pc` | `/home/joshua` | Secondary dev, synced nvim/zsh config |
 
 ---
 

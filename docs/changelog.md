@@ -34,6 +34,23 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-07 - Image cache cleanup and marketplace metadata update
+
+**What changed:**
+- Deleted stale image cache file `image-cache/631bd273-a9bf-46e4-8e20-8a1d40b91da6/1.png`
+- Updated lastUpdated timestamp in `plugins/known_marketplaces.json` from 2026-01-07T20:46:06.830Z to 2026-01-07T21:33:29.011Z
+
+**Why:**
+- The deleted image cache file was likely a stale or obsolete cached asset that is no longer needed
+- The timestamp update reflects the latest state of marketplace plugin metadata, ensuring proper version tracking for plugin management
+
+**Files modified:**
+- `image-cache/631bd273-a9bf-46e4-8e20-8a1d40b91da6/1.png` - Removed stale cache file
+- `plugins/known_marketplaces.json` - Updated lastUpdated timestamp for marketplace plugin metadata
+
+---
+
+
 ## 2026-01-07 - Updated Claude Configuration and Image Cache Cleanup
 
 **What changed:**

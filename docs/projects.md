@@ -141,8 +141,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooModules/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2025-12-22
-**Recent Changes:** The `ollamaSummary.py` script now supports multiple bullet point formats (dash, bullet, and asterisk) when formatting commit messages, improving compatibility with various input styles.
+**Last Updated:** 2026-01-08
+**Recent Changes:** Added OrphanedTasks repository to the automated git backup script, ensuring it's included in regular backup operations.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure
@@ -443,6 +443,29 @@ loom -u topic-name
 - `man/loom.1` - Unix man page
 
 **Documentation**: See `~/projects/loom/CLAUDE.md` or `man loom`
+
+---
+
+## OrphanedTasks
+**Type**: macOS App (Swift/SwiftUI)
+**Status**: Active, functional
+**Last Updated**: 2026-01-08
+**Recent Changes**: Initial release - complete menu bar app with global hotkey, screenshots, reminders, settings
+**Location**: `~/projects/OrphanedTasks`
+**Purpose**: Capture and track interrupted tasks with automatic reminders
+
+**Key Features**:
+- Global hotkey `Cmd+Shift+O` for instant capture from any app
+- Interactive screenshot selection + quick note
+- Persistent reminders every N minutes until marked complete
+- Configurable intervals: 5, 10, 15, 30, 45 min or 1, 2, 4 hours
+- History tracking for completed tasks
+- Menu bar UI (unobtrusive, always accessible)
+- Swift 6 compliant (zero warnings)
+
+**Data Location**: `~/Library/Containers/com.jaded.OrphanedTasks/Data/OrphanTasks/`
+
+**Documentation**: See `~/projects/OrphanedTasks/CLAUDE.md`
 
 ---
 

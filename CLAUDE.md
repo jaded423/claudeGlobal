@@ -29,6 +29,8 @@ This directory (`~/.claude/`) contains global configuration and commands for Cla
 
 **Shell**: All systems use **zsh** (not bash). Always modify `~/.zshrc`, not `~/.bashrc`.
 
+**Git Branch**: Always use `master` (not `main`) for new repositories. All user repos use `master`.
+
 ---
 
 ## Claude Code Limitations

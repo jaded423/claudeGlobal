@@ -34,6 +34,29 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                                                                                                                                                                                                                                                                                           ```changelog
+## 2026-01-08 - Image Cache and Documentation Updates
+
+**What changed:**
+- Updated image cache handling for PNG files in `image-cache/` directory
+- Added documentation for smart routing of changes between `CLAUDE.md` and `changelog.md`
+- Added new section for "SMART DOCUMENTATION ROUTING" with clear categorization
+- Updated `projects.md` with recent changes summary
+
+**Why:**
+- The image cache system now properly handles PNG files and includes metadata
+- Documentation improvements to clarify how changes should be categorized and stored
+- Better organization of project documentation to improve maintainability
+
+**Files modified:**
+- `image-cache/1783392b-9963-4632-ac36-5134b175e29e/10.png` - Added PNG file with metadata
+- `docs/changelog.md` - Added new changelog entry and documentation
+- `docs/CLAUDE.md` - Added smart documentation routing logic
+- `docs/projects.md` - Updated with recent changes summary
+
+---
+
+
                                                                                                                  ```changelog
 ## 2026-01-08 - Image cache directory added
 

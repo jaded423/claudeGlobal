@@ -34,6 +34,24 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-08 - Swift LSP Plugin Installation and Enablement
+
+**What changed:**
+- Installed and enabled the `swift-lsp@claude-plugins-official` plugin
+- Updated `installed_plugins.json` to include the new plugin with its installation details
+- Updated `settings.json` to enable the plugin in the current configuration
+
+**Why:**
+- To provide Swift language server support for Claude's plugin system
+- The plugin was installed and configured to be active in the current setup
+
+**Files modified:**
+- `plugins/installed_plugins.json` - Added entry for swift-lsp plugin with version, install path, and git commit
+- `settings.json` - Enabled the swift-lsp plugin in the enabledPlugins configuration
+
+---
+
+
                                                                                                                ```changelog
 ## 2026-01-08 - Image cache directory added
 

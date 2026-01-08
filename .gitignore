@@ -1,6 +1,7 @@
 # Session-specific data (local only)
 debug/
 file-history/
+image-cache/
 session-env/
 shell-snapshots/
 todos/

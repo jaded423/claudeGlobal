@@ -34,6 +34,21 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-08 - Updated lastUpdated timestamp for claude-plugins-official marketplace
+
+**What changed:**
+- Updated the `lastUpdated` timestamp in `plugins/known_marketplaces.json` for the claude-plugins-official marketplace
+- The timestamp was updated from "2026-01-08T22:31:40.600Z" to "2026-01-08T22:52:51.844Z"
+
+**Why:**
+- This change reflects the most recent update time for the claude-plugins-official marketplace, ensuring accurate tracking of when the marketplace metadata was last modified
+
+**Files modified:**
+- `plugins/known_marketplaces.json` - Updated the `lastUpdated` field for the claude-plugins-official marketplace entry
+
+---
+
+
                                                                                                                                                                                                                                                                                                                                                                                                                            ```changelog
 ## 2026-01-08 - Image Cache and Documentation Updates
 

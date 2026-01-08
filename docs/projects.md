@@ -2,6 +2,24 @@
 
 Detailed descriptions of all active projects in your workspace.
 
+## prompts
+**Type**: AI prompt collection
+**Status**: Active
+**Last Updated**: 2026-01-07
+**Recent Changes**: Created project with 1-3-1 Problem Solving Coach prompt (refined from Gemini gem)
+**Location**: `~/projects/prompts`
+**Purpose**: Refined AI prompts for use with Claude, Gemini, and local LLMs
+
+**Current Prompts**:
+- `1-3-1claude.md` - Dan Martell's 1-3-1 problem-solving framework coach
+
+**Key Features**:
+- Production-ready prompts tested across multiple AI platforms
+- Companion SOPs in `~/projects/loom/SOPs/` with walkthroughs and test scenarios
+- Versioned refinements with documented improvements
+
+**Documentation**: See `~/projects/prompts/CLAUDE.md`
+
 ## promptLibrary
 **Type**: Documentation
 **Status**: Active reference library

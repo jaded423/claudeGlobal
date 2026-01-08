@@ -76,3 +76,4 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2026-01-07T17:01:31-06:00,.claude,81,909,566,7.1,qwen-gon-jinn-hybrid
 2026-01-07T17:03:05-06:00,loom,89,6413,808,9.2,qwen-gon-jinn-hybrid
 2026-01-08T11:05:40-06:00,.claude,328,1237,3628,11.2,qwen-gon-jinn-hybrid
+2026-01-08T12:00:53-06:00,.claude,41,525,293,8.1,qwen-gon-jinn-hybrid

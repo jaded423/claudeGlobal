@@ -1,0 +1,55 @@
+Pics        Ref
+A - Candy Rain.png        A - Candy Rain
+A - Cheetah Piss.png        A - Cheetah Piss
+A - Frosted Lemonade.png        A - Frosted Lemonade 
+A - Oishi.png        A - Pink Starburst
+A - Pink Starburst.png        A - Pluto Kush
+A - Purple Gas.png        A - Purple Gas
+A - Smash Burger.png        A - Smash Burger
+A - Sugar Tarts.png        A - Sugar Tarts
+A - Tangie.png        A - White Runtz
+A - Wedding Cake.png        A - Zoap
+A - White Runtz.png        AA - Amnesia Haze 
+A - Zoap.png        AA - Apple Jacks 
+AA - Amnesia Haze.png        AA - Bacio 
+AA - Banana Runtz.png        AA - Banana Runtz
+AA - Candyland 08.15.58.png        AA - Candyland 
+AA - Forbidden Fruit.png        AA - Forbidden Fruit
+AA - Funnel Cake.png        AA - Funnel Cake 
+AA - Ice Cream Cake.png        AA - Gush Mintz
+AA - Jealousy.png        AA - Ice Cream Cake
+AA - Lemon Pastries.png        AA - Jealousy
+AA - Pink Cookies.png        AA - LA Kush Cake
+AA - Polar Pop.png        AA - Lemon Cookie
+AA - Sour Diesel.png        AA - Lemon Pastries
+AA - Super Boof.png        AA - Pink Certz
+AA - Super Lemon Haze.png        AA - Pink Cookies 
+AAA - Blue Cookies.png        AA - Polar Pop
+AAA - Blue Zushie.png        AA - Runtz
+AAA - Cherry Runtz.png        AA - Super Boof
+AAA - Glitterati.png        AA - Super Lemon Haze
+AAA - Lemon Meringue.png        AA - Wedding Crasher 
+AAA - Lemon Tree.png        AAA - Blue Cookies
+AAA - Peaches 'n Cream.png        AAA - Blue Zushie
+AAA - Peaches & Cream.png        AAA - Cadillac Rainbows
+AAA - Permanent Gas.png        AAA - Cherry Runtz
+AAA - Purple Haze.png        AAA - Gelato 33
+AAA - Sativa Diva.png        AAA - Governmint Oasis
+AAA - Sunset Sherbet.png        AAA - Lemon Tree
+AAA - Tangie.png        AAA - London Pound Cake
+AAA - Zello.png        AAA - Peaches & Cream
+Smalls - Blackberry Kush.png        AAA - Permanent Gas
+Smalls - Death Star.png        AAA - Purple Haze
+Smalls - Elektra Ice.png        AAA - Sativa Diva
+Smalls - Fruit Stripe.png        AAA - Sunset Sherbet
+Smalls - Gas Face.png        AAA - Tangie 
+Smalls - Gummies.png        AAA - White Mango 
+Smalls - Jelly Roll.png        AAA - Zello 
+Smalls - Pink Certz.png        Smalls - Airheadz
+Smalls - Punch Breath.png        Smalls - Death Star
+Smalls - Tropicana Cookies.png        Smalls - Gas Face
+        Smalls - Gummies
+        Smalls - Gush Mintz
+        Smalls - Jelly Roll
+        Smalls - Punch Breath
+        Smalls - Tropicana Cookies

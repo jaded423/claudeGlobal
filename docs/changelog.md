@@ -2,6 +2,52 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## 2026-01-09 - Pi1 Terminal Setup + DOOM ASCII
+
+Configured Raspberry Pi 1 Model B+ with zsh, Oh My Zsh, Powerlevel10k, fzf, zoxide, vim, and installed doom-ascii terminal DOOM game.
+
+## 2026-01-09 - Pi1 Terminal Setup + DOOM ASCII
+
+**What changed:**
+- Configured Raspberry Pi 1 Model B+ (pi1) with Mac-like terminal environment
+- Installed: zsh, Oh My Zsh, Powerlevel10k theme, fzf, zoxide, vim
+- Created Pi-compatible ~/.zshrc (Linux adaptations, no Mac-specific plugins)
+- Created ~/.zsh/functions/ with: git-functions.zsh, ssh-functions.zsh, utils.zsh
+- Created ~/.ssh/config (Linux-compatible, removed UseKeychain)
+- Set zsh as default shell via `chsh`
+- Added Mac aliases: sz, vz, ll, la, doom, etc.
+- Built doom-ascii from source (~17 min compile time on 700MHz ARM11)
+- Installed DOOM shareware WAD for terminal-based ASCII DOOM
+
+**Why:**
+- User wanted same terminal feel on Pi1 as on Mac
+- Pi1 is headless (no display), accessed via SSH through PC port forward
+- DOOM was a fun "can it run DOOM?" challenge for the 2014 hardware
+
+**Pi1 Specs:**
+- Raspberry Pi Model B Plus Rev 1.2 (2014)
+- ARMv6 700MHz single-core, 427MB RAM
+- Raspbian Bookworm (Debian 12)
+- Access: `ssh pi1` (port 2223 via PC)
+
+**Files created on Pi1:**
+- `~/.zshrc` - Oh My Zsh + Powerlevel10k config
+- `~/.zsh/functions/*.zsh` - 3 function files
+- `~/.ssh/config` - SSH shortcuts (Linux-compatible)
+- `~/doom-ascii/` - DOOM ASCII game (compiled from source)
+
+**Performance notes:**
+- zsh source takes 15-22 seconds on Pi1 (Oh My Zsh + P10k overhead)
+- DOOM ASCII playable at `-scaling 6` (lower res for performance)
+- Braille mode (-chars braille) caused rendering issues, reverted to ASCII
+
+**Commands added:**
+- `doom` - Run DOOM ASCII in terminal
+- `sysinfo` - Show Pi system stats including CPU temp
+- `gitall` - Check status of all repos in ~/projects
+
+---
+
 ## 2026-01-08 - Proxmox Network Reconfiguration (Direct 2.5G Inter-Node Link)
 
 **What changed:**

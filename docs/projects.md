@@ -58,11 +58,11 @@ Detailed descriptions of all active projects in your workspace.
 ## zshConfig
 **Type**: ZSH configuration
 **Status**: Active shell config
-**Last Updated**: 2026-01-07
-**Recent Changes**: Synced to Windows PC (WSL) with Linux adaptations (xclip, date -d syntax)
+**Last Updated**: 2026-01-09
+**Recent Changes**: Deployed to Pi1 (Raspberry Pi 1 B+) with Linux adaptations, doom-ascii installed
 **Location**: `~/projects/zshConfig`
 **Symlinked to**: `~/.zshrc`, `~/.p10k.zsh`, `~/.zsh/functions/`
-**Also on**: Windows PC (WSL) - synced 2026-01-07
+**Also on**: Windows PC (WSL), Pi1 @ Elevated
 **Purpose**: Shell configuration with split-file security model
 
 **Key Features**:

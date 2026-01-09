@@ -64,6 +64,13 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-09 - Updated metrics and marketplace timestamp
+
+Added new performance metrics entry to ollamaLog-metrics.csv and updated the lastUpdated timestamp for the claude-plugins-official marketplace in known_marketplaces.json.
+
+---
+
+
 ## 2026-01-07 - PC WSL Fixes and nvim Downgrade
 
 **What changed:**

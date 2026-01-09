@@ -83,3 +83,7 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2026-01-08T16:33:15-06:00,scripts,53,615,270,5.6,qwen-gon-jinn-hybrid
 2026-01-08T17:00:58-06:00,.claude,49,640,270,5.9,qwen-gon-jinn-hybrid
 2026-01-08T22:15:45-06:00,.claude,923,4662,1076,3.4,qwen-gon-jinn-hybrid
+2026-01-09T10:28:25-06:00,.claude,234,640,2973,12.9,qwen-gon-jinn-hybrid
+2026-01-09T10:35:36-06:00,.claude,40,764,252,6.9,qwen-gon-jinn-hybrid
+2026-01-09T10:37:11-06:00,scripts,90,3180,839,9.7,qwen-gon-jinn-hybrid
+2026-01-09T10:38:00-06:00,zshConfig,44,689,234,5.7,qwen-gon-jinn-hybrid

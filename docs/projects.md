@@ -141,8 +141,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooModules/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2026-01-08
-**Recent Changes:** Added OrphanedTasks repository to the automated git backup script, ensuring it's included in regular backup operations.
+**Last Updated:** 2026-01-09
+**Recent Changes:** The primary Ollama server IP address was updated from 192.168.1.126 to 192.168.2.126 across all related scripts, documentation, and monitoring tools.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

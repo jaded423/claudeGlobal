@@ -1,6 +1,6 @@
 # Home Lab Documentation
 
-**Last Updated:** January 8, 2026
+**Last Updated:** January 9, 2026
 **Cluster:** 2-node Proxmox "home-cluster" with QDevice quorum
 
 **Detailed Docs:** See `homelab/` subdirectory for services, troubleshooting, and setup guides.
@@ -27,6 +27,7 @@
 | └─ VM 101: Ubuntu Server | 192.168.2.126 | Docker, Ollama, Plex, Frigate (40GB RAM, 28 vCPU) | Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, QDevice, MagicMirror | Active |
 | **etintake (Windows PC)** | 192.168.1.193 | WSL Ubuntu, Twingate connector (Docker) | Active |
+| └─ **Pi1 (via ICS)** | 192.168.137.123 | Git backup mirror (Pi 1B+, 512MB) | Active |
 
 **Storage:**
 - prox-book5: 880GB NVMe (ZFS)
@@ -59,7 +60,11 @@ Proxmox Cluster "home-cluster" (3 votes: 2 nodes + QDevice)
 ├── etintake (Windows PC) @ 192.168.1.193
 │   ├── WSL Ubuntu (SSH on port 2222)
 │   ├── Twingate Connector (Docker in WSL)
-│   └── RustDesk remote access
+│   ├── RustDesk remote access
+│   └── Pi1 @ 192.168.137.123 (via ICS on ethernet)
+│       ├── Raspberry Pi 1 Model B+ (ARMv6, 512MB RAM)
+│       ├── Git backup mirror (15 repos, 4-hourly sync)
+│       └── SSH: `ssh pi1` (port 2223 via PC forward)
 │
 └── Direct 2.5G Inter-Node Link (10.10.10.0/30)
     prox-book5 (10.10.10.1) ◄─── 2.36 Gbps ───► prox-tower (10.10.10.2)
@@ -152,6 +157,46 @@ Host 192.168.2.126 ubuntu-server ubuntu vm101
 |---------|----------|---------|
 | Pi-hole | 192.168.2.131 | DNS ad-blocking |
 | Samba | 192.168.2.250 | File sharing (smb://192.168.2.250/Shared) |
+
+### Pi1 @ Elevated (Git Backup Mirror)
+
+| Property | Value |
+|----------|-------|
+| **Hardware** | Raspberry Pi 1 Model B+ (ARMv6, 700MHz, 512MB RAM) |
+| **OS** | Raspberry Pi OS (Legacy) Bookworm Lite |
+| **IP** | 192.168.137.123 (ICS subnet behind Windows PC) |
+| **SSH** | `ssh pi1` (port 2223 via PC port forward) |
+| **User** | pi (passwordless sudo) |
+| **Storage** | 8GB SD card (~4.4GB free) |
+| **Internet** | ~40 Mbps via Windows ICS |
+
+**Services:**
+- Git backup mirror: 15 repos (152MB) syncing every 4 hours
+- Sync script: `~/git-mirrors/sync-mirrors.sh`
+- Sync log: `~/git-mirrors/sync.log`
+
+**Network Architecture:**
+```
+Mac → PC:2223 → Windows portproxy → Pi:22
+Pi → Windows ICS NAT → PC WiFi → Internet
+```
+
+**Manual Commands:**
+```bash
+# SSH to Pi from Mac
+ssh pi1
+
+# Trigger manual sync
+ssh pi1 "~/git-mirrors/sync-mirrors.sh"
+
+# Check sync status
+ssh pi1 "cat ~/git-mirrors/sync.log | tail -20"
+
+# List mirrored repos
+ssh pi1 "ls ~/git-mirrors/*.git"
+```
+
+**Note:** Pi1 internet depends on PC being powered on (ICS). If PC is off, Pi has no network access.
 
 ---
 
@@ -284,6 +329,7 @@ OOO  # Creates skip files on all 3 nodes
 
 | Date | Change |
 |------|--------|
+| 2026-01-09 | Pi1 @ Elevated: Raspberry Pi 1B+ git backup mirror via Windows ICS, 15 repos, 4-hourly sync |
 | 2026-01-07 | Windows PC (etintake) SSH setup: WSL Ubuntu, port 2222, auto port forwarding |
 | 2026-01-06 | 4TB HDD ZFS pool, media migration to prox-tower, Ollama models to HDD |
 | 2025-12-27 | scan-and-move.sh bug fixes, qBittorrent optimization, cron disabled |

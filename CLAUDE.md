@@ -125,10 +125,14 @@ All projects have hourly automated backups to GitHub.
 | SSH (prox-book5) | `ssh root@192.168.2.250` |
 | SSH (prox-tower) | `ssh root@192.168.2.249` |
 | SSH (VM 101) | `ssh jaded@192.168.2.126` |
+| SSH (PC/WSL) | `ssh pc` (port 2222) |
+| SSH (Pi1 @ Elevated) | `ssh pi1` (port 2223 via PC) |
 | Samba | `smb://192.168.2.250/Shared` |
 | Twingate | jaded423 network |
 
 **Services on VM 101**: Plex (32400), Jellyfin (8096), Ollama (11434), Frigate (5000), qBittorrent (8080)
+
+**Pi1 @ Elevated**: Git backup mirror (15 repos, 4-hourly sync) - requires PC to be on for internet
 
 ---
 

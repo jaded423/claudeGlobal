@@ -2,7 +2,7 @@
 
 Quick reference for accessing all machines in the multi-location network.
 
-**Last Updated:** January 7, 2026 (Added Windows PC etintake - WSL Ubuntu SSH)
+**Last Updated:** January 9, 2026 (Added Pi1 @ Elevated - Git backup mirror via Windows ICS)
 
 ---
 
@@ -29,6 +29,9 @@ ssh mac                                # Using alias (works from book5, tower, t
 
 # Windows PC - WSL Ubuntu (aliases: etintake, wsl, pc)
 ssh etintake                           # Port 2222, user joshua
+
+# Pi1 @ Elevated (via Windows PC port forward)
+ssh pi1                                # Port 2223, user pi (git backup mirror)
 ```
 
 ---
@@ -81,6 +84,7 @@ ssh etintake                           # Port 2222, user joshua
 | **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
 | **Mac (macAir)** | 192.168.2.226 | j | Direct (book5/tower), ProxyJump (termux) | Development |
 | **etintake (Win PC)** | 192.168.1.193:2222 | joshua | Direct/Twingate | WSL Ubuntu, Twingate connector |
+| **Pi1 (Elevated)** | 192.168.1.193:2223 | pi | Via PC port forward | Git backup mirror (Pi 1B+) |
 
 ---
 
@@ -172,6 +176,20 @@ Host s25ultra phone termux
 
 # Note: Phone runs zsh with oh-my-zsh + powerlevel10k (configured Dec 20, 2025)
 # Plugins: git, zoxide, fzf, docker, npm, python, colored-man-pages, jsontools, history, sudo
+
+# Pi1 @ Elevated - Git backup mirror (via Windows PC port forward)
+Host pi1 rpi1
+  HostName 192.168.1.193
+  User pi
+  Port 2223
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Note: Pi1 (Raspberry Pi 1B+) gets internet via Windows ICS - requires PC to be on
+# Services: Git backup mirror (15 repos, 4-hourly sync via cron)
 ```
 
 ---
@@ -303,6 +321,8 @@ ssh macair        # → j@192.168.2.226
 ssh etintake      # → joshua@192.168.1.193:2222
 ssh wsl           # → joshua@192.168.1.193:2222
 ssh pc            # → joshua@192.168.1.193:2222
+ssh pi1           # → pi@192.168.1.193:2223 (via PC forward)
+ssh rpi1          # → pi@192.168.1.193:2223 (via PC forward)
 ```
 
 ---
@@ -340,6 +360,65 @@ Mac → Twingate → Windows:2222 → portproxy → WSL:2222 → SSH
 **Troubleshooting:**
 - If SSH fails after reboot: Run `sudo /usr/local/bin/fix-wsl-ssh` in WSL
 - If Windows IP changed: Update Twingate resource in admin console
+
+---
+
+## Pi1 @ Elevated (Git Backup Mirror)
+
+**Completed January 9, 2026**
+
+| Component | Details |
+|-----------|---------|
+| Hostname | raspberrypi |
+| Hardware | Raspberry Pi 1 Model B+ (ARMv6, 700MHz, 512MB RAM) |
+| OS | Raspberry Pi OS (Legacy) Bookworm Lite |
+| Pi IP | 192.168.137.123 (Windows ICS subnet) |
+| SSH Port | 2223 (via Windows port forward) |
+| User | pi (passwordless sudo) |
+| Storage | 8GB SD card (~4.4GB free, 152MB used by mirrors) |
+| Internet Speed | ~40 Mbps via Windows ICS NAT |
+
+**SSH Access:**
+```bash
+ssh pi1               # Uses aliases: pi1, rpi1
+ssh -p 2223 pi@192.168.1.193
+```
+
+**Architecture:**
+```
+Mac → PC:2223 → Windows portproxy → Pi:22 (192.168.137.123)
+Pi → Windows ICS NAT → PC WiFi → Internet
+```
+
+**Git Backup Mirror:**
+- 15 repositories mirrored from GitHub (bare repos)
+- Location: `~/git-mirrors/*.git`
+- Sync script: `~/git-mirrors/sync-mirrors.sh`
+- Schedule: Every 4 hours via cron
+- Log: `~/git-mirrors/sync.log`
+
+**Common Commands:**
+```bash
+# Manual sync
+ssh pi1 "~/git-mirrors/sync-mirrors.sh"
+
+# Check sync log
+ssh pi1 "tail -20 ~/git-mirrors/sync.log"
+
+# List mirrored repos
+ssh pi1 "ls ~/git-mirrors/*.git"
+
+# Check disk usage
+ssh pi1 "du -sh ~/git-mirrors/"
+
+# Run speedtest
+ssh pi1 "speedtest-cli"
+```
+
+**Important Notes:**
+- Pi internet requires Windows PC to be powered on (ICS dependency)
+- Windows port forward: `netsh interface portproxy` rule on port 2223
+- GitHub SSH key: "Pi1 Backup" in github.com/settings/keys
 
 ---
 

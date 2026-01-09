@@ -34,6 +34,36 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-08 - Core Service and Plugin Updates
+
+**What changed:**
+- Updated official Claude plugin marketplace with new commit and last updated timestamp
+- Stats cache updated to reflect new daily activity and token usage for 2026-01-08
+- Updated Atlassian MCP integration to use a more reliable default configuration (streamable HTTP)
+- Changed "Interrupted" message color from red to grey for a less alarming appearance
+- Removed permission prompt when entering plan mode - users can now enter plan mode without approval
+- Removed underline styling from image reference links
+
+**Why:**
+- The plugin marketplace update ensures users have access to the latest official plugins
+- The stats cache update reflects daily usage and token consumption for the new date
+- The Atlassian MCP integration change improves reliability of HTTP streaming
+- The UI/UX refinements improve user experience by reducing unnecessary prompts and visual clutter
+
+**Files modified:**
+- `plugins/known_marketplaces.json` - Updated lastUpdated timestamp for claude-plugins-official marketplace
+- `plugins/marketplaces/claude-plugins-official` - Updated submodule commit
+- `stats-cache.json` - Updated daily activity and token usage for 2026-01-08
+- `plugins/known_marketplaces.json` - Updated lastUpdated timestamp for claude-plugins-official marketplace
+- `plugins/marketplaces/claude-plugins-official` - Updated submodule commit
+- `stats-cache.json` - Updated daily activity and token usage for 2026-01-08
+- `plugins/known_marketplaces.json` - Updated lastUpdated timestamp for claude-plugins-official marketplace
+- `plugins/marketplaces/claude-plugins-official` - Updated submodule commit
+- `stats-cache.json` - Updated daily activity and token usage for 2026-01-08
+
+---
+
+
 ## 2026-01-08 - Updated lastUpdated timestamp for claude-plugins-official marketplace
 
 **What changed:**

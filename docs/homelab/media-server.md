@@ -84,7 +84,7 @@ Movies/
 
 ### qBittorrent Settings
 
-**Web UI:** http://192.168.1.126:8080
+**Web UI:** http://192.168.2.126:8080
 **Config:** `/var/lib/docker/volumes/qbit-config/_data/qBittorrent/qBittorrent.conf`
 
 **Optimized Settings (Dec 27, 2025):**
@@ -98,7 +98,7 @@ Movies/
 
 ### Plex
 **Port:** 32400
-**Web UI:** http://192.168.1.126:32400/web
+**Web UI:** http://192.168.2.126:32400/web
 **Container Path:** `/media/tower/` → `/mnt/media-pool/` on host
 **Library Paths (inside container):**
 - Movies: `/media/tower/Movies/`
@@ -106,7 +106,7 @@ Movies/
 
 ### Jellyfin
 **Port:** 8096
-**Web UI:** http://192.168.1.126:8096
+**Web UI:** http://192.168.2.126:8096
 **Status:** Backup media server
 
 ---
@@ -115,8 +115,8 @@ Movies/
 
 **Export from prox-tower** (`/etc/exports`):
 ```bash
-/media-pool/media 192.168.1.126(rw,sync,no_subtree_check,no_root_squash,crossmnt)
-/media-pool/ollama 192.168.1.126(rw,sync,no_subtree_check,no_root_squash)
+/media-pool/media 192.168.2.126(rw,sync,no_subtree_check,no_root_squash,crossmnt)
+/media-pool/ollama 192.168.2.126(rw,sync,no_subtree_check,no_root_squash)
 ```
 
 **Critical:** `crossmnt` is required for `/media-pool/media` because Movies and Serials are separate ZFS child datasets. Without it, those directories appear empty via NFS.
@@ -138,7 +138,7 @@ ssh root@192.168.2.249 "du -sh /media-pool/media/*"
 
 ### Verify NFS Mounts
 ```bash
-ssh jaded@192.168.1.126 "df -h | grep media-pool"
+ssh jaded@192.168.2.126 "df -h | grep media-pool"
 ```
 
 ### Scan Library (Plex)

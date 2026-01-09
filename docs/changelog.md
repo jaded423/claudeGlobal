@@ -2,6 +2,68 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
+## 2026-01-08 - Proxmox Network Reconfiguration (Direct 2.5G Inter-Node Link)
+
+**What changed:**
+- Reconfigured Proxmox cluster networking: 2.5GbE now used for direct inter-node link instead of VM traffic
+- VM 101 moved from 192.168.1.126 (2.5GbE vmbr1) to 192.168.2.126 (1GbE vmbr0)
+- Created direct 2.5G link between prox-book5 and prox-tower on private 10.10.10.0/30 subnet
+- Both nodes now have 1GbE to router (internet) + 2.5GbE direct to each other (inter-node)
+- Updated 10 documentation files with new VM 101 IP
+- Updated ~/.ssh/config: changed VM 101 IP, removed tower-fast entry
+- Updated NFS exports on tower: 192.168.1.126 → 192.168.2.126
+- Updated NFS mounts on VM 101 fstab: 192.168.1.249 → 192.168.2.249
+- Configured vmbr1 on book5 with 10.10.10.1/30 for direct link
+
+**Why:**
+- User adding 2.5GbE adapter to book5 but router only has one 2.5G port
+- Direct inter-node link provides 2.36 Gbps for VM migrations and storage replication
+- Plan to get 2.5G mesh WiFi system later; this is interim solution
+- Internet limited to 1GbE per node but cluster traffic gets full 2.5G speed
+
+**Network topology now:**
+```
+┌─────────────────┐     Direct 2.5G Link     ┌─────────────────┐
+│   prox-book5    │      (2.36 Gbps)         │   prox-tower    │
+│  vmbr1: 10.10.10.1 ◄──────────────────────► vmbr1: 10.10.10.2 │
+│  vmbr0: 192.168.2.250                       vmbr0: 192.168.2.249 │
+└────────┬────────┘                          └────────┬────────┘
+         │ 1GbE                                       │ 1GbE
+         └──────────────┬─────────────────────────────┘
+                        │
+                   ┌────┴────┐
+                   │ Router  │
+                   └─────────┘
+```
+
+**Files modified:**
+- `~/.ssh/config` - Updated VM 101 IP, removed tower-fast entry
+- `CLAUDE.md` - Updated VM 101 SSH reference
+- `docs/homelab.md` - Updated IP references
+- `docs/ssh-access-cheatsheet.md` - Updated IPs and 2.5GbE→1GbE notes
+- `docs/projects.md` - Updated VM 101 reference
+- `docs/mac.md` - Updated VM 101 reference
+- `docs/homelab/media-server.md` - Updated Web UI URLs, NFS exports
+- `docs/homelab/services.md` - Updated service locations
+- `docs/homelab/google-drive.md` - Updated mount paths
+- `docs/homelab/gpu-passthrough.md` - Updated SSH commands
+- Tower `/etc/exports` - Updated NFS export IPs
+- VM 101 `/etc/fstab` - Updated NFS mount IPs
+- Tower `/etc/network/interfaces` - Added gateway to vmbr0, changed vmbr1 to 10.10.10.2/30
+- Book5 `/etc/network/interfaces` - Added vmbr1 with 10.10.10.1/30
+
+**Speed test results:**
+- Direct inter-node link: **2.36 Gbps** (verified with iperf3)
+- Internet per node: ~940 Mbps (1GbE limit)
+
+**Technical notes:**
+- VM 101's network bridge changed from vmbr1 to vmbr0 (qm set 101 --net0)
+- VM 101 netplan updated: 192.168.1.126/24 → 192.168.2.126/24, gateway .1.1 → .2.1
+- ProxyJump still required for SSH to VM 101 (Mac on 192.168.1.x, VM on 192.168.2.x)
+- NFS mounts remounted successfully after IP changes
+
+---
+
 ## 2026-01-07 - PC WSL Fixes and nvim Downgrade
 
 **What changed:**

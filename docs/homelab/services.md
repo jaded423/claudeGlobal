@@ -142,7 +142,7 @@ docker images                   # List images
 **Port:** 11434 (localhost)
 **Status Check:** `systemctl status ollama`
 **API Endpoint:** `http://127.0.0.1:11434`
-**Open WebUI:** http://192.168.1.126:3000
+**Open WebUI:** http://192.168.2.126:3000
 
 **Storage Location:** `/mnt/ollama/models/` (NFS mount from prox-tower HDD)
 **Configuration:** Systemd override sets `OLLAMA_MODELS=/mnt/ollama/models`
@@ -188,9 +188,9 @@ curl http://localhost:11434/api/generate -d '{
 ## Frigate NVR
 
 **Port:** 5000 (Web UI), 8554 (RTSP), 8555 (WebRTC), 1883 (MQTT)
-**Location:** VM 101 (192.168.1.126)
+**Location:** VM 101 (192.168.2.126)
 **Status Check:** `docker ps | grep frigate`
-**Web UI:** http://192.168.1.126:5000
+**Web UI:** http://192.168.2.126:5000
 
 **Cameras:**
 

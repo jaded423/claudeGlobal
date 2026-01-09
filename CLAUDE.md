@@ -124,7 +124,7 @@ All projects have hourly automated backups to GitHub.
 |----------|--------|
 | SSH (prox-book5) | `ssh root@192.168.2.250` |
 | SSH (prox-tower) | `ssh root@192.168.2.249` |
-| SSH (VM 101) | `ssh jaded@192.168.1.126` |
+| SSH (VM 101) | `ssh jaded@192.168.2.126` |
 | Samba | `smb://192.168.2.250/Shared` |
 | Twingate | jaded423 network |
 

@@ -100,7 +100,7 @@ pmset -g assertions         # Show what's preventing sleep
 - `192.168.2.249` - prox-tower (Proxmox Node 2, management)
 - `192.168.1.249` - prox-tower-fast (2.5GbE network)
 - `192.168.2.161` - VM 100 Omarchy (via ProxyJump)
-- `192.168.1.126` - VM 101 Ubuntu Server (via ProxyJump)
+- `192.168.2.126` - VM 101 Ubuntu Server (via ProxyJump)
 
 **ProxyJump:** VMs accessed through Proxmox hosts due to Twingate routing.
 

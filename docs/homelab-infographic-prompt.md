@@ -87,7 +87,7 @@ DNS: Pi-hole at 192.168.2.131
 
 ### VM 101: Ubuntu Server
 - **Host:** prox-tower
-- **IP:** 192.168.1.126 (on 2.5GbE network)
+- **IP:** 192.168.2.126 (on 2.5GbE network)
 - **User:** jaded
 - **OS:** Ubuntu Server 24.04 LTS
 - **Specs:** 40GB RAM, 6 cores, 300GB disk
@@ -117,7 +117,7 @@ Mac ─────────────────→ magic-pihole (192.168
 **ProxyJump connections (show as 2-hop):**
 ```
 Mac ──→ prox-book5 ──→ VM 100 (192.168.2.161)
-Mac ──→ prox-tower ──→ VM 101 (192.168.1.126)
+Mac ──→ prox-tower ──→ VM 101 (192.168.2.126)
 ```
 
 **Cross-node (Proxmox to Proxmox):**
@@ -138,7 +138,7 @@ Mac (remote) → Twingate Cloud → Connectors (book5/tower/Pi) → Resources
 | `prox-tower`, `tower` | 192.168.2.249 | root | Direct |
 | `tower-fast` | 192.168.1.249 | root | Direct (2.5GbE) |
 | `omarchy`, `vm100` | 192.168.2.161 | jaded | ProxyJump via .250 |
-| `ubuntu`, `vm101` | 192.168.1.126 | jaded | ProxyJump via .249 |
+| `ubuntu`, `vm101` | 192.168.2.126 | jaded | ProxyJump via .249 |
 | `pihole`, `pi` | 192.168.2.131 | jaded | Direct |
 
 ## DATA FLOWS TO VISUALIZE
@@ -163,7 +163,7 @@ Mac (remote) → Twingate Cloud → Connectors (book5/tower/Pi) → Resources
 | prox-tower SSH | 192.168.2.249 | 22 | tower |
 | magic-pihole SSH | 192.168.2.131 | 22 | Pi |
 | Samba Shares | 192.168.2.250 | 139, 445 | book5 |
-| Plex | 192.168.1.126 | 32400 | tower |
+| Plex | 192.168.2.126 | 32400 | tower |
 
 ## VISUAL LAYOUT SUGGESTIONS
 

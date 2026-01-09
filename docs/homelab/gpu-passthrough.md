@@ -104,7 +104,7 @@ Ollama variants only store config changes, not duplicate weights.
 
 ### Quick Hybrid Model
 ```bash
-ssh jaded@192.168.1.126 'cat > /tmp/Modelfile << EOF
+ssh jaded@192.168.2.126 'cat > /tmp/Modelfile << EOF
 FROM model-name:tag
 PARAMETER num_gpu 24
 EOF
@@ -147,13 +147,13 @@ ollama cp old-name new-name        # Copy/rename
 
 ```bash
 # GPU status in VM
-ssh jaded@192.168.1.126 "nvidia-smi"
+ssh jaded@192.168.2.126 "nvidia-smi"
 
 # VRAM usage
-ssh jaded@192.168.1.126 "nvidia-smi --query-gpu=memory.used,memory.total --format=csv"
+ssh jaded@192.168.2.126 "nvidia-smi --query-gpu=memory.used,memory.total --format=csv"
 
 # Test Ollama GPU
-ssh jaded@192.168.1.126 "ollama run llama3.2:3b 'Hello' --verbose 2>&1 | grep 'eval rate'"
+ssh jaded@192.168.2.126 "ollama run llama3.2:3b 'Hello' --verbose 2>&1 | grep 'eval rate'"
 
 # Check host vfio binding
 ssh root@192.168.2.249 "lspci -nnk -s 01:00 | grep 'driver in use'"

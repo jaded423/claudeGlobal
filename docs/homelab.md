@@ -1,6 +1,6 @@
 # Home Lab Documentation
 
-**Last Updated:** January 7, 2026
+**Last Updated:** January 8, 2026
 **Cluster:** 2-node Proxmox "home-cluster" with QDevice quorum
 
 **Detailed Docs:** See `homelab/` subdirectory for services, troubleshooting, and setup guides.
@@ -13,17 +13,18 @@
 
 | Network | Subnet | Gateway | Speed | Purpose |
 |---------|--------|---------|-------|---------|
-| **Primary** | 192.168.1.0/24 | .1.1 | 2.5 Gbps | VMs, media streaming |
-| **Management** | 192.168.2.0/24 | .2.1 | 1 Gbps | Twingate, AMT, Proxmox hosts |
+| **Management** | 192.168.2.0/24 | .2.1 | 1 Gbps | Proxmox hosts, VMs, Twingate |
+| **Mac/PC** | 192.168.1.0/24 | .1.1 | 1 Gbps | Mac, Windows PC, other devices |
+| **Inter-Node** | 10.10.10.0/30 | - | 2.5 Gbps | Direct link between Proxmox nodes |
 
 ### Active Devices
 
 | Device | IP | Purpose | Status |
 |--------|-----|---------|--------|
-| **prox-book5** | 192.168.2.250 | Proxmox node 1 (Samsung Galaxy Book5 Pro, 16GB) | Active |
+| **prox-book5** | 192.168.2.250 (vmbr0) / 10.10.10.1 (vmbr1) | Proxmox node 1 (Samsung Galaxy Book5 Pro, 16GB) | Active |
 | └─ VM 100: Omarchy | 192.168.2.161 | Arch Linux desktop (Hyprland) | Auto-start |
-| **prox-tower** | 192.168.2.249 / 192.168.1.249 | Proxmox node 2 (ThinkStation, 78GB, Xeon 16c/32t) | Active |
-| └─ VM 101: Ubuntu Server | 192.168.1.126 | Docker, Ollama, Plex, Frigate (40GB RAM, 28 vCPU) | Auto-start |
+| **prox-tower** | 192.168.2.249 (vmbr0) / 10.10.10.2 (vmbr1) | Proxmox node 2 (ThinkStation, 78GB, Xeon 16c/32t) | Active |
+| └─ VM 101: Ubuntu Server | 192.168.2.126 | Docker, Ollama, Plex, Frigate (40GB RAM, 28 vCPU) | Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, QDevice, MagicMirror | Active |
 | **etintake (Windows PC)** | 192.168.1.193 | WSL Ubuntu, Twingate connector (Docker) | Active |
 
@@ -36,15 +37,16 @@
 ```
 Proxmox Cluster "home-cluster" (3 votes: 2 nodes + QDevice)
 │
-├── prox-book5 @ 192.168.2.250
+├── prox-book5 @ 192.168.2.250 (vmbr0) / 10.10.10.1 (vmbr1)
 │   ├── Twingate Connector (systemd)
+│   ├── Dual-NIC: 1GbE (USB-C dock) + 2.5GbE (Realtek RTL8156)
 │   └── VM 100: Omarchy @ 192.168.2.161 (Arch + Hyprland)
 │
-├── prox-tower @ 192.168.2.249 (mgmt) / 192.168.1.249 (primary)
+├── prox-tower @ 192.168.2.249 (vmbr0) / 10.10.10.2 (vmbr1)
 │   ├── Twingate Connector (systemd)
 │   ├── Dual-NIC: Intel I218-LM (1GbE) + Realtek RTL8125 (2.5GbE)
 │   ├── media-pool (4TB HDD): /media-pool/media/, /media-pool/ollama/
-│   └── VM 101: Ubuntu Server @ 192.168.1.126
+│   └── VM 101: Ubuntu Server @ 192.168.2.126
 │       ├── Docker: Plex, Jellyfin, qBittorrent, ClamAV, Frigate, Mosquitto
 │       ├── Ollama (6 LLMs, 40GB, GPU-accelerated via Quadro M4000)
 │       └── Google Drive mounts (rclone FUSE)
@@ -54,10 +56,13 @@ Proxmox Cluster "home-cluster" (3 votes: 2 nodes + QDevice)
 │   ├── Corosync QDevice (cluster quorum)
 │   └── MagicMirror kiosk
 │
-└── etintake (Windows PC) @ 192.168.1.193
-    ├── WSL Ubuntu (SSH on port 2222)
-    ├── Twingate Connector (Docker in WSL)
-    └── RustDesk remote access
+├── etintake (Windows PC) @ 192.168.1.193
+│   ├── WSL Ubuntu (SSH on port 2222)
+│   ├── Twingate Connector (Docker in WSL)
+│   └── RustDesk remote access
+│
+└── Direct 2.5G Inter-Node Link (10.10.10.0/30)
+    prox-book5 (10.10.10.1) ◄─── 2.36 Gbps ───► prox-tower (10.10.10.2)
 ```
 
 ---
@@ -69,12 +74,11 @@ Proxmox Cluster "home-cluster" (3 votes: 2 nodes + QDevice)
 ```bash
 # Proxmox hosts (direct)
 ssh root@192.168.2.250          # prox-book5
-ssh root@192.168.2.249          # prox-tower (mgmt network)
-ssh root@192.168.1.249          # prox-tower (2.5GbE, faster)
+ssh root@192.168.2.249          # prox-tower
 
 # VMs (via ProxyJump - automatic)
 ssh jaded@192.168.2.161         # VM 100 - Omarchy
-ssh jaded@192.168.1.126         # VM 101 - Ubuntu Server
+ssh jaded@192.168.2.126         # VM 101 - Ubuntu Server (aliases: ubuntu, vm101)
 
 # Windows PC - WSL Ubuntu (aliases: etintake, wsl, pc)
 ssh etintake                    # Port 2222, user joshua
@@ -86,17 +90,12 @@ VMs require ProxyJump due to Twingate routing. This config makes it automatic:
 
 ```ssh
 # Proxmox Node 1
-Host 192.168.2.250
+Host 192.168.2.250 prox-book5 book5
   User root
   IdentityFile ~/.ssh/id_ed25519
 
-# Proxmox Node 2 (management)
+# Proxmox Node 2
 Host 192.168.2.249 prox-tower tower
-  User root
-  IdentityFile ~/.ssh/id_ed25519
-
-# Proxmox Node 2 (2.5GbE)
-Host 192.168.1.249 prox-tower-fast tower-fast
   User root
   IdentityFile ~/.ssh/id_ed25519
 
@@ -107,7 +106,7 @@ Host 192.168.2.161 omarchy vm100
   IdentityFile ~/.ssh/id_ed25519
 
 # VM 101 - Ubuntu Server (ProxyJump through prox-tower)
-Host 192.168.1.126 ubuntu-server ubuntu vm101
+Host 192.168.2.126 ubuntu-server ubuntu vm101
   User jaded
   ProxyJump 192.168.2.249
   IdentityFile ~/.ssh/id_ed25519
@@ -216,10 +215,10 @@ Host 192.168.1.126 ubuntu-server ubuntu vm101
 ### Service Status
 ```bash
 # VM 101 Docker containers
-ssh jaded@192.168.1.126 "docker ps --format 'table {{.Names}}\t{{.Status}}'"
+ssh jaded@192.168.2.126 "docker ps --format 'table {{.Names}}\t{{.Status}}'"
 
 # Ollama
-ssh jaded@192.168.1.126 "systemctl status ollama"
+ssh jaded@192.168.2.126 "systemctl status ollama"
 
 # Twingate (on Proxmox hosts)
 ssh root@192.168.2.250 "systemctl status twingate-connector"
@@ -228,13 +227,13 @@ ssh root@192.168.2.250 "systemctl status twingate-connector"
 ### Common Operations
 ```bash
 # Check GPU usage
-ssh jaded@192.168.1.126 "nvidia-smi"
+ssh jaded@192.168.2.126 "nvidia-smi"
 
 # List Ollama models
-ssh jaded@192.168.1.126 "ollama list"
+ssh jaded@192.168.2.126 "ollama list"
 
 # Restart Frigate
-ssh jaded@192.168.1.126 "cd ~/frigate && docker compose restart frigate"
+ssh jaded@192.168.2.126 "cd ~/frigate && docker compose restart frigate"
 
 # Check cluster quorum
 ssh root@192.168.2.250 "pvecm status"
@@ -246,7 +245,7 @@ ssh root@192.168.2.250 "pvecm status"
 smb://192.168.2.250/Shared
 
 # SCP to VM 101
-scp file.txt jaded@192.168.1.126:~/
+scp file.txt jaded@192.168.2.126:~/
 ```
 
 ---

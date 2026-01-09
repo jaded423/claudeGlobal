@@ -18,7 +18,7 @@ ssh root@192.168.1.249      # prox-tower (Node 2) - 2.5GbE primary network
 
 # VMs (auto ProxyJump configured)
 ssh jaded@192.168.2.161     # VM 100 - Omarchy Desktop (via prox-book5)
-ssh jaded@192.168.1.126     # VM 101 - Ubuntu Server (via prox-tower, on 2.5GbE)
+ssh jaded@192.168.2.126     # VM 101 - Ubuntu Server (via prox-tower, on 1GbE)
 
 # Raspberry Pi
 ssh jaded@192.168.2.131     # magic-pihole (Pi-hole, Twingate, MagicMirror)
@@ -58,14 +58,14 @@ ssh etintake                           # Port 2222, user joshua
 │ Proxmox Node 1    │          │ Primary:    192.168.1.249 (2.5G)│
 │ User: root        │          │ Proxmox Node 2 | User: root     │
 ├───────────────────┤          ├─────────────────────────────────┤
-│ └─ VM 100         │          │ └─ VM 101 (on 2.5GbE network)   │
-│    192.168.2.161  │          │    192.168.1.126                │
+│ └─ VM 100         │          │ └─ VM 101 (on 1GbE vmbr0)   │
+│    192.168.2.161  │          │    192.168.2.126                │
 │    Omarchy        │          │    Ubuntu Server                │
 │    User: jaded    │          │    User: jaded                  │
 └───────────────────┘          └─────────────────────────────────┘
 ```
 
-**Note (Dec 13, 2025):** prox-tower now has dual NICs - Intel I218-LM (1GbE, management/Twingate) and Realtek RTL8125 (2.5GbE, VMs/primary). VM 101 runs on the faster 2.5GbE network.
+**Note (Dec 13, 2025):** prox-tower now has dual NICs - Intel I218-LM (1GbE, management/Twingate) and Realtek RTL8125 (2.5GbE, VMs/primary). VM 101 now runs on 1GbE (vmbr0) - 2.5GbE used for direct inter-node link.
 
 ---
 
@@ -77,7 +77,7 @@ ssh etintake                           # Port 2222, user joshua
 | **prox-tower** | 192.168.2.249 (mgmt) | root | Direct SSH | Proxmox Node 2, Twingate (systemd) |
 | **prox-tower** | 192.168.1.249 (2.5G) | root | Direct SSH | Primary network, VM bridge |
 | **VM 100 (Omarchy)** | 192.168.2.161 | jaded | ProxyJump via .250 | Arch Desktop |
-| **VM 101 (Ubuntu)** | **192.168.1.126** | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin (2.5GbE) |
+| **VM 101 (Ubuntu)** | **192.168.2.126** | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin (1GbE) |
 | **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
 | **Mac (macAir)** | 192.168.2.226 | j | Direct (book5/tower), ProxyJump (termux) | Development |
 | **etintake (Win PC)** | 192.168.1.193:2222 | joshua | Direct/Twingate | WSL Ubuntu, Twingate connector |
@@ -134,9 +134,9 @@ Host 192.168.2.161 omarchy vm100
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# VM 101 - Ubuntu Server (on 2.5GbE network, ProxyJump through prox-tower)
-Host 192.168.1.126 ubuntu-server ubuntu vm101
-  HostName 192.168.1.126
+# VM 101 - Ubuntu Server (on 1GbE vmbr0, ProxyJump through prox-tower)
+Host 192.168.2.126 ubuntu-server ubuntu vm101
+  HostName 192.168.2.126
   User jaded
   ProxyJump 192.168.2.249
   AddKeysToAgent yes
@@ -293,9 +293,9 @@ ssh prox-tower    # → root@192.168.2.249 (management)
 ssh tower-fast    # → root@192.168.1.249 (2.5GbE)
 ssh omarchy       # → jaded@192.168.2.161 (via ProxyJump)
 ssh vm100         # → jaded@192.168.2.161 (via ProxyJump)
-ssh ubuntu-server # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
-ssh ubuntu        # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
-ssh vm101         # → jaded@192.168.1.126 (via ProxyJump, 2.5GbE)
+ssh ubuntu-server # → jaded@192.168.2.126 (via ProxyJump, 1GbE)
+ssh ubuntu        # → jaded@192.168.2.126 (via ProxyJump, 1GbE)
+ssh vm101         # → jaded@192.168.2.126 (via ProxyJump, 1GbE)
 ssh pihole        # → jaded@192.168.2.131
 ssh pi            # → jaded@192.168.2.131
 ssh mac           # → j@192.168.2.226
@@ -347,28 +347,28 @@ Mac → Twingate → Windows:2222 → portproxy → WSL:2222 → SSH
 
 **Copy file TO Ubuntu Server:**
 ```bash
-scp file.txt jaded@192.168.1.126:~/
+scp file.txt jaded@192.168.2.126:~/
 # Or use alias:
 scp file.txt ubuntu-server:~/
 ```
 
 **Copy file FROM Ubuntu Server:**
 ```bash
-scp jaded@192.168.1.126:~/file.txt ./
+scp jaded@192.168.2.126:~/file.txt ./
 # Or use alias:
 scp ubuntu-server:~/file.txt ./
 ```
 
 **Rsync to Ubuntu Server:**
 ```bash
-rsync -avz ./folder/ jaded@192.168.1.126:~/folder/
+rsync -avz ./folder/ jaded@192.168.2.126:~/folder/
 # Or use alias:
 rsync -avz ./folder/ ubuntu-server:~/folder/
 ```
 
 **Execute remote command:**
 ```bash
-ssh jaded@192.168.1.126 "docker ps"
+ssh jaded@192.168.2.126 "docker ps"
 # Or use alias:
 ssh ubuntu-server "docker ps"
 ```

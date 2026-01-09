@@ -8,7 +8,7 @@ rclone FUSE mounts for Google Drive access.
 
 **Tool:** rclone with VFS caching
 **Mount Type:** FUSE (Filesystem in Userspace)
-**Location:** VM 101 (192.168.1.126)
+**Location:** VM 101 (192.168.2.126)
 
 ---
 
@@ -83,8 +83,8 @@ Both Proxmox nodes mount Google Drives from VM 101 via SSHFS.
 
 **fstab Configuration:**
 ```bash
-jaded@192.168.1.126:/home/jaded/GoogleDrives/elevated /mnt/elevated fuse.sshfs defaults,allow_other,_netdev,reconnect,IdentityFile=/root/.ssh/id_rsa 0 0
-jaded@192.168.1.126:/home/jaded/GoogleDrives/jaded /mnt/jaded fuse.sshfs defaults,allow_other,_netdev,reconnect,IdentityFile=/root/.ssh/id_rsa 0 0
+jaded@192.168.2.126:/home/jaded/GoogleDrives/elevated /mnt/elevated fuse.sshfs defaults,allow_other,_netdev,reconnect,IdentityFile=/root/.ssh/id_rsa 0 0
+jaded@192.168.2.126:/home/jaded/GoogleDrives/jaded /mnt/jaded fuse.sshfs defaults,allow_other,_netdev,reconnect,IdentityFile=/root/.ssh/id_rsa 0 0
 ```
 
 **Obsidian.nvim Configuration:**
@@ -136,7 +136,7 @@ sudo pacman -S cifs-utils    # Arch
 sudo apt install cifs-utils  # Debian/Ubuntu
 
 # Mount Samba share
-sudo mount -t cifs //192.168.1.126/Shared /mnt/shared -o user=jaded
+sudo mount -t cifs //192.168.2.126/Shared /mnt/shared -o user=jaded
 
 # Access Google Drives
 ls /mnt/shared/GoogleDrive/

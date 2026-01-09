@@ -123,7 +123,7 @@ Detailed descriptions of all active projects in your workspace.
 **Last Updated**: 2026-01-06
 **Recent Changes**: Built DB Explorer module (Phase 1 & 2) - Model Browser, SQL Query Runner, saved queries, CSV export
 **Location**: `~/projects/odooModules`
-**Server**: VM 101 (Ubuntu) @ 192.168.1.126, Odoo on port 8069
+**Server**: VM 101 (Ubuntu) @ 192.168.2.126, Odoo on port 8069
 **Purpose**: Custom Odoo module development for self-hosted instance
 
 **Key Features**:
@@ -303,8 +303,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2026-01-06
-**Recent Changes**: Fixed NFS export for ZFS child datasets (added `crossmnt` option). Updated Plex docker-compose to use new media mount at `/media/tower/`.
+**Last Updated**: 2026-01-08
+**Recent Changes**: Direct 2.5G inter-node link configured (2.36 Gbps); VM 101 moved to 192.168.2.126
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)

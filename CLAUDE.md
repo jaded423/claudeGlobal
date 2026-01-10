@@ -123,8 +123,9 @@ All projects have hourly automated backups to GitHub.
 | SSH (prox-book5) | `ssh root@192.168.2.250` |
 | SSH (prox-tower) | `ssh root@192.168.2.249` |
 | SSH (VM 101) | `ssh jaded@192.168.2.126` |
-| SSH (PC/WSL) | `ssh pc` (port 2222) |
-| SSH (Pi1 @ Elevated) | `ssh pi1` (port 2223 via PC) |
+| SSH (PC/PowerShell) | `ssh pc` (port 22) |
+| SSH (PC/WSL) | `ssh wsl` (port 2222) |
+| SSH (Pi1 @ Elevated) | `ssh pi1` (ProxyJump via pc) |
 | Samba | `smb://192.168.2.250/Shared` |
 | Twingate | jaded423 network |
 

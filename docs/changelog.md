@@ -4,7 +4,43 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
-                                                                                                                                                   ```changelog
+## 2026-01-10 - Pi1 SSH Access via Windows PowerShell ProxyJump
+
+**What changed:**
+- Changed Windows OpenSSH default shell from WSL to PowerShell
+- Added Mac SSH key to Windows `C:\ProgramData\ssh\administrators_authorized_keys`
+- Updated Mac `~/.ssh/config` with new SSH aliases:
+  - `ssh pc` → Windows PowerShell (port 22)
+  - `ssh wsl` → WSL Ubuntu (port 2222)
+  - `ssh pi1` → Pi via ProxyJump through Windows PowerShell
+
+**Why:**
+- Windows `netsh interface portproxy` wasn't reliably forwarding port 2223 to the Pi
+- WSL cannot reach the Pi's ICS subnet (192.168.137.x) directly
+- Windows PowerShell CAN reach the Pi, so ProxyJump through PowerShell works
+
+**Network path (new):**
+```
+Mac → Windows:22 (PowerShell) → Pi:22 (ProxyJump)
+```
+
+**Network path (old, deprecated):**
+```
+Mac → PC:2223 → Windows portproxy → Pi:22 (unreliable)
+```
+
+**Files modified:**
+- `~/.ssh/config` - Updated SSH host entries for pc, wsl, pi1
+- Windows registry `HKLM:\SOFTWARE\OpenSSH\DefaultShell` - Set to PowerShell
+- Windows `C:\ProgramData\ssh\administrators_authorized_keys` - Added Mac's SSH key
+
+**Technical notes:**
+- Windows admin users require keys in `administrators_authorized_keys`, not user's `.ssh/authorized_keys`
+- Old port 2223 forwarding rule still exists but is no longer used
+- WSL access unchanged on port 2222
+
+---
+
 ## 2026-01-10 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp for the claude-plugins-official marketplace from 2026-01-10T06:10:41.388Z to 2026-01-10T15:25:25.075Z in known_marketplaces.json.

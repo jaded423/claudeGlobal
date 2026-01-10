@@ -86,8 +86,12 @@ ssh root@192.168.2.249          # prox-tower
 ssh jaded@192.168.2.161         # VM 100 - Omarchy
 ssh jaded@192.168.2.126         # VM 101 - Ubuntu Server (aliases: ubuntu, vm101)
 
-# Windows PC - WSL Ubuntu (aliases: etintake, wsl, pc)
-ssh etintake                    # Port 2222, user joshua
+# Windows PC
+ssh pc                          # PowerShell (port 22, user joshu)
+ssh wsl                         # WSL Ubuntu (port 2222, user joshua)
+
+# Pi1 @ Elevated (via Windows ProxyJump)
+ssh pi1                         # Pi (via pc ProxyJump)
 ```
 
 ### SSH Config (~/.ssh/config on Mac)
@@ -166,7 +170,7 @@ Host 192.168.2.126 ubuntu-server ubuntu vm101
 | **Hardware** | Raspberry Pi 1 Model B+ (ARMv6, 700MHz, 512MB RAM) |
 | **OS** | Raspberry Pi OS (Legacy) Bookworm Lite |
 | **IP** | 192.168.137.123 (ICS subnet behind Windows PC) |
-| **SSH** | `ssh pi1` (port 2223 via PC port forward) |
+| **SSH** | `ssh pi1` (ProxyJump via Windows PowerShell) |
 | **User** | pi (passwordless sudo) |
 | **Storage** | 8GB SD card (~4.4GB free) |
 | **Internet** | ~40 Mbps via Windows ICS |
@@ -178,7 +182,7 @@ Host 192.168.2.126 ubuntu-server ubuntu vm101
 
 **Network Architecture:**
 ```
-Mac → PC:2223 → Windows portproxy → Pi:22
+Mac → Windows:22 (PowerShell) → Pi:22 (ProxyJump)
 Pi → Windows ICS NAT → PC WiFi → Internet
 ```
 

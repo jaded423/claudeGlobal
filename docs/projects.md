@@ -141,8 +141,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooModules/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2026-01-09
-**Recent Changes:** Updated the changelog script to insert new entries before the first ## entry, improving document structure and entry placement.
+**Last Updated:** 2026-01-10
+**Recent Changes:** Fixed slow Ollama performance on VM101 - added 24h keepalive to systemd and pre-warm on boot (was cold-starting after reboots)
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

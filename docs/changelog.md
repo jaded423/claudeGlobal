@@ -4,6 +4,10 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-10 - VM Performance & Marketplace Updates
+
+Updated documentation and scripts to address slow Ollama performance on VM101 by adding systemd keepalive and pre-warming on boot. Also updated the known marketplaces JSON with a new timestamp.
+
 ## 2026-01-10 - Claude Code v2.1.3 Release + Homelab Updates
 
 Released version 2.1.3 with improved slash command handling, enhanced permission rule detection, and VSCode integration improvements. Updated homelab documentation to reflect new Frigate camera, HDD storage, and RAM optimization changes.

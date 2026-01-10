@@ -92,3 +92,4 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2026-01-09T21:35:33-06:00,nvimConfig,48,595,370,8.7,qwen-gon-jinn-hybrid
 2026-01-09T22:01:07-06:00,.claude,45,1099,382,9.8,qwen-gon-jinn-hybrid
 2026-01-10T00:06:48-06:00,.claude,385,3037,3893,10.3,qwen-gon-jinn-hybrid
+2026-01-10T00:32:11-06:00,.claude,116,806,253,2.3,qwen-gon-jinn-hybrid

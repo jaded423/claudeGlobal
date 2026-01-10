@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                   ```changelog
+## 2026-01-10 - Updated marketplace last updated timestamp
+
+Updated the lastUpdated timestamp for the claude-plugins-official marketplace from 2026-01-10T06:10:41.388Z to 2026-01-10T15:25:25.075Z in known_marketplaces.json.
+
 ## 2026-01-10 - VM Performance & Marketplace Updates
 
 Updated documentation and scripts to address slow Ollama performance on VM101 by adding systemd keepalive and pre-warming on boot. Also updated the known marketplaces JSON with a new timestamp.

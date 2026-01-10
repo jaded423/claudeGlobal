@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                      ```changelog
+## 2026-01-10 - Updated marketplace last updated timestamp
+
+Updated the lastUpdated timestamp for the claude-plugins-official marketplace entry in known_marketplaces.json to reflect the most recent update time.
+
 ## 2026-01-10 - Pi1 SSH Access via Windows PowerShell ProxyJump
 
 **What changed:**

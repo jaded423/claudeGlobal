@@ -2,7 +2,90 @@
 
 This file contains the complete version history of the global Claude Code configuration system.
 
-                                                                                                                                                                                                                          ```changelog
+---
+
+## 2026-01-10 - Claude Code v2.1.3 Release + Homelab Updates
+
+Released version 2.1.3 with improved slash command handling, enhanced permission rule detection, and VSCode integration improvements. Updated homelab documentation to reflect new Frigate camera, HDD storage, and RAM optimization changes.
+
+## 2026-01-09 - Frigate Expansion: Second Camera, HDD Storage, RAM Optimization
+
+**What changed:**
+- Added second Tapo camera (porch) to Frigate at 192.168.1.129
+- Migrated Frigate storage from SSD to HDD (media-pool) - 105GB transferred
+- Optimized NFS for async mode + nconnect=8 (130 MB/s vs ~15 MB/s before)
+- Changed Frigate recording mode from motion-based to continuous 24/7
+- Changed retention from 7 days to 30 days for all recordings
+- Reallocated prox-tower RAM: VM 101 = 48GB, ZFS ARC = 18GB, Host = 12GB
+
+**Camera specs discovered:**
+- tapo_360_living_room: 2560x1440 (2K), H.264, 20fps, ~2.0 Mbps
+- tapo_porch: 3840x2160 (4K), H.265 (HEVC), 30fps, ~1.3 Mbps
+
+**Storage analysis:**
+- Combined bitrate: ~3.3 Mbps (~35 GB/day continuous)
+- 30-day retention: ~1 TB
+- HDD capacity: 3.3 TB free (95+ days possible)
+
+**NFS optimization details:**
+- Server-side: Changed /etc/exports from `sync` to `async`
+- Client-side: Updated /etc/fstab with `nconnect=8`
+- Result: 892 MB/s benchmark (writes to cache, ZFS syncs to disk)
+
+**RAM reallocation:**
+- VM 101: 40GB → 48GB
+- ZFS ARC: 3GB → 18GB max (persistent in /etc/modprobe.d/zfs.conf)
+- Host OS: ~35GB → 12GB (plenty for Proxmox hypervisor)
+
+**Why:**
+- Second camera for porch coverage
+- HDD better for continuous writes (no SSD wear, more capacity)
+- RAM was underutilized - ZFS ARC now caches media reads
+- Preparing for Plex + Frigate stress test over weekend
+
+**Files modified on prox-tower:**
+- `/etc/exports` - Changed to async mode
+- `/etc/modprobe.d/zfs.conf` - ZFS ARC max set to 18GB
+- `/etc/pve/qemu-server/101.conf` - VM memory increased to 49152
+
+**Files modified on VM 101:**
+- `~/frigate/config/config.yml` - Added tapo_porch camera, changed to continuous recording
+- `~/frigate/docker-compose.yml` - Changed media path to /mnt/media-pool/frigate
+- `/etc/fstab` - Added nconnect=8 to NFS mount
+
+**Technical notes:**
+- Attempted virtiofs for direct HDD access but virtiofsd crashed (InvalidParam error)
+- NFS with async mode ended up being simpler and fast enough (~130 MB/s)
+- ZFS ARC will auto-fill to 18GB as media is accessed, reducing HDD seeks for Plex
+
+---
+
+## 2026-01-09 - Mac Battery Optimization + Passwordless Sudo
+
+**What changed:**
+- Diagnosed battery drain on MacBook Air M4 (Mac16,12)
+- Identified RustDesk as primary drain (40% CPU, blocking display sleep)
+- Identified ClickUp as secondary drain (1.4GB RAM)
+- Enabled Low Power Mode on battery (`sudo pmset -b lowpowermode 1`)
+- Configured passwordless sudo for user j via `/etc/sudoers.d/j-nopasswd`
+
+**Why:**
+- User experiencing poor battery life on new MacBook Air
+- RustDesk was preventing display sleep and using excessive CPU even when idle
+- Passwordless sudo allows Claude to run system commands directly
+
+**System state after changes:**
+- Battery health: 100% capacity, 40 cycles, Normal condition
+- RustDesk server (background): 0.2% CPU, 39MB RAM - fine to leave running
+- Low Power Mode: Enabled on battery
+- Sudo: Works without password for user j
+
+**Files modified:**
+- `/etc/sudoers.d/j-nopasswd` - Created with `j ALL=(ALL) NOPASSWD: ALL`
+- `~/.claude/CLAUDE.md` - Updated sudo limitations section
+
+---
+
 ## 2026-01-09 - Stats and marketplace update
 
 Updated statistics cache with new daily activity and model usage data for January 9th, and refreshed the last updated timestamp for the Claude plugins marketplace.

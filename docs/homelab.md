@@ -24,7 +24,7 @@
 | **prox-book5** | 192.168.2.250 (vmbr0) / 10.10.10.1 (vmbr1) | Proxmox node 1 (Samsung Galaxy Book5 Pro, 16GB) | Active |
 | └─ VM 100: Omarchy | 192.168.2.161 | Arch Linux desktop (Hyprland) | Auto-start |
 | **prox-tower** | 192.168.2.249 (vmbr0) / 10.10.10.2 (vmbr1) | Proxmox node 2 (ThinkStation, 78GB, Xeon 16c/32t) | Active |
-| └─ VM 101: Ubuntu Server | 192.168.2.126 | Docker, Ollama, Plex, Frigate (40GB RAM, 28 vCPU) | Auto-start |
+| └─ VM 101: Ubuntu Server | 192.168.2.126 | Docker, Ollama, Plex, Frigate (48GB RAM, 28 vCPU) | Auto-start |
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, QDevice, MagicMirror | Active |
 | **etintake (Windows PC)** | 192.168.1.193 | WSL Ubuntu, Twingate connector (Docker) | Active |
 | └─ **Pi1 (via ICS)** | 192.168.137.123 | Git backup mirror (Pi 1B+, 512MB) | Active |
@@ -46,10 +46,11 @@ Proxmox Cluster "home-cluster" (3 votes: 2 nodes + QDevice)
 ├── prox-tower @ 192.168.2.249 (vmbr0) / 10.10.10.2 (vmbr1)
 │   ├── Twingate Connector (systemd)
 │   ├── Dual-NIC: Intel I218-LM (1GbE) + Realtek RTL8125 (2.5GbE)
-│   ├── media-pool (4TB HDD): /media-pool/media/, /media-pool/ollama/
+│   ├── media-pool (4TB HDD): /media-pool/media/, /media-pool/ollama/, /media-pool/frigate/
+│   ├── RAM: 48GB VM 101, 18GB ZFS ARC, 12GB host
 │   └── VM 101: Ubuntu Server @ 192.168.2.126
 │       ├── Docker: Plex, Jellyfin, qBittorrent, ClamAV, Frigate, Mosquitto
-│       ├── Ollama (6 LLMs, 40GB, GPU-accelerated via Quadro M4000)
+│       ├── Ollama (6 LLMs, GPU-accelerated via Quadro M4000)
 │       └── Google Drive mounts (rclone FUSE)
 │
 ├── Raspberry Pi @ 192.168.2.131
@@ -138,7 +139,7 @@ Host 192.168.2.126 ubuntu-server ubuntu vm101
 | Plex | 32400 | Media server |
 | Jellyfin | 8096 | Media server (backup) |
 | qBittorrent | 8080 | Torrent client (Web UI) |
-| Frigate | 5000 | NVR with AI detection |
+| Frigate | 5000 | NVR - 2 cameras, continuous 30-day, HDD storage |
 | Open WebUI | 3000 | Ollama chat interface |
 | Ollama API | 11434 | LLM inference |
 | Mosquitto | 1883 | MQTT broker |
@@ -197,6 +198,21 @@ ssh pi1 "ls ~/git-mirrors/*.git"
 ```
 
 **Note:** Pi1 internet depends on PC being powered on (ICS). If PC is off, Pi has no network access.
+
+---
+
+## Frigate NVR (VM 101)
+
+**Storage:** HDD via NFS (`/mnt/media-pool/frigate`) - async mode, ~130 MB/s
+**Recording:** Continuous 24/7, 30-day retention
+**Credentials:** `jaded423` / `Jadedv69!0` (env vars in `~/frigate/.env`)
+
+| Camera | IP | Resolution | Codec | Bitrate |
+|--------|-----|------------|-------|---------|
+| tapo_360_living_room | 192.168.1.245 | 2560x1440 (2K) | H.264 | ~2.0 Mbps |
+| tapo_porch | 192.168.1.129 | 3840x2160 (4K) | H.265 | ~1.3 Mbps |
+
+**Storage math:** ~35 GB/day → ~1 TB at 30 days → 3.3 TB free on HDD
 
 ---
 
@@ -329,6 +345,7 @@ OOO  # Creates skip files on all 3 nodes
 
 | Date | Change |
 |------|--------|
+| 2026-01-09 | Frigate: Added porch camera (4K), moved to HDD, continuous 30-day, RAM realloc (48/18/12) |
 | 2026-01-09 | Pi1 @ Elevated: Raspberry Pi 1B+ git backup mirror via Windows ICS, 15 repos, 4-hourly sync |
 | 2026-01-07 | Windows PC (etintake) SSH setup: WSL Ubuntu, port 2222, auto port forwarding |
 | 2026-01-06 | 4TB HDD ZFS pool, media migration to prox-tower, Ollama models to HDD |

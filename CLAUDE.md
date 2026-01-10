@@ -35,13 +35,11 @@ This directory (`~/.claude/`) contains global configuration and commands for Cla
 
 ## Claude Code Limitations
 
-**Claude CANNOT run sudo commands** - they always fail.
+**Sudo**: Passwordless sudo is enabled on all machines, but **always ask before running sudo commands**.
 
-**Pattern**: Ask user to run sudo commands, then verify:
-```
-Please run: sudo systemctl restart service
-After you run it, I'll verify with: systemctl status service
-```
+Example: "I need to run `sudo pmset -b lowpowermode 1` to enable Low Power Mode. Should I proceed?"
+
+Only run sudo without asking if user explicitly requests it ("run sudo X", "do X with sudo").
 
 **Multi-machine context**: Check `uname -s && hostname` before documenting. See [machine-context.md](docs/machine-context.md) for details.
 

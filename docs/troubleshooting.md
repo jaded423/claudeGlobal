@@ -567,6 +567,92 @@ route get default               # Active network interface
 
 **Date Fixed:** 2025-12-19
 
+### Claude Bridge: Cross-Machine AI Collaboration via Shared tmux
+
+**Problem:** You have Claude Code running on two different machines (e.g., Mac and Pixelbook Go) that can't directly SSH to each other, but both need to collaborate to solve a connectivity issue between them.
+
+**Scenario:**
+- Machine A (Mac) has Claude Code and can SSH to a shared server (prox-book5)
+- Machine B (Pixelbook) has Claude Code and can also SSH to the same shared server
+- Machine A cannot SSH to Machine B (that's the problem you're trying to fix)
+- You need both Claude instances to exchange information to debug the issue
+
+**Solution - The Claude Bridge:**
+
+Create a tmux session on the shared server that both Claude instances can access to "talk" to each other:
+
+**Step 1:** From Machine A (Mac), create the bridge session:
+```bash
+ssh root@192.168.2.250 "tmux new-session -d -s bridge -x 200 -y 50"
+ssh root@192.168.2.250 "tmux send-keys -t bridge 'echo \"=== Claude Bridge Session ===\"' Enter"
+```
+
+**Step 2:** Send messages from Machine A's Claude:
+```bash
+ssh root@192.168.2.250 "tmux send-keys -t bridge 'echo \"[Mac Claude] Your message here\"' Enter"
+```
+
+**Step 3:** Check for responses:
+```bash
+ssh root@192.168.2.250 "tmux capture-pane -t bridge -p -S -50"
+```
+
+**Step 4:** Tell the user to have Machine B's Claude connect:
+> "SSH to root@192.168.2.250 and attach to tmux session 'bridge'. Send messages with:
+> `tmux send-keys -t bridge 'echo \"[Go Claude] Your response\"' Enter`"
+
+**Step 5:** Both Claudes can now exchange diagnostic info, SSH keys, config snippets, etc.
+
+**Real-World Example (2026-01-10):**
+
+Mac Claude couldn't SSH to Pixelbook Go (Crostini Linux). Used the bridge to:
+1. Mac Claude asked Go Claude to check SSH daemon status and config
+2. Go Claude reported SSH was running on port 2222, config OK
+3. Mac Claude sent its public key via the bridge
+4. Go Claude added the key to authorized_keys
+5. Mac Claude sent instructions for bidirectional setup
+6. Go Claude responded with its public key
+7. Both machines now have full SSH access to each other
+
+**Commands Quick Reference:**
+
+```bash
+# Create bridge (from any machine that can reach shared server)
+ssh root@192.168.2.250 "tmux new-session -d -s bridge"
+
+# Send message
+ssh root@192.168.2.250 "tmux send-keys -t bridge 'echo \"[Your Claude] message\"' Enter"
+
+# Read messages (last 50 lines)
+ssh root@192.168.2.250 "tmux capture-pane -t bridge -p -S -50"
+
+# User can watch live
+ssh root@192.168.2.250 "tmux attach -t bridge"
+
+# Clean up when done
+ssh root@192.168.2.250 "tmux kill-session -t bridge"
+```
+
+**Why This Works:**
+- tmux persists the session on the shared server
+- Both Claude instances can read/write to the same terminal buffer
+- No direct connectivity needed between the two machines
+- Messages are visible to the user if they attach to the session
+- Works for exchanging keys, configs, diagnostic output, or any text
+
+**When to Use:**
+- Debugging connectivity issues between two machines
+- Setting up SSH keys when one direction doesn't work yet
+- Any situation where two Claude instances need to coordinate
+- "Break glass" emergency access when normal paths are broken
+
+**Prerequisites:**
+- At least one machine both Claudes can SSH to (the "bridge" host)
+- tmux installed on the bridge host
+- SSH keys configured for both machines to access the bridge
+
+**Date Added:** 2026-01-10
+
 ---
 
 ## Getting Help

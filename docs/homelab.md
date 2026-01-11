@@ -1,6 +1,6 @@
 # Home Lab Documentation
 
-**Last Updated:** January 9, 2026
+**Last Updated:** January 10, 2026
 **Cluster:** 2-node Proxmox "home-cluster" with QDevice quorum
 
 **Detailed Docs:** See `homelab/` subdirectory for services, troubleshooting, and setup guides.
@@ -28,6 +28,7 @@
 | **Raspberry Pi 2** | 192.168.2.131 | Pi-hole DNS, QDevice, MagicMirror | Active |
 | **etintake (Windows PC)** | 192.168.1.193 | WSL Ubuntu, Twingate connector (Docker) | Active |
 | └─ **Pi1 (via ICS)** | 192.168.137.123 | Git backup mirror (Pi 1B+, 512MB) | Active |
+| **Pixelbook Go** | 100.115.92.198 (Crostini) | Chrome OS + Linux, Twingate connector | Active |
 
 **Storage:**
 - prox-book5: 880GB NVMe (ZFS)
@@ -67,6 +68,11 @@ Proxmox Cluster "home-cluster" (3 votes: 2 nodes + QDevice)
 │       ├── Git backup mirror (15 repos, 4-hourly sync)
 │       └── SSH: `ssh pi1` (port 2223 via PC forward)
 │
+├── Pixelbook Go @ 100.115.92.198 (Crostini internal)
+│   ├── Twingate Connector (systemd)
+│   ├── SSH: `ssh go` (port 2222 via Twingate)
+│   └── Claude Code installed
+│
 └── Direct 2.5G Inter-Node Link (10.10.10.0/30)
     prox-book5 (10.10.10.1) ◄─── 2.36 Gbps ───► prox-tower (10.10.10.2)
 ```
@@ -92,6 +98,9 @@ ssh wsl                         # WSL Ubuntu (port 2222, user joshua)
 
 # Pi1 @ Elevated (via Windows ProxyJump)
 ssh pi1                         # Pi (via pc ProxyJump)
+
+# Pixelbook Go (via Twingate)
+ssh go                          # or: ssh pixelbook
 ```
 
 ### SSH Config (~/.ssh/config on Mac)
@@ -349,6 +358,7 @@ OOO  # Creates skip files on all 3 nodes
 
 | Date | Change |
 |------|--------|
+| 2026-01-10 | Pixelbook Go: Twingate connector in Crostini, SSH via `ssh go` (port 2222), Claude Code installed |
 | 2026-01-09 | Frigate: Added porch camera (4K), moved to HDD, continuous 30-day, RAM realloc (48/18/12) |
 | 2026-01-09 | Pi1 @ Elevated: Raspberry Pi 1B+ git backup mirror via Windows ICS, 15 repos, 4-hourly sync |
 | 2026-01-07 | Windows PC (etintake) SSH setup: WSL Ubuntu, port 2222, auto port forwarding |

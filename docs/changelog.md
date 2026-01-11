@@ -4,15 +4,39 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
-                                                                                                                                      ```changelog
-                                                                                                                                       ```changelog
-## 2026-01-10 - Updated marketplace last updated timestamp
+## 2026-01-10 - Pixelbook Go Homelab Integration + Claude Bridge Technique
 
-Updated the lastUpdated timestamp for the claude-plugins-official marketplace entry in known_marketplaces.json to reflect the most recent update time.
+**What changed:**
+- Added Pixelbook Go (Chrome OS + Crostini Linux) to homelab with full SSH access
+- Installed Twingate connector inside Crostini to bypass Chrome OS port forwarding limitations
+- Configured bidirectional SSH: Mac ↔ Pixelbook Go
+- Installed Claude Code on Pixelbook Go for local troubleshooting
+- Documented "Claude Bridge" technique for cross-machine AI collaboration
 
-## 2026-01-10 - Updated marketplace last updated timestamp
+**Network setup:**
+- SSH runs on port 2222 (Chrome OS restricts ports < 1024)
+- Twingate connector routes traffic to Crostini internal IP (100.115.92.198)
+- SSH alias: `ssh go` or `ssh pixelbook`
 
-Updated the lastUpdated timestamp for the claude-plugins-official marketplace entry in known_marketplaces.json to reflect the most recent update time.
+**Claude Bridge technique:**
+When two Claude instances can't directly reach each other but both can SSH to a shared server:
+1. Create tmux session on shared server: `tmux new-session -d -s bridge`
+2. Both Claudes send/read messages via `tmux send-keys` and `tmux capture-pane`
+3. Used this to exchange SSH keys and debug connectivity between Mac and Pixelbook
+
+**Files modified:**
+- `~/.ssh/config` - Added `go` / `pixelbook` host entry (port 2222, user jaded423)
+- `~/.ssh/authorized_keys` - Added Pixelbook Go's public key for reverse access
+- `docs/homelab.md` - Added Pixelbook Go to devices table, architecture diagram, SSH section, changelog
+- `docs/troubleshooting.md` - Added "Claude Bridge: Cross-Machine AI Collaboration via Shared tmux" section
+
+**Technical notes:**
+- Chrome OS port forwarding only works for local/Android apps, not external devices
+- Twingate connector inside Crostini punches through this limitation
+- SSH initially failed with "kex_exchange_identification" - key wasn't in authorized_keys
+- Used tmux bridge on prox-book5 for Mac Claude and Go Claude to collaborate on fix
+
+---
 
 ## 2026-01-10 - Pi1 SSH Access via Windows PowerShell ProxyJump
 

@@ -303,8 +303,8 @@ Detailed descriptions of all active projects in your workspace.
 **Type**: Proxmox VE cluster infrastructure
 **Status**: Active production cluster (2 nodes)
 **Location**: 192.168.2.x network, accessible via Twingate remotely
-**Last Updated**: 2026-01-08
-**Recent Changes**: Direct 2.5G inter-node link configured (2.36 Gbps); VM 101 moved to 192.168.2.126
+**Last Updated**: 2026-01-10
+**Recent Changes**: Added Pixelbook Go with Twingate connector in Crostini (`ssh go`); documented Claude Bridge technique for cross-machine AI collaboration
 **Nodes**:
   - prox-book5 @ 192.168.2.250 (Samsung Galaxy Book5 Pro, 16GB RAM, hosts VM 100)
   - prox-tower @ 192.168.2.249 (ThinkStation 510, 78GB RAM, Xeon E5-2683 v4 16c/32t, 2.5GbE, ZFS storage, hosts VM 101 with 28 vCPUs)

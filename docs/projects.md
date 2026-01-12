@@ -142,7 +142,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-12
-**Recent Changes:** Added a new Python script (`crawler.py`) to automate Google Drive file downloads by triggering minimal reads to ensure local sync, intended for cron-based execution.
+**Recent Changes:** Introduced automated Google Drive syncing and Apple Photos import workflows, along with improved state tracking for photo imports.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

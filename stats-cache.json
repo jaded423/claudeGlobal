@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastComputedDate": "2026-01-09",
+  "lastComputedDate": "2026-01-11",
   "dailyActivity": [
     {
       "date": "2025-11-10",
@@ -307,6 +307,12 @@
       "messageCount": 1264,
       "sessionCount": 5,
       "toolCallCount": 328
+    },
+    {
+      "date": "2026-01-10",
+      "messageCount": 1582,
+      "sessionCount": 7,
+      "toolCallCount": 395
     }
   ],
   "dailyModelTokens": [
@@ -619,6 +625,12 @@
       "tokensByModel": {
         "claude-opus-4-5-20251101": 224072
       }
+    },
+    {
+      "date": "2026-01-10",
+      "tokensByModel": {
+        "claude-opus-4-5-20251101": 80005
+      }
     }
   ],
   "modelUsage": {
@@ -632,13 +644,14 @@
       "contextWindow": 0
     },
     "claude-opus-4-5-20251101": {
-      "inputTokens": 687314,
-      "outputTokens": 1087416,
-      "cacheReadInputTokens": 865328027,
-      "cacheCreationInputTokens": 75251129,
+      "inputTokens": 698332,
+      "outputTokens": 1156403,
+      "cacheReadInputTokens": 922203826,
+      "cacheCreationInputTokens": 79466037,
       "webSearchRequests": 0,
       "costUSD": 0,
-      "contextWindow": 0
+      "contextWindow": 0,
+      "maxOutputTokens": null
     },
     "claude-opus-4-1-20250805": {
       "inputTokens": 4173,
@@ -650,8 +663,8 @@
       "contextWindow": 0
     }
   },
-  "totalSessions": 512,
-  "totalMessages": 34715,
+  "totalSessions": 519,
+  "totalMessages": 36297,
   "longestSession": {
     "sessionId": "e66c6462-2eac-4dcd-b58b-bf78e9cbdf62",
     "duration": 332466615,
@@ -660,7 +673,7 @@
   },
   "firstSessionDate": "2025-11-10T23:33:41.492Z",
   "hourCounts": {
-    "0": 12,
+    "0": 13,
     "1": 12,
     "2": 5,
     "3": 7,
@@ -669,20 +682,20 @@
     "6": 5,
     "7": 4,
     "8": 40,
-    "9": 35,
-    "10": 40,
+    "9": 36,
+    "10": 41,
     "11": 44,
-    "12": 37,
+    "12": 38,
     "13": 35,
     "14": 49,
-    "15": 39,
+    "15": 40,
     "16": 37,
     "17": 18,
     "18": 10,
     "19": 12,
     "20": 9,
-    "21": 9,
+    "21": 10,
     "22": 21,
-    "23": 21
+    "23": 22
   }
 }

@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                                                                                                                                                                      ```changelog
+## 2026-01-12 - Background Task Control and Stats Updates
+
+Added new environment variable to disable background tasks and fixed OAuth refresh logic. Updated stats cache with new daily activity and model usage metrics from the past few days.
+
 ## 2026-01-10 - Pixelbook Go Homelab Integration + Claude Bridge Technique
 
 **What changed:**

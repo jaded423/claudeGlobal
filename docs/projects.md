@@ -141,8 +141,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooModules/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2026-01-10
-**Recent Changes:** Fixed slow Ollama performance on VM101 - added 24h keepalive to systemd and pre-warm on boot (was cold-starting after reboots)
+**Last Updated:** 2026-01-12
+**Recent Changes:** Added a new Python script (`crawler.py`) to automate Google Drive file downloads by triggering minimal reads to ensure local sync, intended for cron-based execution.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

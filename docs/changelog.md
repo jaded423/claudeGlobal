@@ -5,6 +5,11 @@ This file contains the complete version history of the global Claude Code config
 ---
 
                                                                                                                                                                                                                                                                                                       ```changelog
+                                                                                                                                       ```changelog
+## 2026-01-12 - Updated marketplace last updated timestamp
+
+Updated the lastUpdated timestamp for the claude-plugins-official marketplace from 2026-01-12T17:07:30.398Z to 2026-01-12T19:58:45.123Z in the known_marketplaces.json file.
+
 ## 2026-01-12 - OdooReports Automation Migration and Plugin Update
 
 Updated OdooReports project to run cron jobs on WSL for reliable 24/7 execution, and updated the known marketplaces plugin timestamp.

@@ -88,10 +88,10 @@ Detailed descriptions of all active projects in your workspace.
 ## odooReports
 **Type**: Python automation system
 **Status**: Active business automation
-**Location**: `~/projects/odooReports`
+**Location**: `~/projects/odooReports` (Mac source), `/home/joshua/projects/odooReports/` (WSL execution)
 **Purpose**: Automated reporting for Elevated Trading
-**Last Updated**: 2026-01-06
-**Recent Changes**: Added `active_customers_no_email.py` utility - finds active customers (ordered in last N days) without email addresses. Uses optimized batch API calls (3 total). Also added Buying Patterns Report for analyzing purchasing patterns.
+**Last Updated**: 2026-01-12
+**Recent Changes**: Migrated cron jobs from Mac to PC/WSL for reliable 24/7 execution. Mac was sleeping at 6 AM causing missed Monday reports.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
@@ -107,11 +107,11 @@ Detailed descriptions of all active projects in your workspace.
 - Gmail OAuth integration for email delivery
 - Professional PDF reports with company branding
 - Color-coded status indicators (green/yellow/red)
-- **Automated execution**: Via cron
+- **Automated execution**: Via WSL cron on always-on PC (`ssh wsl`)
 - **Secure credentials**: Centralized in gitignored odoo_credentials.json file
 
 **Critical Dependencies**:
-- Python 3.13
+- Python 3.12 (WSL) / Python 3.13 (Mac)
 - OAuth credentials in AR_AP/ directory (shared across reports)
 - Odoo credentials in `odoo_credentials.json` (gitignored)
 
@@ -142,7 +142,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-12
-**Recent Changes:** Introduced automated Google Drive syncing and Apple Photos import workflows, along with improved state tracking for photo imports.
+**Recent Changes:** Enhanced the Apple Photos sync script with email alerting for failures and fatal errors, improved deletion handling, and updated documentation and configuration files.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

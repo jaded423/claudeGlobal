@@ -226,9 +226,15 @@ Host go pixelbook
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# Note: Pixelbook Go uses reverse SSH tunnel (not direct Twingate)
-# Go runs Twingate CLIENT to reach homelab, but this conflicts with connector
-# Reverse tunnel from Go → book5:2244 allows Mac to reach Go via ProxyJump
+# Pixelbook Go - Direct mDNS (same network only)
+Host go-local pixelbook-local
+  HostName go.local
+  User jaded
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
 ```
 
 ---
@@ -362,247 +368,87 @@ ssh wsl           # → joshua@192.168.1.193:2222
 ssh pc            # → joshua@192.168.1.193:2222
 ssh pi1           # → pi@192.168.1.193:2223 (via PC forward)
 ssh rpi1          # → pi@192.168.1.193:2223 (via PC forward)
-ssh go            # → jaded@192.168.1.244 (Pixelbook Go via Twingate)
-ssh pixelbook     # → jaded@192.168.1.244 (Pixelbook Go via Twingate)
+ssh go            # → jaded@localhost:2244 (via reverse tunnel through book5)
+ssh pixelbook     # → jaded@localhost:2244 (alias for go)
+ssh go-local      # → jaded@go.local (direct mDNS, same network only)
 ```
 
 ---
 
-## Windows PC (etintake) Setup
+## Windows PC (etintake)
 
-**Completed January 7, 2026**
+**Completed January 7, 2026** | **Full docs**: [homelab/pc.md](homelab/pc.md)
 
 | Component | Details |
 |-----------|---------|
 | Hostname | etintake |
-| Windows IP | 192.168.1.193 (DHCP) |
-| WSL IP | Dynamic (172.20.x.x) |
-| SSH Port | 2222 |
-| User | joshua |
-| Twingate | "Elevated" network, "PC" connector (Docker in WSL) |
+| IP | 192.168.1.193 (DHCP) |
+| Users | joshu (PowerShell), joshua (WSL) |
 
 **SSH Access:**
 ```bash
-ssh etintake          # Uses aliases: etintake, wsl, pc
-ssh -p 2222 joshua@192.168.1.193
+ssh pc              # PowerShell (port 22)
+ssh wsl             # WSL Ubuntu (port 2222)
+ssh pi1             # Pi1 via ProxyJump
 ```
 
-**Architecture:**
-```
-Mac → Twingate → Windows:2222 → portproxy → WSL:2222 → SSH
-```
+**Architecture:** WSL Ubuntu with port forwarding, Twingate connector in Docker.
 
-**Auto-start:** `/etc/wsl.conf` runs `/etc/wsl-ssh-startup.sh` on WSL boot:
-- Creates /run/sshd
-- Removes /run/nologin
-- Starts sshd
-- Updates Windows port forwarding to current WSL IP
-
-**Troubleshooting:**
-- If SSH fails after reboot: Run `sudo /usr/local/bin/fix-wsl-ssh` in WSL
-- If Windows IP changed: Update Twingate resource in admin console
+See [homelab/pc.md](homelab/pc.md) for full setup, auto-start config, and troubleshooting.
 
 ---
 
 ## Pi1 @ Elevated (Git Backup Mirror)
 
-**Completed January 9, 2026**
+**Completed January 9, 2026** | **Full docs**: [homelab/pi1.md](homelab/pi1.md)
 
 | Component | Details |
 |-----------|---------|
 | Hostname | raspberrypi |
-| Hardware | Raspberry Pi 1 Model B+ (ARMv6, 700MHz, 512MB RAM) |
-| OS | Raspberry Pi OS (Legacy) Bookworm Lite |
-| Pi IP | 192.168.137.123 (Windows ICS subnet) |
-| SSH Port | 2223 (via Windows port forward) |
-| User | pi (passwordless sudo) |
-| Storage | 8GB SD card (~4.4GB free, 152MB used by mirrors) |
-| Internet Speed | ~40 Mbps via Windows ICS NAT |
+| Hardware | Raspberry Pi 1 Model B+ (512MB RAM) |
+| IP | 192.168.137.123 (via Windows ICS) |
+| User | pi |
 
 **SSH Access:**
 ```bash
-ssh pi1               # Uses aliases: pi1, rpi1
-ssh -p 2223 pi@192.168.1.193
+ssh pi1             # Via Windows PC ProxyJump
+ssh rpi1            # Alias
 ```
 
-**Architecture:**
-```
-Mac → PC:2223 → Windows portproxy → Pi:22 (192.168.137.123)
-Pi → Windows ICS NAT → PC WiFi → Internet
-```
+**Purpose:** Offline git backup mirror - 15 repos syncing every 4 hours.
 
-**Git Backup Mirror:**
-- 15 repositories mirrored from GitHub (bare repos)
-- Location: `~/git-mirrors/*.git`
-- Sync script: `~/git-mirrors/sync-mirrors.sh`
-- Schedule: Every 4 hours via cron
-- Log: `~/git-mirrors/sync.log`
+**Note:** Requires Windows PC to be powered on (ICS dependency).
 
-**Common Commands:**
-```bash
-# Manual sync
-ssh pi1 "~/git-mirrors/sync-mirrors.sh"
-
-# Check sync log
-ssh pi1 "tail -20 ~/git-mirrors/sync.log"
-
-# List mirrored repos
-ssh pi1 "ls ~/git-mirrors/*.git"
-
-# Check disk usage
-ssh pi1 "du -sh ~/git-mirrors/"
-
-# Run speedtest
-ssh pi1 "speedtest-cli"
-```
-
-**Important Notes:**
-- Pi internet requires Windows PC to be powered on (ICS dependency)
-- Windows port forward: `netsh interface portproxy` rule on port 2223
-- GitHub SSH key: "Pi1 Backup" in github.com/settings/keys
+See [homelab/pi1.md](homelab/pi1.md) for git mirror details, sync commands, and troubleshooting.
 
 ---
 
 ## Pixelbook Go (CachyOS Hyprland)
 
-**Completed January 12-13, 2026**
+**Completed January 12-13, 2026** | **Full docs**: [homelab/go.md](homelab/go.md)
 
 | Component | Details |
 |-----------|---------|
 | Hostname | go |
 | Hardware | Google Pixelbook Go (Intel Core m3, 8GB RAM) |
-| OS | CachyOS Linux (Arch-based) |
-| Kernel | 6.12.65-2-cachyos-lts |
-| DE | Hyprland 0.53.1 |
-| IP | 192.168.1.244 (local), localhost:2244 via tunnel |
-| User | jaded (passwordless sudo) |
-| Shell | zsh + oh-my-zsh + powerlevel10k |
-| Terminal | kitty (default), alacritty (alternate) |
+| OS | CachyOS Linux (Arch-based), Hyprland DE |
+| IP | 192.168.1.244 (local network) |
+| User | jaded |
 
 **SSH Access:**
 ```bash
-ssh go                # Via reverse tunnel through book5
-ssh pixelbook         # Alias for go
+ssh go                # Via reverse tunnel through book5 (works anywhere)
+ssh go-local          # Direct mDNS (same network only)
 ```
 
-**Network Architecture:**
-```
-Mac → Twingate → book5 → reverse tunnel (port 2244) → Go
-Go → Twingate Client → homelab (192.168.2.x)
-```
+**Architecture:** Go uses Twingate **Client** to reach homelab, with a reverse SSH tunnel through book5:2244 for incoming connections (avoids client/connector routing conflicts).
 
-**Why Reverse Tunnel (not direct Twingate):**
-- Go has Twingate **Client** installed to reach homelab (192.168.2.x)
-- Go also had Twingate **Connector** (Docker) for incoming connections
-- Running both causes routing conflicts - client takes over network routing
-- Solution: Use reverse SSH tunnel instead of connector for incoming access
+**Key Features:**
+- zsh + oh-my-zsh + powerlevel10k (Arch-adapted config)
+- Stays awake on AC with lid closed (tunnel remains active)
+- WiFi power save auto-toggles based on AC state
 
-**Installed Software:**
-| Package | Purpose |
-|---------|---------|
-| neovim | Text editor (config from nvimConfig repo) |
-| zsh | Shell |
-| oh-my-zsh | Zsh framework |
-| powerlevel10k | Zsh theme |
-| ttf-meslo-nerd | Nerd font for terminal icons |
-| waybar | Status bar |
-| hyprlauncher | Application launcher |
-| kitty | Terminal emulator |
-| zoxide | Smart directory navigation |
-| fzf | Fuzzy finder |
-
-**Hyprland Keybindings:**
-| Keys | Action |
-|------|--------|
-| SUPER + Q | Open terminal (kitty) |
-| SUPER + R | Open launcher (hyprlauncher) |
-| SUPER + 1-9 | Switch workspace |
-| SUPER + SHIFT + 1-9 | Move window to workspace |
-| SUPER + C | Close window |
-| SUPER + E | File manager (thunar) |
-| 3-finger swipe | Switch workspaces |
-
-**Configuration Files:**
-- Hyprland: `~/.config/hypr/hyprland.conf`
-- Kitty: `~/.config/kitty/kitty.conf`
-- Neovim: `~/.config/nvim` (cloned from nvimConfig repo)
-- Zsh: `~/.zshrc` (Arch-adapted version)
-
-**Reverse Tunnel Service (on Go):**
-
-Location: `~/.config/systemd/user/ssh-tunnel.service`
-
-```ini
-[Unit]
-Description=Reverse SSH tunnel to book5
-After=network-online.target
-
-[Service]
-ExecStart=/usr/bin/ssh -R 2244:localhost:22 root@192.168.2.250 -N -i /home/jaded/.ssh/id_ed25519 -o ServerAliveInterval=60 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=default.target
-```
-
-**Manage the tunnel:**
-```bash
-systemctl --user status ssh-tunnel   # Check status
-systemctl --user restart ssh-tunnel  # Restart if needed
-journalctl --user -u ssh-tunnel -f   # View logs
-```
-
-**Requirements for tunnel to work:**
-1. Go's SSH key must be in book5's `~/.ssh/authorized_keys`
-2. book5's SSH key must be in Go's `~/.ssh/authorized_keys`
-3. Twingate client must be connected on Go (for Go → book5 connection)
-
-**Power/Lid Behavior:**
-
-Config: `/etc/systemd/logind.conf.d/lid-switch.conf`
-```ini
-[Login]
-HandleLidSwitch=suspend
-HandleLidSwitchExternalPower=ignore
-```
-
-| Condition | Behavior |
-|-----------|----------|
-| AC + lid closed | Stays awake, tunnel active |
-| Battery + lid closed | Sleeps (saves battery) |
-| After wake | Tunnel auto-reconnects |
-
-**WiFi Power Save (auto-toggles on AC state):**
-
-Script: `/usr/local/bin/wifi-power-manager`
-```bash
-#!/bin/bash
-AC_ONLINE=$(cat /sys/class/power_supply/AC/online 2>/dev/null)
-if [ "$AC_ONLINE" = "1" ]; then
-    iw dev wlan0 set power_save off
-else
-    iw dev wlan0 set power_save on
-fi
-```
-
-Udev rule: `/etc/udev/rules.d/99-wifi-power.rules`
-```
-ACTION=="change", SUBSYSTEM=="power_supply", RUN+="/usr/local/bin/wifi-power-manager"
-```
-
-| Condition | WiFi Power Save |
-|-----------|-----------------|
-| On AC | OFF (stable connection) |
-| On Battery | ON (saves power) |
-
-**Issues Fixed During Setup:**
-1. **Phantom Monitor**: `Unknown-1` ghost monitor disabled in hyprland.conf
-2. **Gesture Syntax**: Updated to Hyprland 0.53+ syntax
-3. **Default Shell**: Changed from fish to zsh for SSH sessions
-4. **Twingate Client/Connector Conflict**: Resolved with reverse tunnel approach
-5. **Lid Close on AC**: Configured to stay awake for persistent tunnel
-6. **WiFi Power Save**: Auto-toggles based on AC state via udev rule
+See [homelab/go.md](homelab/go.md) for full setup details, troubleshooting, and configuration files.
 
 ---
 

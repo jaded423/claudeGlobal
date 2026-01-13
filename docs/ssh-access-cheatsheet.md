@@ -2,7 +2,7 @@
 
 Quick reference for accessing all machines in the multi-location network.
 
-**Last Updated:** January 9, 2026 (Added Pi1 @ Elevated - Git backup mirror via Windows ICS)
+**Last Updated:** January 13, 2026 (Added Pixelbook Go - CachyOS Hyprland via Twingate)
 
 ---
 
@@ -32,6 +32,10 @@ ssh etintake                           # Port 2222, user joshua
 
 # Pi1 @ Elevated (via Windows PC port forward)
 ssh pi1                                # Port 2223, user pi (git backup mirror)
+
+# Pixelbook Go - CachyOS (via Twingate)
+ssh go                                 # CachyOS Hyprland, user jaded
+ssh pixelbook                          # Alias for go
 ```
 
 ---
@@ -85,6 +89,7 @@ ssh pi1                                # Port 2223, user pi (git backup mirror)
 | **Mac (macAir)** | 192.168.2.226 | j | Direct (book5/tower), ProxyJump (termux) | Development |
 | **etintake (Win PC)** | 192.168.1.193:2222 | joshua | Direct/Twingate | WSL Ubuntu, Twingate connector |
 | **Pi1 (Elevated)** | 192.168.1.193:2223 | pi | Via PC port forward | Git backup mirror (Pi 1B+) |
+| **Pixelbook Go** | 192.168.1.244 | jaded | Twingate | CachyOS Hyprland, dev laptop |
 
 ---
 
@@ -190,6 +195,20 @@ Host pi1 rpi1
 
 # Note: Pi1 (Raspberry Pi 1B+) gets internet via Windows ICS - requires PC to be on
 # Services: Git backup mirror (15 repos, 4-hourly sync via cron)
+
+# Pixelbook Go - CachyOS Hyprland (via Twingate)
+Host go pixelbook
+  HostName 192.168.1.244
+  User jaded
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Note: Pixelbook Go runs CachyOS (Arch-based) with Hyprland DE
+# Shell: zsh + oh-my-zsh + powerlevel10k | Terminal: kitty
+# Twingate connector (Docker) provides remote access
 ```
 
 ---
@@ -323,6 +342,8 @@ ssh wsl           # → joshua@192.168.1.193:2222
 ssh pc            # → joshua@192.168.1.193:2222
 ssh pi1           # → pi@192.168.1.193:2223 (via PC forward)
 ssh rpi1          # → pi@192.168.1.193:2223 (via PC forward)
+ssh go            # → jaded@192.168.1.244 (Pixelbook Go via Twingate)
+ssh pixelbook     # → jaded@192.168.1.244 (Pixelbook Go via Twingate)
 ```
 
 ---
@@ -419,6 +440,71 @@ ssh pi1 "speedtest-cli"
 - Pi internet requires Windows PC to be powered on (ICS dependency)
 - Windows port forward: `netsh interface portproxy` rule on port 2223
 - GitHub SSH key: "Pi1 Backup" in github.com/settings/keys
+
+---
+
+## Pixelbook Go (CachyOS Hyprland)
+
+**Completed January 12-13, 2026**
+
+| Component | Details |
+|-----------|---------|
+| Hostname | pixelbook-go |
+| Hardware | Google Pixelbook Go (Intel Core m3, 8GB RAM) |
+| OS | CachyOS Linux (Arch-based) |
+| Kernel | 6.12.65-2-cachyos-lts |
+| DE | Hyprland 0.53.1 |
+| IP | 192.168.1.244 |
+| User | jaded (passwordless sudo) |
+| Shell | zsh + oh-my-zsh + powerlevel10k |
+| Terminal | kitty (default), alacritty (alternate) |
+
+**SSH Access:**
+```bash
+ssh go                # Uses aliases: go, pixelbook
+ssh jaded@192.168.1.244
+```
+
+**Twingate Setup:**
+- Connector: Docker container on the Pixelbook
+- Network: jaded423
+- Allows remote SSH access from Mac/other devices
+
+**Installed Software:**
+| Package | Purpose |
+|---------|---------|
+| neovim | Text editor (config from nvimConfig repo) |
+| zsh | Shell |
+| oh-my-zsh | Zsh framework |
+| powerlevel10k | Zsh theme |
+| ttf-meslo-nerd | Nerd font for terminal icons |
+| waybar | Status bar |
+| hyprlauncher | Application launcher |
+| kitty | Terminal emulator |
+| zoxide | Smart directory navigation |
+| fzf | Fuzzy finder |
+
+**Hyprland Keybindings:**
+| Keys | Action |
+|------|--------|
+| SUPER + Q | Open terminal (kitty) |
+| SUPER + R | Open launcher (hyprlauncher) |
+| SUPER + 1-9 | Switch workspace |
+| SUPER + SHIFT + 1-9 | Move window to workspace |
+| SUPER + C | Close window |
+| SUPER + E | File manager (thunar) |
+| 3-finger swipe | Switch workspaces |
+
+**Configuration Files:**
+- Hyprland: `~/.config/hypr/hyprland.conf`
+- Kitty: `~/.config/kitty/kitty.conf`
+- Neovim: `~/.config/nvim` (cloned from nvimConfig repo)
+- Zsh: `~/.zshrc` (Arch-adapted version)
+
+**Issues Fixed During Setup:**
+1. **Phantom Monitor**: `Unknown-1` ghost monitor disabled in hyprland.conf
+2. **Gesture Syntax**: Updated to Hyprland 0.53+ syntax
+3. **Default Shell**: Changed from fish to zsh for SSH sessions
 
 ---
 

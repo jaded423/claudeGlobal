@@ -1,0 +1,34 @@
+Log file: /Users/j/.local/state/nvim/conform.log
+          [error]   195 | </html
+          [error] > 196 |
+          [error]       | ^
+          
+          2025-12-10 10:37:36[ERROR] Formatter 'prettier' error: [error] /Users/j/projects/signatures/dax-joshua.html: SyntaxError: Unexpected character "EOF" (196:1)
+          [error]   194 |   </body>
+          [error]   195 | </html
+          [error] > 196 |
+          [error]       | ^
+          
+          2025-12-10 10:41:38[ERROR] Formatter 'prettier' error: [error] /Users/j/projects/signatures/dax-joshua.html: SyntaxError: Unexpected character "EOF" (196:1)
+          [error]   194 |   </body>
+          [error]   195 | </html
+          [error] > 196 |
+          [error]       | ^
+          
+          2025-12-15 08:47:09[WARN] Formatter 'black' timeout
+          2026-01-06 12:04:36[WARN] Formatter 'black' timeout
+          2026-01-13 15:23:04[ERROR] Formatter 'gofmt' error: <standard input>:27:41: expected type, found '{'
+          <standard input>:28:13: expected ';', found ']'
+          
+          2026-01-13 15:24:52[ERROR] Formatter 'gofmt' error: <standard input>:27:41: expected type, found '{'
+          <standard input>:28:13: expected ';', found ']'
+          <standard input>:32:2: expected declaration, found 'return'
+
+Formatters for this buffer:
+gofmt ready (go) /opt/homebrew/bin/gofmt
+
+Other formatters:
+black ready (python) /Library/Frameworks/Python.framework/Versions/3.14/bin/black
+isort ready (python) /Library/Frameworks/Python.framework/Versions/3.14/bin/isort
+prettier ready (typescriptreact, markdown, javascriptreact, typescript, javascript, json, css, yaml, html) /opt/homebrew/bin/prettier
+stylua ready (lua) /opt/homebrew/bin/stylua

@@ -6,6 +6,11 @@ This file contains the complete version history of the global Claude Code config
 
                                                                                                                                                                                                                                                                                                       ```changelog
                                                                                                                                        ```changelog
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ```changelog
+## 2026-01-13 - Homelab Documentation Cleanup
+
+Removed 2 documentation files related to homelab infrastructure and updated changelog format.
+
 ## 2026-01-12 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp for the claude-plugins-official marketplace from 2026-01-12T17:07:30.398Z to 2026-01-12T19:58:45.123Z in the known_marketplaces.json file.

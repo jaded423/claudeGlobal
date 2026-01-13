@@ -230,12 +230,12 @@ See [pi1.md](homelab/pi1.md) for details.
 | [google-drive.md](homelab/google-drive.md) | rclone FUSE mounts |
 | [media-server.md](homelab/media-server.md) | Plex/Jellyfin organization |
 
-### Other
+### Planning & Other
 
 | Doc | Content |
 |-----|---------|
+| [homelab/expansion-plans.md](homelab/expansion-plans.md) | Future upgrade plans |
 | [ssh-access-cheatsheet.md](ssh-access-cheatsheet.md) | SSH quick reference |
-| [homelab-expansion.md](homelab-expansion.md) | Future upgrade plans |
 
 ---
 

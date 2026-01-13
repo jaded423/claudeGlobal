@@ -65,12 +65,30 @@ ssh pixelbook                          # Alias for go
 │ Proxmox Node 1    │          │ Primary:    192.168.1.249 (2.5G)│
 │ User: root        │          │ Proxmox Node 2 | User: root     │
 ├───────────────────┤          ├─────────────────────────────────┤
-│ └─ VM 100         │          │ └─ VM 101 (on 1GbE vmbr0)   │
+│ └─ VM 100         │          │ └─ VM 101 (on 1GbE vmbr0)       │
 │    192.168.2.161  │          │    192.168.2.126                │
 │    Omarchy        │          │    Ubuntu Server                │
 │    User: jaded    │          │    User: jaded                  │
-└───────────────────┘          └─────────────────────────────────┘
+├───────────────────┤          └─────────────────────────────────┘
+│                   │
+│ ◄──REVERSE SSH────┤
+│    TUNNEL :2244   │
+│                   │
+└───────────────────┘
+        ▲
+        │ (Twingate Client)
+        │
+┌───────────────────┐
+│ Pixelbook Go      │
+│ 192.168.1.244     │
+│ CachyOS Hyprland  │
+│ User: jaded       │
+│ (separate network)│
+└───────────────────┘
 ```
+
+**Note:** Pixelbook Go uses Twingate CLIENT (not connector) to reach homelab.
+Mac reaches Go via reverse SSH tunnel through book5:2244, not direct Twingate.
 
 **Note (Dec 13, 2025):** prox-tower now has dual NICs - Intel I218-LM (1GbE, management/Twingate) and Realtek RTL8125 (2.5GbE, VMs/primary). VM 101 now runs on 1GbE (vmbr0) - 2.5GbE used for direct inter-node link.
 
@@ -196,19 +214,21 @@ Host pi1 rpi1
 # Note: Pi1 (Raspberry Pi 1B+) gets internet via Windows ICS - requires PC to be on
 # Services: Git backup mirror (15 repos, 4-hourly sync via cron)
 
-# Pixelbook Go - CachyOS Hyprland (via Twingate)
+# Pixelbook Go - CachyOS Hyprland (via reverse tunnel through book5)
 Host go pixelbook
-  HostName 192.168.1.244
+  HostName localhost
+  Port 2244
   User jaded
+  ProxyJump book5
   AddKeysToAgent yes
   UseKeychain yes
   IdentityFile ~/.ssh/id_ed25519
   ServerAliveInterval 60
   ServerAliveCountMax 3
 
-# Note: Pixelbook Go runs CachyOS (Arch-based) with Hyprland DE
-# Shell: zsh + oh-my-zsh + powerlevel10k | Terminal: kitty
-# Twingate connector (Docker) provides remote access
+# Note: Pixelbook Go uses reverse SSH tunnel (not direct Twingate)
+# Go runs Twingate CLIENT to reach homelab, but this conflicts with connector
+# Reverse tunnel from Go → book5:2244 allows Mac to reach Go via ProxyJump
 ```
 
 ---
@@ -449,26 +469,33 @@ ssh pi1 "speedtest-cli"
 
 | Component | Details |
 |-----------|---------|
-| Hostname | pixelbook-go |
+| Hostname | go |
 | Hardware | Google Pixelbook Go (Intel Core m3, 8GB RAM) |
 | OS | CachyOS Linux (Arch-based) |
 | Kernel | 6.12.65-2-cachyos-lts |
 | DE | Hyprland 0.53.1 |
-| IP | 192.168.1.244 |
+| IP | 192.168.1.244 (local), localhost:2244 via tunnel |
 | User | jaded (passwordless sudo) |
 | Shell | zsh + oh-my-zsh + powerlevel10k |
 | Terminal | kitty (default), alacritty (alternate) |
 
 **SSH Access:**
 ```bash
-ssh go                # Uses aliases: go, pixelbook
-ssh jaded@192.168.1.244
+ssh go                # Via reverse tunnel through book5
+ssh pixelbook         # Alias for go
 ```
 
-**Twingate Setup:**
-- Connector: Docker container on the Pixelbook
-- Network: jaded423
-- Allows remote SSH access from Mac/other devices
+**Network Architecture:**
+```
+Mac → Twingate → book5 → reverse tunnel (port 2244) → Go
+Go → Twingate Client → homelab (192.168.2.x)
+```
+
+**Why Reverse Tunnel (not direct Twingate):**
+- Go has Twingate **Client** installed to reach homelab (192.168.2.x)
+- Go also had Twingate **Connector** (Docker) for incoming connections
+- Running both causes routing conflicts - client takes over network routing
+- Solution: Use reverse SSH tunnel instead of connector for incoming access
 
 **Installed Software:**
 | Package | Purpose |
@@ -501,10 +528,81 @@ ssh jaded@192.168.1.244
 - Neovim: `~/.config/nvim` (cloned from nvimConfig repo)
 - Zsh: `~/.zshrc` (Arch-adapted version)
 
+**Reverse Tunnel Service (on Go):**
+
+Location: `~/.config/systemd/user/ssh-tunnel.service`
+
+```ini
+[Unit]
+Description=Reverse SSH tunnel to book5
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/ssh -R 2244:localhost:22 root@192.168.2.250 -N -i /home/jaded/.ssh/id_ed25519 -o ServerAliveInterval=60 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=no
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+```
+
+**Manage the tunnel:**
+```bash
+systemctl --user status ssh-tunnel   # Check status
+systemctl --user restart ssh-tunnel  # Restart if needed
+journalctl --user -u ssh-tunnel -f   # View logs
+```
+
+**Requirements for tunnel to work:**
+1. Go's SSH key must be in book5's `~/.ssh/authorized_keys`
+2. book5's SSH key must be in Go's `~/.ssh/authorized_keys`
+3. Twingate client must be connected on Go (for Go → book5 connection)
+
+**Power/Lid Behavior:**
+
+Config: `/etc/systemd/logind.conf.d/lid-switch.conf`
+```ini
+[Login]
+HandleLidSwitch=suspend
+HandleLidSwitchExternalPower=ignore
+```
+
+| Condition | Behavior |
+|-----------|----------|
+| AC + lid closed | Stays awake, tunnel active |
+| Battery + lid closed | Sleeps (saves battery) |
+| After wake | Tunnel auto-reconnects |
+
+**WiFi Power Save (auto-toggles on AC state):**
+
+Script: `/usr/local/bin/wifi-power-manager`
+```bash
+#!/bin/bash
+AC_ONLINE=$(cat /sys/class/power_supply/AC/online 2>/dev/null)
+if [ "$AC_ONLINE" = "1" ]; then
+    iw dev wlan0 set power_save off
+else
+    iw dev wlan0 set power_save on
+fi
+```
+
+Udev rule: `/etc/udev/rules.d/99-wifi-power.rules`
+```
+ACTION=="change", SUBSYSTEM=="power_supply", RUN+="/usr/local/bin/wifi-power-manager"
+```
+
+| Condition | WiFi Power Save |
+|-----------|-----------------|
+| On AC | OFF (stable connection) |
+| On Battery | ON (saves power) |
+
 **Issues Fixed During Setup:**
 1. **Phantom Monitor**: `Unknown-1` ghost monitor disabled in hyprland.conf
 2. **Gesture Syntax**: Updated to Hyprland 0.53+ syntax
 3. **Default Shell**: Changed from fish to zsh for SSH sessions
+4. **Twingate Client/Connector Conflict**: Resolved with reverse tunnel approach
+5. **Lid Close on AC**: Configured to stay awake for persistent tunnel
+6. **WiFi Power Save**: Auto-toggles based on AC state via udev rule
 
 ---
 

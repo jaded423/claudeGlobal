@@ -126,10 +126,15 @@ All projects have hourly automated backups to GitHub.
 | SSH (PC/PowerShell) | `ssh pc` (port 22) |
 | SSH (PC/WSL) | `ssh wsl` (port 2222) |
 | SSH (Pi1 @ Elevated) | `ssh pi1` (ProxyJump via pc) |
+| SSH (Pixelbook Go) | `ssh go` (reverse tunnel via book5) |
 | Samba | `smb://192.168.2.250/Shared` |
 | Twingate | jaded423 network |
 
 **Services on VM 101**: Plex (32400), Jellyfin (8096), Ollama (11434), Frigate (5000), qBittorrent (8080)
+
+**Pixelbook Go**: CachyOS Hyprland laptop (192.168.1.244)
+- Uses reverse SSH tunnel through book5:2244 (Twingate client/connector conflict)
+- zsh + Oh My Zsh + Powerlevel10k, kitty terminal, Hyprland DE
 
 **Pi1 @ Elevated**: Git backup mirror (15 repos, 4-hourly sync) - requires PC to be on for internet
 - Now configured with zsh + Oh My Zsh + Powerlevel10k (mirrors Mac terminal)

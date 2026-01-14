@@ -9,6 +9,11 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ```changelog
                                                                                                                                                                                                                       ```changelog
                                                                                                                                                                                                                                                                                      ```changelog
+                                                                                                                                                                                                                                ```changelog
+## 2026-01-14 - Odoo Inventory Sheet Sync Implementation Plan
+
+Added comprehensive implementation plan for syncing Odoo inventory data to Google Sheets, including phases for data exploration, API setup, script development, and column mapping.
+
 ## 2026-01-14 - Updated marketplace and stats data
 
 Updated the last updated timestamp for the claude-plugins-official marketplace and refreshed user activity statistics in stats-cache.json to reflect new data from January 13, 2026.

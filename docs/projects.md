@@ -142,7 +142,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-14
-**Recent Changes:** Updated the photo synchronization state file with a new timestamp to reflect the latest run time.
+**Recent Changes:** Migrated from Apple Photos to Google Photos for better mobile sharing and iMessage integration. Replaced Python AppleScript approach with rclone for improved reliability and OAuth handling.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

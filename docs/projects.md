@@ -142,7 +142,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-14
-**Recent Changes:** Refactored photo sync logic to handle multiple directories with independent tracking, updated state file format to support per-directory synchronization.
+**Recent Changes:** Updated Google Photos credentials and adjusted sync state to reflect new client configuration and updated import timestamps, including removal of several previously imported videos and addition of new media entries.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

@@ -8,6 +8,11 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                        ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ```changelog
                                                                                                                                                                                                                       ```changelog
+                                                                                                                                                                                                                                                                                     ```changelog
+## 2026-01-14 - Updated marketplace and stats data
+
+Updated the last updated timestamp for the claude-plugins-official marketplace and refreshed user activity statistics in stats-cache.json to reflect new data from January 13, 2026.
+
 ## 2026-01-13 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp for the claude-plugins-official marketplace to reflect the latest sync time.

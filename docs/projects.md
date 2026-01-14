@@ -142,7 +142,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-14
-**Recent Changes:** Updated the photos synchronization state file with a new last run timestamp to mark the completion of the latest crawl process.
+**Recent Changes:** Refactored photo sync logic to handle multiple directories with independent tracking, updated state file format to support per-directory synchronization.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

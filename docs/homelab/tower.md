@@ -124,6 +124,17 @@ lspci -nnk | grep -A3 NVIDIA
 | Proxmox Web UI | Port 8006 | Cluster management |
 | NFS Server | Native | media-pool exports to VM 101 |
 
+### Health Monitoring
+
+**Tower Guardian** on omarchy monitors this node for health issues:
+- Proxmox API checks
+- SSH connectivity tests
+- ICMP ping fallback
+- AI-powered failure analysis
+- Tapo P105 smart plug for automated power cycling
+
+See [omarchy.md](omarchy.md#tower-guardian---proxmox-health-monitor) for full details.
+
 ### Twingate Connector
 
 ```bash
@@ -228,7 +239,8 @@ pvecm status
 
 If network becomes unresponsive:
 1. Physical reboot required (power cycle)
-2. Verify TSO is disabled after boot:
+2. **Automated**: Tower Guardian can detect unresponsive state and trigger Tapo P105 power cycle with email approval
+3. Verify TSO is disabled after boot:
    ```bash
    ethtool -k nic0 | grep tso
    ```
@@ -262,5 +274,6 @@ lspci -nnk | grep -A3 NVIDIA
 
 - [book5.md](book5.md) - Proxmox Node 1
 - [ubuntu.md](ubuntu.md) - VM 101 on this host
+- [omarchy.md](omarchy.md) - Tower Guardian monitoring (VM 100 on book5)
 - [pihole.md](pihole.md) - QDevice host
 - [gpu-passthrough.md](gpu-passthrough.md) - Quadro M4000 setup

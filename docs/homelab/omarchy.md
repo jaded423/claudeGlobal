@@ -27,7 +27,7 @@ ssh jaded@192.168.2.161
 |----------|-------|
 | VMID | 100 |
 | Host | prox-book5 |
-| RAM | 8GB |
+| RAM | 12GB |
 | vCPU | 4 cores |
 | Disk | 32GB (on book5 local-zfs) |
 | Network | vmbr0 (192.168.2.x) |
@@ -101,6 +101,100 @@ Mac → Twingate → book5 → ProxyJump → omarchy:22
 
 ---
 
+## Tower Guardian - Proxmox Health Monitor
+
+**Project Location**: `~/docker/tower-guardian/`
+**Purpose**: AI-powered health monitoring for prox-tower with automated alerting and power cycle capability
+
+### Services
+
+| Service | Port | Image | Purpose |
+|---------|------|-------|---------|
+| n8n | 5678 | n8nio/n8n | Workflow automation engine |
+| Ollama | 11434 | ollama/ollama | Local LLM (Llama 3.1 8B) |
+
+**Web Access**:
+- n8n: http://192.168.2.161:5678
+- Ollama API: http://192.168.2.161:11434
+
+### Quick Commands
+
+```bash
+# Start/stop stack
+cd ~/docker/tower-guardian
+docker compose up -d
+docker compose down
+
+# Check status
+docker ps
+
+# Chat with Ollama
+docker exec -it ollama ollama run llama3.1:8b
+
+# View logs
+docker logs n8n
+docker logs ollama
+```
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  omarchy (192.168.2.161) - Tower Guardian               │
+│  ├── n8n (port 5678) - Workflow engine                  │
+│  └── ollama (port 11434) - Llama 3.1 8B (4.9GB)         │
+└─────────────────────────────────────────────────────────┘
+                            │
+       ┌────────────────────┼────────────────────┐
+       ▼                    ▼                    ▼
+ ┌───────────┐      ┌─────────────┐      ┌─────────────┐
+ │ prox-tower│      │ Email       │      │ Tapo P105   │
+ │ .2.249    │      │ (Gmail)     │      │ Smart Plug  │
+ │ SSH/API   │      │ Approval    │      │ Power Cycle │
+ └───────────┘      └─────────────┘      └─────────────┘
+```
+
+### Setup Status
+
+**Completed**:
+- [x] Docker Compose stack created
+- [x] n8n container running
+- [x] Ollama container running
+- [x] Llama 3.1 8B model installed
+
+**Remaining**:
+- [ ] n8n initial setup (create account)
+- [ ] Email integration (Gmail SMTP/IMAP)
+- [ ] Tapo P105 smart plug integration
+- [ ] SSH keys (n8n → prox-tower)
+- [ ] Build health check workflow
+
+### Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `~/docker/tower-guardian/docker-compose.yml` | Container definitions |
+| `~/docker/tower-guardian/README.md` | Full project documentation |
+| Docker volume: `tower-guardian_n8n_data` | n8n workflows, credentials |
+| Docker volume: `tower-guardian_ollama_data` | LLM models |
+
+### Planned Workflow
+
+1. **Schedule Trigger** - Every 5 minutes
+2. **Health Checks** - Proxmox API, SSH, ICMP ping
+3. **AI Analysis** - Ollama evaluates results
+4. **Email Notification** - Request approval for action
+5. **Tapo Power Cycle** - Hard reboot on approval
+6. **Verify Recovery** - Confirm system back online
+
+### Credentials Needed
+
+- [ ] Tapo app email (lowercase!) and password
+- [ ] Gmail app password for SMTP/IMAP
+- [ ] SSH key for prox-tower root access
+
+---
+
 ## SSH Configuration
 
 ### On Mac (`~/.ssh/config`)
@@ -167,4 +261,5 @@ VM may need console access via Proxmox Web UI:
 ## Related Docs
 
 - [book5.md](book5.md) - Host (prox-book5)
+- [tower.md](tower.md) - Monitored by Tower Guardian
 - [go.md](go.md) - Similar Hyprland setup on Pixelbook Go

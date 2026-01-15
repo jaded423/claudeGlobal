@@ -133,6 +133,15 @@ ssh pihole                   # DNS/QDevice Pi
 
 ## Services Quick Reference
 
+### VM 100 (Omarchy) - Tower Guardian
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| n8n | 5678 | Workflow automation (health monitoring) |
+| Ollama | 11434 | Local LLM (Llama 3.1 8B) |
+
+**Details**: See [omarchy.md](homelab/omarchy.md#tower-guardian---proxmox-health-monitor)
+
 ### VM 101 (Ubuntu Server)
 
 | Service | Port | Purpose |

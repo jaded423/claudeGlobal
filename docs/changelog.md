@@ -4,13 +4,61 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
-                                                                                                                                                                                                                                                                                                      ```changelog
-                                                                                                                                       ```changelog
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ```changelog
-                                                                                                                                                                                                                      ```changelog
-                                                                                                                                                                                                                                                                                     ```changelog
-                                                                                                                                                                                                                                ```changelog
-                                                                                                                                                                                                                                                                                                                                          ```changelog
+## 2026-01-15 - Open WebUI Docker Compose Migration + Upgrade
+
+Migrated open-webui on VM101 from `docker run` to docker-compose and upgraded to v0.7.2, with configuration now declarative and version-controllable.
+
+## 2026-01-15 - Open WebUI Docker Compose Migration + Upgrade
+
+**What changed:**
+- Migrated open-webui on VM101 from `docker run` to docker-compose
+- Created `/home/jaded/open-webui/docker-compose.yml` with proper configuration
+- Upgraded from Dec 2, 2025 image to v0.7.2 (2026-01-10, build 2b26355)
+- Container uses existing named volume `open-webui` (data preserved)
+
+**Why:**
+- Docker Compose is industry standard for managing containers
+- Configuration is now declarative, version-controllable, and self-documenting
+- Future upgrades simplified to: `docker compose pull && docker compose up -d`
+- Previous `docker run` command was not documented anywhere
+
+**Compose configuration:**
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "3000:8080"
+    environment:
+      - TZ=America/Chicago
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - open-webui:/app/backend/data
+
+volumes:
+  open-webui:
+    external: true
+```
+
+**Files created on VM101:**
+- `/home/jaded/open-webui/docker-compose.yml` - New compose file
+
+**Files modified:**
+- `docs/homelab/ubuntu.md` - Moved open-webui from "Systemd Services" to Docker containers table, added compose location column, added upgrade instructions
+
+**v0.7.2 release notes:**
+- Fixed database connection timeouts under high concurrency
+- Fixed workspace prompts editor errors
+- Fixed local Whisper speech-to-text
+- Improved Evaluations page loading speed
+- Fixed Settings tab i18n labels
+
+---
+
 ## 2026-01-15 - Version 2.1.7 Release
 
 This release includes 14 bug fixes and improvements, including enhanced security, better Windows compatibility, and improved performance. It also updates OAuth and API Console URLs and enables MCP tool search auto mode by default.

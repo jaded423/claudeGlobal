@@ -71,14 +71,15 @@ sudo mount -a
 
 ### Docker Containers
 
-| Container | Port | Purpose |
-|-----------|------|---------|
-| plex | 32400 | Media server |
-| jellyfin | 8096 | Media server (backup) |
-| qbittorrent | 8080 | Torrent client (Web UI) |
-| frigate | 5000 | NVR - 2 cameras |
-| mosquitto | 1883 | MQTT broker |
-| clamav | - | Antivirus scanning |
+| Container | Port | Compose Location | Purpose |
+|-----------|------|------------------|---------|
+| plex | 32400 | ~/docker/ | Media server |
+| jellyfin | 8096 | ~/docker/ | Media server (backup) |
+| qbittorrent | 8080 | ~/docker/ | Torrent client (Web UI) |
+| frigate | 5000 | ~/frigate/ | NVR - 2 cameras |
+| open-webui | 3000 | ~/open-webui/ | Ollama chat interface |
+| mosquitto | 1883 | ~/frigate/ | MQTT broker |
+| clamav | - | ~/docker/ | Antivirus scanning |
 
 ```bash
 # Check all containers
@@ -96,7 +97,6 @@ docker logs -f <container_name>
 | Service | Port | Purpose |
 |---------|------|---------|
 | ollama | 11434 | LLM inference API |
-| open-webui | 3000 | Ollama chat interface |
 
 ```bash
 # Check Ollama
@@ -104,6 +104,20 @@ systemctl status ollama
 
 # Restart
 sudo systemctl restart ollama
+```
+
+### Open WebUI
+
+Ollama chat interface at http://192.168.2.126:3000
+
+```bash
+# Upgrade
+cd ~/open-webui
+docker compose pull
+docker compose up -d
+
+# Check logs
+docker logs -f open-webui
 ```
 
 ---

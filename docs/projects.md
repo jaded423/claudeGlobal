@@ -142,7 +142,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-15
-**Recent Changes:** Updated the last run timestamp in the photos sync state file to reflect the latest crawler execution time.
+**Recent Changes:** Updated the last_run timestamp in crawler/photos_sync_state.json to reflect the latest crawler execution time.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

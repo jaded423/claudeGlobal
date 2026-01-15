@@ -10,6 +10,11 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                                                                                                       ```changelog
                                                                                                                                                                                                                                                                                      ```changelog
                                                                                                                                                                                                                                 ```changelog
+                                                                                                                                                                                                                                                                                                                                          ```changelog
+## 2026-01-15 - Version 2.1.7 Release
+
+This release includes 14 bug fixes and improvements, including enhanced security, better Windows compatibility, and improved performance. It also updates OAuth and API Console URLs and enables MCP tool search auto mode by default.
+
 ## 2026-01-14 - Odoo Inventory Sheet Sync Implementation Plan
 
 Added comprehensive implementation plan for syncing Odoo inventory data to Google Sheets, including phases for data exploration, API setup, script development, and column mapping.

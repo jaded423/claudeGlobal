@@ -1,0 +1,23 @@
+/uninstall <PatchCodeGuid>[;Update2.msp] /package <Product.msi | ProductCode>
+        Remove update(s) for a product
+Repair Options
+    /f[p|e|c|m|s|o|d|a|u|v] <Product.msi | ProductCode>
+        Repairs a product
+        p - only if file is missing
+        o - if file is missing or an older version is installed (default)
+        e - if file is missing or an equal or older version is installed
+        d - if file is missing or a different version is installed
+        c - if file is missing or checksum does not match the calculated value
+        a - forces all files to be reinstalled
+        u - all required user-specific registry entries (default)
+        m - all required computer-specific registry entries (default)
+        s - all existing shortcuts (default)
+        v - runs from source and recaches local package
+Setting Public Properties
+    [PROPERTY=PropertyValue]
+
+Consult the Windows ® Installer SDK for additional documentation on the
+command line syntax.
+
+Copyright © Microsoft Corporation. All rights reserved.
+Portions of this software are based in part on the work of the Independent JPEG Group

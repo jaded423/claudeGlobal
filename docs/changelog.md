@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                                                                                                ```changelog
+## 2026-01-16 - Windows Installer Documentation Added
+
+Added comprehensive documentation for Windows Installer command-line options, including install, uninstall, repair, and logging options. Created two new cache files containing detailed MSIEXEC usage information.
+
 ## 2026-01-15 - Open WebUI Docker Compose Migration + Upgrade
 
 Migrated open-webui on VM101 from `docker run` to docker-compose and upgraded to v0.7.2, with configuration now declarative and version-controllable.

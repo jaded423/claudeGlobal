@@ -4,7 +4,40 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
-                                                                                                                                                                                                                                ```changelog
+## 2026-01-16 - PC Health Monitoring System Deployed
+
+**What changed:**
+- Deployed n8n-based PC health monitoring on omarchy VM (192.168.2.161:5678)
+- Created PC Heartbeat Receiver workflow (webhook + timestamp file)
+- Created PC Health Monitor workflow (schedule trigger + stale check + IFTTT power cycle)
+- Configured Windows scheduled task "PC Heartbeat" (every 2 min via PowerShell)
+- Configured Windows scheduled task "Start WSL Cron" (on boot, stored credentials)
+- Set up Windows auto-login via registry for unattended recovery
+- Installed Twingate headless mode on PC (MSI + service_secret)
+- Configured BIOS auto-power-on after AC loss
+- Created IFTTT webhooks for Tapo P105 smart plug control
+- Fixed Twingate conflict (headless client + connector) by changing SSH resource to 127.0.0.1
+
+**Why:**
+- PC runs odooReports cron jobs - must stay online 24/7
+- PC could hang or lose connectivity with no automatic recovery
+- System now auto-recovers from failures without manual intervention
+
+**Infrastructure overview:**
+```
+Mac ──(Twingate)──► omarchy:5678 (n8n)
+                        │
+PC ──(Twingate)─────────┘ (heartbeat every 2 min)
+ │
+ └── IFTTT ──► Tapo P105 smart plug ──► PC power
+```
+
+**Thresholds:** 10 min warning email, 20 min critical (auto power cycle)
+
+**Verification:** Full end-to-end test passed - email warning, power cycle, auto-recovery, heartbeats resume
+
+---
+
 ## 2026-01-16 - Windows Installer Documentation Added
 
 Added comprehensive documentation for Windows Installer command-line options, including install, uninstall, repair, and logging options. Created two new cache files containing detailed MSIEXEC usage information.

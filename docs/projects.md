@@ -90,8 +90,8 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active business automation
 **Location**: `~/projects/odooReports` (Mac source), `/home/joshua/projects/odooReports/` (WSL execution)
 **Purpose**: Automated reporting for Elevated Trading
-**Last Updated**: 2026-01-12
-**Recent Changes**: Migrated cron jobs from Mac to PC/WSL for reliable 24/7 execution. Mac was sleeping at 6 AM causing missed Monday reports.
+**Last Updated**: 2026-01-16
+**Recent Changes**: Deployed PC health monitoring (n8n heartbeats + IFTTT power cycling) - PC now auto-recovers from failures. Twingate headless mode installed.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays

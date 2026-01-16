@@ -178,7 +178,7 @@ ssh pihole                   # DNS/QDevice Pi
 | Network | Connectors |
 |---------|------------|
 | jaded423 | prox-book5, prox-tower, magic-pihole |
-| Elevated | Windows PC (Docker in WSL) |
+| Elevated | Windows PC (headless service) |
 
 **Admin Console**: https://jaded423.twingate.com
 
@@ -252,6 +252,7 @@ See [pi1.md](homelab/pi1.md) for details.
 
 | Date | Change |
 |------|--------|
+| 2026-01-16 | PC health monitoring: n8n heartbeats, IFTTT power cycle, Twingate headless |
 | 2026-01-13 | Reorganized homelab docs into per-node files |
 | 2026-01-12-13 | Pixelbook Go: CachyOS Hyprland, reverse tunnel, power management |
 | 2026-01-10 | Pixelbook Go: Initial Twingate connector setup |

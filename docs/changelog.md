@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                                                                                                                                                  ```changelog
+## 2026-01-17 - CLI and Plugin Enhancements
+
+Updated changelog with fixes for MCP connection requests, new Setup hook event, and improved VSCode plugin installation experience. Also updated plugin marketplace timestamps and statistics.
+
 ## 2026-01-16 - PC Health Monitoring System Deployed
 
 **What changed:**

@@ -1,6 +1,6 @@
 # Home Lab Documentation
 
-**Last Updated:** January 13, 2026
+**Last Updated:** January 17, 2026
 **Cluster:** 2-node Proxmox "home-cluster" with QDevice quorum
 
 ---
@@ -106,6 +106,7 @@
 | **MacBook Air** | 192.168.2.226 | Primary workstation | [mac.md](homelab/mac.md) |
 | **Pixelbook Go** | 192.168.1.244 | CachyOS dev laptop | [go.md](homelab/go.md) |
 | **Windows PC** | 192.168.1.193 | WSL, Twingate | [pc.md](homelab/pc.md) |
+| **Samsung S25 Ultra** | 192.168.1.96 | Mobile SSH, tunnels | [phone.md](homelab/phone.md) |
 | **Pi1** | 192.168.137.123 | Git backup mirror | [pi1.md](homelab/pi1.md) |
 
 ---

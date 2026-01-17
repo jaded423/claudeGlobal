@@ -4,7 +4,48 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
-                                                                                                                                                                                                                                                                                  ```changelog
+---
+
+## 2026-01-17 - Phone SSH Tunnels + n8n Secure Cookie Fix
+
+**What changed:**
+- Fixed n8n secure cookie error blocking access from LAN IP (192.168.2.161:5678)
+- Configured SSH tunnels on Samsung S25 Ultra (Termux) for homelab service access
+- Created new documentation: `docs/homelab/phone.md`
+- Updated phone's `~/.ssh/config` with correct ProxyJump routes via Twingate
+- Added phone's SSH key to omarchy and ubuntu authorized_keys
+- Installed tmux on phone for persistent tunnel sessions
+- Set up auto-start tunnels in phone's `~/.zshrc`
+
+**Phone tunnel configuration:**
+| Session | localhost Ports | Destination |
+|---------|-----------------|-------------|
+| tunnels | 5678, 11434, 8000 | omarchy (n8n, Ollama, tapo-rest) |
+| ubuntu-tunnels | 32400, 5000, 8080, 3000 | ubuntu (Plex, Frigate, qBittorrent, Open WebUI) |
+
+**Why:**
+- n8n's `N8N_SECURE_COOKIE` defaults to true, blocking HTTP access via IP
+- Mac used SSH tunnel to localhost (secure context), phone needed same setup
+- Phone can now access all homelab services via localhost through Twingate
+
+**Route:** Phone → Twingate → tower → (book5 →) omarchy/ubuntu
+
+**Technical notes:**
+- SSH `-L` flag creates port-specific forwarding, not VPN (other traffic unaffected)
+- Local ports must be unique; remote ports can overlap across servers
+- Tunnels persist in tmux sessions, auto-start on Termux launch
+- Reverted `N8N_SECURE_COOKIE=false` after tunnels configured (using localhost is secure)
+
+**Files created/modified:**
+- `docs/homelab/phone.md` - New comprehensive phone documentation
+- `docs/homelab.md` - Added phone to Client Devices table
+- Phone `~/.ssh/config` - Fixed ProxyJump routes
+- Phone `~/.zshrc` - Added `start_tunnels` function
+- omarchy `~/.ssh/authorized_keys` - Added phone key
+- ubuntu `~/.ssh/authorized_keys` - Added phone key
+
+---
+
 ## 2026-01-17 - CLI and Plugin Enhancements
 
 Updated changelog with fixes for MCP connection requests, new Setup hook event, and improved VSCode plugin installation experience. Also updated plugin marketplace timestamps and statistics.

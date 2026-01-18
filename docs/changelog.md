@@ -6,6 +6,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                        ```changelog
+## 2026-01-17 - Updated marketplace last updated timestamp
+
+Updated the lastUpdated timestamp in known_marketplaces.json to reflect the latest update time for the claude-plugins-official marketplace.
+
 ## 2026-01-17 - Phone & Tower Documentation Updates
 
 Updated phone documentation with new SSH port, user, and tunnel management details. Enhanced tower documentation with dual NIC setup and improved network interface descriptions.

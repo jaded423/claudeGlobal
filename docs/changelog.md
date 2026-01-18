@@ -6,6 +6,85 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-18 - Windows PC Reverse Tunnel Setup
+
+Updated documentation to reflect the new reverse SSH tunnel setup for the Windows PC, including scheduled task configuration and access methods. Also updated SSH access cheatsheet and clarified current state vs implementation details in documentation.
+
+## 2026-01-17 - Distributed Documentation System + PC Reverse Tunnel
+
+**What changed:**
+- Deployed read-only CLAUDE.md files to 8 homelab machines: Phone, Omarchy, Ubuntu, Tower, Book5, Go, Pihole, PC
+- Each machine's CLAUDE.md points to GitHub for latest docs and uses `~/notes/` for local session notes
+- Set up PC reverse SSH tunnel through book5:2245 (same pattern as Pixelbook Go)
+- Created Windows Scheduled Task "SSH Tunnel to book5" for persistent tunnel with auto-restart
+- Updated Mac ~/.ssh/config with `pc-tunnel` host and changed pi1 to use `pc-tunnel` as ProxyJump
+- Fixed Powerlevel10k gitstatus on phone by removing `vcs` from prompt elements
+- Updated homelab docs: phone.md, tower.md, go.md, pc.md with new information
+
+**Distributed documentation architecture:**
+```
+Mac (~/.claude/docs/)           ← Source of truth
+    │
+    ├── Hourly backup to GitHub
+    │
+    ▼
+GitHub (jaded423/claudeGlobal)  ← Central repo
+    │
+    └── Other machines read via raw URLs
+        ├── Phone ~/CLAUDE.md (read-only)
+        ├── Omarchy ~/CLAUDE.md
+        ├── Ubuntu ~/CLAUDE.md
+        ├── Tower ~/CLAUDE.md
+        ├── Book5 ~/CLAUDE.md
+        ├── Go ~/CLAUDE.md
+        ├── Pihole ~/CLAUDE.md
+        └── PC C:\Users\joshu\CLAUDE.md
+```
+
+**PC reverse tunnel setup:**
+- Problem: Twingate client on PC blocks inbound connections when connector not running
+- Solution: PC initiates outbound tunnel to book5:2245, Mac connects through that
+- Windows Scheduled Task runs at logon, restarts on failure, runs hidden (no window)
+- Command: `ssh -N -R 2245:localhost:22 root@192.168.2.250`
+
+**Mac SSH config changes:**
+```
+# New host for PC via reverse tunnel
+Host pc-tunnel
+  HostName localhost
+  Port 2245
+  User joshu
+  ProxyJump book5
+
+# Updated pi1 to use pc-tunnel
+Host pi1 rpi1
+  ProxyJump pc-tunnel  # Changed from pc
+```
+
+**Why:**
+- Other machines running Claude Code need context but shouldn't be sources of truth
+- Prevents documentation drift and conflicting edits
+- Read-only CLAUDE.md files guide Claude sessions on remote machines
+- Local notes allow capturing insights for Mac to integrate later
+- PC needed same reverse tunnel pattern as Go due to Twingate client/connector conflict
+
+**Files modified (Mac):**
+- `~/.claude/CLAUDE.md` - Updated SSH table, added PC section, added distributed docs info
+- `~/.claude/docs/homelab/phone.md` - Added mole command, Termux:Boot scripts, known issues
+- `~/.claude/docs/homelab/tower.md` - Clarified dual NIC setup documentation
+- `~/.claude/docs/homelab/go.md` - Updated IP to 192.168.1.185, added SSH key fix note
+- `~/.claude/docs/homelab/pc.md` - Added reverse tunnel section
+- `~/.claude/docs/homelab.md` - Updated Go IP
+- `~/.ssh/config` - Added pc-tunnel, updated pi1 ProxyJump
+
+**Files deployed to remote machines:**
+- 8 read-only CLAUDE.md files (phone, omarchy, ubuntu, tower, book5, go, pihole, pc)
+
+**Pending:**
+- Pi1 CLAUDE.md deployment (machine offline, file saved at `~/.claude/pending-deployments/pi1-claude.md`)
+
+---
+
                                                                                                                                         ```changelog
 ## 2026-01-17 - Updated marketplace last updated timestamp
 

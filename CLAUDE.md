@@ -43,6 +43,11 @@ Only run sudo without asking if user explicitly requests it ("run sudo X", "do X
 
 **Multi-machine context**: Check `uname -s && hostname` before documenting. See [machine-context.md](docs/machine-context.md) for details.
 
+**Distributed Documentation**: Mac is the source of truth for homelab docs. Other machines have read-only CLAUDE.md files that:
+- Point to GitHub for latest docs (raw URLs)
+- Use `~/notes/` for local session notes
+- Mac Claude integrates notes during `/log` runs
+
 ---
 
 ## Transparency: tmux Session
@@ -123,22 +128,28 @@ All projects have hourly automated backups to GitHub.
 | SSH (prox-book5) | `ssh root@192.168.2.250` |
 | SSH (prox-tower) | `ssh root@192.168.2.249` |
 | SSH (VM 101) | `ssh jaded@192.168.2.126` |
-| SSH (PC/PowerShell) | `ssh pc` (port 22) |
-| SSH (PC/WSL) | `ssh wsl` (port 2222) |
-| SSH (Pi1 @ Elevated) | `ssh pi1` (ProxyJump via pc) |
-| SSH (Pixelbook Go) | `ssh go` (reverse tunnel via book5) |
+| SSH (PC/PowerShell) | `ssh pc-tunnel` (reverse tunnel via book5:2245) |
+| SSH (PC/WSL) | `ssh wsl` (port 2222, direct - same network only) |
+| SSH (Pi1 @ Elevated) | `ssh pi1` (ProxyJump via pc-tunnel) |
+| SSH (Pixelbook Go) | `ssh go` (reverse tunnel via book5:2244) |
 | Samba | `smb://192.168.2.250/Shared` |
 | Twingate | jaded423 network |
 
 **Services on VM 101**: Plex (32400), Jellyfin (8096), Ollama (11434), Frigate (5000), qBittorrent (8080)
 
-**Pixelbook Go**: CachyOS Hyprland laptop (192.168.1.244)
+**Pixelbook Go**: CachyOS Hyprland laptop (192.168.1.185)
 - Uses reverse SSH tunnel through book5:2244 (Twingate client/connector conflict)
 - zsh + Oh My Zsh + Powerlevel10k, kitty terminal, Hyprland DE
+
+**Windows PC**: Desktop at Elevated Trading office
+- Uses reverse SSH tunnel through book5:2245 (same pattern as Go - Twingate client blocks inbound)
+- Scheduled Task "SSH Tunnel to book5" maintains persistent tunnel
+- Direct SSH (`ssh pc`) only works on same network without Twingate client running
 
 **Pi1 @ Elevated**: Git backup mirror (15 repos, 4-hourly sync) - requires PC to be on for internet
 - Now configured with zsh + Oh My Zsh + Powerlevel10k (mirrors Mac terminal)
 - Has doom-ascii installed (`doom` alias) - because it can run DOOM
+- Currently offline (ICS subnet unreachable)
 
 ---
 

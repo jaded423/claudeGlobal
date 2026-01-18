@@ -10,13 +10,18 @@
 ## Quick Access
 
 ```bash
-# From Mac
-ssh pc              # PowerShell (port 22)
-ssh wsl             # WSL Ubuntu (port 2222)
+# From Mac (via reverse tunnel - works remotely)
+ssh pc-tunnel       # PowerShell via book5:2245
 
-# Pi1 (via PC)
-ssh pi1             # ProxyJump through PC
+# From Mac (direct - same network only, Twingate client conflict)
+ssh pc              # PowerShell (port 22) - currently broken
+ssh wsl             # WSL Ubuntu (port 2222) - currently broken
+
+# Pi1 (via PC tunnel)
+ssh pi1             # ProxyJump through pc-tunnel
 ```
+
+**Note**: Direct SSH (192.168.1.193) doesn't work when Twingate client is running due to client/connector conflict. Use reverse tunnel instead.
 
 ---
 
@@ -112,11 +117,38 @@ echo "WSL IP: $WSL_IP, port forwarding updated"
 
 ---
 
+## Reverse Tunnel (Remote Access)
+
+PC runs Twingate **client** for outbound homelab access. Incoming SSH uses reverse tunnel through book5 (same pattern as Pixelbook Go).
+
+```
+Mac → Twingate → book5 → localhost:2245 → PC:22
+```
+
+**Scheduled Task**: "SSH Tunnel to book5"
+- Runs at logon, background (no window)
+- Auto-restarts on failure
+- Key: `C:\Users\joshu\.ssh\id_ed25519`
+
+```powershell
+# Check status
+Get-ScheduledTask -TaskName "SSH Tunnel to book5" | Select-Object State
+
+# Restart
+Start-ScheduledTask -TaskName "SSH Tunnel to book5"
+
+# Stop
+Stop-ScheduledTask -TaskName "SSH Tunnel to book5"
+```
+
+---
+
 ## Services
 
 | Service | Location | Purpose |
 |---------|----------|---------|
-| Twingate Connector | Docker in WSL | "Elevated" network, "PC" connector |
+| Twingate Client | Windows | Outbound homelab access (jaded423 network) |
+| Reverse SSH Tunnel | Scheduled Task | Inbound access via book5:2245 |
 | RustDesk | Windows | Remote desktop access |
 | ICS (Internet Connection Sharing) | Ethernet adapter | Internet for Pi1 |
 | Port Forward :2223 | netsh portproxy | SSH to Pi1 |

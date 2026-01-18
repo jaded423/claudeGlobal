@@ -6,6 +6,10 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-17 - Phone & Tower Documentation Updates
+
+Updated phone documentation with new SSH port, user, and tunnel management details. Enhanced tower documentation with dual NIC setup and improved network interface descriptions.
+
 ## 2026-01-17 - Phone SSH Tunnels + n8n Secure Cookie Fix
 
 **What changed:**

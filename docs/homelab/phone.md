@@ -1,8 +1,10 @@
 # Samsung S25 Ultra (Phone)
 
 **Last Updated:** January 17, 2026
-**IP Address:** 192.168.1.96
+**IP Address:** 192.168.1.96 (home WiFi) / 192.168.2.101 (via Twingate)
 **Network:** 192.168.1.0/24 (Mac/PC network)
+**SSH Port:** 8022
+**User:** u0_a499
 
 ---
 
@@ -62,6 +64,22 @@ Host 192.168.2.161 omarchy vm100
 Host 192.168.2.126 ubuntu-server vm101 ubuntu
   HostName 192.168.2.126
   User jaded
+  ProxyJump tower
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# MacBook Air (via tower)
+Host 192.168.2.226 mac macbook
+  HostName 192.168.2.226
+  User j
+  ProxyJump tower
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+
+# Pi-hole (via tower)
+Host 192.168.2.131 pihole magic-pihole
+  HostName 192.168.2.131
+  User pi
   ProxyJump tower
   ServerAliveInterval 60
   ServerAliveCountMax 3
@@ -133,9 +151,94 @@ start_tunnels() {
 start_tunnels
 ```
 
+### Termux:Boot (Device Boot)
+
+SSH server starts automatically when phone boots via Termux:Boot app:
+
+**Location:** `~/.termux/boot/start-sshd.sh`
+```bash
+#!/data/data/com.termux/files/usr/bin/bash
+sshd
+```
+
+**Boot sequence:**
+1. Phone boots → Android starts Termux:Boot
+2. Termux:Boot runs `~/.termux/boot/start-sshd.sh`
+3. SSH server available on port 8022
+4. First shell login triggers `start_tunnels` via `.zshrc`
+
 ---
 
 ## Tunnel Management
+
+### `mole` Command (Health Check & Auto-Repair)
+
+The `mole` function checks tunnel health and auto-repairs dead/zombie tunnels:
+
+```bash
+mole() {
+  echo "🔍 Checking tunnel health..."
+
+  local omarchy_dead=0
+  local ubuntu_dead=0
+
+  # Test omarchy tunnel (n8n on 5678)
+  if ! curl -s -o /dev/null --connect-timeout 3 http://localhost:5678 2>/dev/null; then
+    echo "⚠️  Omarchy tunnel appears dead"
+    omarchy_dead=1
+  else
+    echo "✅ Omarchy tunnel healthy (n8n responding)"
+  fi
+
+  # Test ubuntu tunnel (Frigate on 5000)
+  if ! curl -s -o /dev/null --connect-timeout 3 http://localhost:5000 2>/dev/null; then
+    echo "⚠️  Ubuntu tunnel appears dead"
+    ubuntu_dead=1
+  else
+    echo "✅ Ubuntu tunnel healthy (Frigate responding)"
+  fi
+
+  # Auto-repair dead tunnels
+  if [ $omarchy_dead -eq 1 ]; then
+    echo "🔫 Killing zombie omarchy SSH processes..."
+    pkill -f "ssh.*omarchy" 2>/dev/null
+    tmux kill-session -t tunnels 2>/dev/null
+    sleep 1
+    echo "🔧 Recreating omarchy tunnel..."
+    tmux new-session -d -s tunnels 'ssh -N -L 5678:localhost:5678 \
+      -L 11434:localhost:11434 -L 8000:localhost:8000 \
+      -o ServerAliveInterval=60 -o ServerAliveCountMax=3 omarchy'
+    sleep 2
+    echo "✅ Omarchy tunnel restored!"
+  fi
+
+  if [ $ubuntu_dead -eq 1 ]; then
+    echo "🔫 Killing zombie ubuntu SSH processes..."
+    pkill -f "ssh.*ubuntu" 2>/dev/null
+    tmux kill-session -t ubuntu-tunnels 2>/dev/null
+    sleep 1
+    echo "🔧 Recreating ubuntu tunnel..."
+    tmux new-session -d -s ubuntu-tunnels 'ssh -N -L 32400:localhost:32400 \
+      -L 5000:localhost:5000 -L 8080:localhost:8080 -L 3000:localhost:3000 \
+      -o ServerAliveInterval=60 -o ServerAliveCountMax=3 ubuntu'
+    sleep 2
+    echo "✅ Ubuntu tunnel restored!"
+  fi
+
+  if [ $omarchy_dead -eq 0 ] && [ $ubuntu_dead -eq 0 ]; then
+    echo "🎉 All tunnels healthy!"
+  fi
+}
+```
+
+**Usage:**
+```bash
+mole    # Check health and auto-repair dead tunnels
+```
+
+---
+
+## Manual Tunnel Management
 
 ```bash
 # Check running tunnels
@@ -227,6 +330,19 @@ ping 192.168.2.249
 ssh-keygen -R <ip-address>
 # Then reconnect to accept new key
 ```
+
+---
+
+## Known Issues
+
+### Tunnels occasionally die
+Tunnels can drop due to network changes or phone sleep. Use `mole` to check and auto-repair.
+
+### Omarchy tunnel more unstable than Ubuntu
+The omarchy tunnel is more prone to disconnection. Check `mole` output if services are unreachable.
+
+### Powerlevel10k gitstatus
+Gitstatus binary doesn't work on Termux/Android. Fixed by removing `vcs` from `~/.p10k.zsh` left prompt elements (2026-01-17).
 
 ---
 

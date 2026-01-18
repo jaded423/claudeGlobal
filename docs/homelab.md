@@ -59,7 +59,7 @@
 │                                                                                    │
 │  ┌─────────────────────┐         ┌─────────────────────┐                          │
 │  │ Pixelbook Go        │         │ Samsung S25 Ultra   │                          │
-│  │ 192.168.1.244       │         │ 192.168.1.96        │                          │
+│  │ 192.168.1.185       │         │ 192.168.1.96        │                          │
 │  │ go.local (mDNS)     │         │ Termux              │                          │
 │  │ CachyOS + Hyprland  │         │                     │                          │
 │  │                     │         │ • SSH :8022         │                          │
@@ -104,7 +104,7 @@
 | Device | IP | Purpose | Docs |
 |--------|-----|---------|------|
 | **MacBook Air** | 192.168.2.226 | Primary workstation | [mac.md](homelab/mac.md) |
-| **Pixelbook Go** | 192.168.1.244 | CachyOS dev laptop | [go.md](homelab/go.md) |
+| **Pixelbook Go** | 192.168.1.185 | CachyOS dev laptop | [go.md](homelab/go.md) |
 | **Windows PC** | 192.168.1.193 | WSL, Twingate | [pc.md](homelab/pc.md) |
 | **Samsung S25 Ultra** | 192.168.1.96 | Mobile SSH, tunnels | [phone.md](homelab/phone.md) |
 | **Pi1** | 192.168.137.123 | Git backup mirror | [pi1.md](homelab/pi1.md) |

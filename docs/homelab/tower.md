@@ -43,8 +43,10 @@ https://192.168.2.249:8006
 
 | Interface | Type | Speed | IP | Bridge | Purpose |
 |-----------|------|-------|-----|--------|---------|
-| Intel I218-LM | Onboard | 1 Gbps | 192.168.2.249 | vmbr0 | Management, Twingate |
-| Realtek RTL8125 | PCIe | 2.5 Gbps | 10.10.10.2 | vmbr1 | Inter-node link |
+| Intel I218-LM | Onboard | 1 Gbps | 192.168.2.249 | vmbr0 | Internet, Management, Twingate |
+| TP-Link TX201 (RTL8125) | PCIe | 2.5 Gbps | 10.10.10.2 | vmbr1 | Inter-node link to book5 |
+
+**Dual NIC Setup**: Intel provides internet connectivity (with TSO workaround), TP-Link provides fast 2.5 Gbps inter-node link. Future: 10GbE upgrade when network switch is available.
 
 **Note**: Intel I218-LM has TSO bug - see Known Issues below.
 

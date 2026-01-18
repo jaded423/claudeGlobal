@@ -245,6 +245,8 @@ twingate status
 ssh -R 2244:localhost:22 root@192.168.2.250 -N -v
 ```
 
+**Key Fix**: The service must specify `-i /home/jaded/.ssh/id_ed25519` explicitly because systemd services don't have access to SSH agent.
+
 ### WiFi drops when lid closed
 
 ```bash

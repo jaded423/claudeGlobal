@@ -2,40 +2,71 @@
 
 Quick reference for accessing all machines in the multi-location network.
 
-**Last Updated:** January 13, 2026 (Added Pixelbook Go - CachyOS Hyprland via Twingate)
+**Last Updated:** January 19, 2026 (Unified tunnel architecture for all roaming devices)
+
+---
+
+## Unified Tunnel Architecture
+
+All roaming devices (Mac, Go, Phone, PC) use **reverse SSH tunnels** through book5 as the primary access method. This works from anywhere because book5 is always reachable via Twingate.
+
+**Pattern:**
+- `ssh device` → Uses reverse tunnel through book5 (works from anywhere)
+- `ssh device-local` → Direct/mDNS access (same network only)
+
+**Tunnel Ports on book5:**
+| Port | Device | User |
+|------|--------|------|
+| 2244 | Pixelbook Go | jaded |
+| 2245 | Windows PC (PowerShell) | joshu |
+| 2246 | Mac | j |
+| 2247 | Phone (Termux) | u0_a499 |
+| 2248 | WSL Ubuntu | joshua |
 
 ---
 
 ## Quick Access Commands
 
-### From Mac (Local or Remote via Twingate)
+### Roaming Devices (Tunnel-Based Primary)
 
 ```bash
-# Proxmox Hosts (direct access)
-ssh root@192.168.2.250      # prox-book5 (Node 1)
-ssh root@192.168.2.249      # prox-tower (Node 2) - Management network
-ssh root@192.168.1.249      # prox-tower (Node 2) - 2.5GbE primary network
+# Pixelbook Go - CachyOS Hyprland
+ssh go                     # Via tunnel (works anywhere)
+ssh go-local               # Direct mDNS (same network only)
+
+# Windows PC - PowerShell
+ssh pc                     # Via tunnel (works anywhere)
+ssh pc-local               # Direct (same network only)
+
+# Mac
+ssh mac                    # Via tunnel (from other devices)
+ssh mac-local              # Direct mDNS (same network only)
+
+# Phone - Termux (Samsung S25 Ultra)
+ssh phone                  # Via tunnel (works anywhere)
+ssh phone-local            # Direct (same network only, port 8022)
+
+# WSL Ubuntu (on Windows PC)
+ssh wsl                    # Via tunnel through book5
+ssh wsl-local              # Direct (same network only, port 2222)
+```
+
+### Homelab (Direct Access)
+
+```bash
+# Proxmox Hosts
+ssh book5                  # prox-book5 (Node 1) - 192.168.2.250
+ssh tower                  # prox-tower (Node 2) - 192.168.2.249
 
 # VMs (auto ProxyJump configured)
-ssh jaded@192.168.2.161     # VM 100 - Omarchy Desktop (via prox-book5)
-ssh jaded@192.168.2.126     # VM 101 - Ubuntu Server (via prox-tower, on 1GbE)
+ssh omarchy                # VM 100 - Arch Desktop (via book5)
+ssh ubuntu                 # VM 101 - Ubuntu Server (via tower)
 
 # Raspberry Pi
-ssh jaded@192.168.2.131     # magic-pihole (Pi-hole, Twingate, MagicMirror)
+ssh pihole                 # magic-pihole - 192.168.2.131
 
-# Mac (from homelab - direct LAN access)
-ssh j@192.168.2.226                    # Mac direct (from book5, tower)
-ssh mac                                # Using alias (works from book5, tower, termux)
-
-# Windows PC - WSL Ubuntu (aliases: etintake, wsl, pc)
-ssh etintake                           # Port 2222, user joshua
-
-# Pi1 @ Elevated (via Windows PC port forward)
-ssh pi1                                # Port 2223, user pi (git backup mirror)
-
-# Pixelbook Go - CachyOS (via Twingate)
-ssh go                                 # CachyOS Hyprland, user jaded
-ssh pixelbook                          # Alias for go
+# Pi1 @ Elevated (via PC tunnel)
+ssh pi1                    # Git backup mirror (requires PC to be on)
 ```
 
 ---
@@ -59,55 +90,64 @@ ssh pixelbook                          # Alias for go
 └───────┬───────┘              └───────┬───────┘              └───────────────┘
         │                               │
         ▼                               ▼
-┌───────────────────┐          ┌─────────────────────────────────┐
-│ prox-book5        │          │ prox-tower (DUAL-NIC)           │
-│ 192.168.2.250     │          │ Management: 192.168.2.249 (1G)  │
-│ Proxmox Node 1    │          │ Primary:    192.168.1.249 (2.5G)│
-│ User: root        │          │ Proxmox Node 2 | User: root     │
-├───────────────────┤          ├─────────────────────────────────┤
-│ └─ VM 100         │          │ └─ VM 101 (on 1GbE vmbr0)       │
-│    192.168.2.161  │          │    192.168.2.126                │
-│    Omarchy        │          │    Ubuntu Server                │
-│    User: jaded    │          │    User: jaded                  │
-├───────────────────┤          └─────────────────────────────────┘
-│                   │
-│ ◄──REVERSE SSH────┤
-│    TUNNEL :2244   │
-│                   │
-└───────────────────┘
+┌───────────────────────────────┐    ┌─────────────────────────────────┐
+│ prox-book5 (TUNNEL HUB)       │    │ prox-tower (DUAL-NIC)           │
+│ 192.168.2.250                 │    │ Management: 192.168.2.249 (1G)  │
+│ Proxmox Node 1 | User: root   │    │ Primary:    192.168.1.249 (2.5G)│
+├───────────────────────────────┤    │ Proxmox Node 2 | User: root     │
+│ REVERSE TUNNELS LISTENING:    │    ├─────────────────────────────────┤
+│ :2244 ← Pixelbook Go          │    │ └─ VM 101 (on 1GbE vmbr0)       │
+│ :2245 ← Windows PC            │    │    192.168.2.126                │
+│ :2246 ← Mac                   │    │    Ubuntu Server                │
+│ :2247 ← Phone (Termux)        │    │    User: jaded                  │
+│ :2248 ← WSL Ubuntu            │    └─────────────────────────────────┘
+├───────────────────────────────┤
+│ └─ VM 100                     │
+│    192.168.2.161              │
+│    Omarchy | User: jaded      │
+└───────────────────────────────┘
         ▲
-        │ (Twingate Client)
+        │ (Outbound SSH with -R flag)
         │
-┌───────────────────┐
-│ Pixelbook Go      │
-│ 192.168.1.244     │
-│ CachyOS Hyprland  │
-│ User: jaded       │
-│ (separate network)│
-└───────────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│                      ROAMING DEVICES                                  │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐     │
+│  │ Mac         │ │ Go          │ │ Phone       │ │ PC          │     │
+│  │ :2246       │ │ :2244       │ │ :2247       │ │ :2245/:2248 │     │
+│  │ LaunchAgent │ │ systemd     │ │ Termux:Boot │ │ Sched Task  │     │
+│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘     │
+│  All use Twingate CLIENT to reach book5, then reverse-forward port   │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
-**Note:** Pixelbook Go uses Twingate CLIENT (not connector) to reach homelab.
-Mac reaches Go via reverse SSH tunnel through book5:2244, not direct Twingate.
+**How it works:** Each roaming device maintains a persistent outbound SSH connection to book5 with a reverse port forward (`-R port:localhost:22`). Other devices can then SSH to `localhost:port` on book5 (via ProxyJump) to reach any roaming device.
 
-**Note (Dec 13, 2025):** prox-tower now has dual NICs - Intel I218-LM (1GbE, management/Twingate) and Realtek RTL8125 (2.5GbE, VMs/primary). VM 101 now runs on 1GbE (vmbr0) - 2.5GbE used for direct inter-node link.
+**Why tunnels?** All devices roam between networks (home, work, mobile). Tunnels work from anywhere as long as book5 is reachable via Twingate.
 
 ---
 
 ## Device Reference Table
 
-| Device | IP | User | Access Method | Services |
-|--------|-----|------|---------------|----------|
-| **prox-book5** | 192.168.2.250 | root | Direct SSH | Proxmox Node 1, Twingate (systemd) |
-| **prox-tower** | 192.168.2.249 (mgmt) | root | Direct SSH | Proxmox Node 2, Twingate (systemd) |
-| **prox-tower** | 192.168.1.249 (2.5G) | root | Direct SSH | Primary network, VM bridge |
-| **VM 100 (Omarchy)** | 192.168.2.161 | jaded | ProxyJump via .250 | Arch Desktop |
-| **VM 101 (Ubuntu)** | **192.168.2.126** | jaded | ProxyJump via .249 | Docker, Ollama, Jellyfin (1GbE) |
-| **magic-pihole** | 192.168.2.131 | jaded | Direct SSH | Pi-hole, Twingate, MagicMirror |
-| **Mac (macAir)** | 192.168.2.226 | j | Direct (book5/tower), ProxyJump (termux) | Development |
-| **etintake (Win PC)** | 192.168.1.193:2222 | joshua | Direct/Twingate | WSL Ubuntu, Twingate connector |
-| **Pi1 (Elevated)** | 192.168.1.193:2223 | pi | Via PC port forward | Git backup mirror (Pi 1B+) |
-| **Pixelbook Go** | 192.168.1.244 | jaded | Twingate | CachyOS Hyprland, dev laptop |
+### Homelab (Static)
+
+| Device | IP | User | Access | Services |
+|--------|-----|------|--------|----------|
+| **prox-book5** | 192.168.2.250 | root | Direct | Proxmox Node 1, Tunnel Hub, Twingate |
+| **prox-tower** | 192.168.2.249 | root | Direct | Proxmox Node 2, Twingate |
+| **VM 100 (Omarchy)** | 192.168.2.161 | jaded | ProxyJump via book5 | Arch Desktop |
+| **VM 101 (Ubuntu)** | 192.168.2.126 | jaded | ProxyJump via tower | Docker, Ollama, Plex, Jellyfin, Frigate |
+| **magic-pihole** | 192.168.2.131 | jaded | Direct | Pi-hole, Twingate, MagicMirror |
+| **Pi1 (Elevated)** | 192.168.137.123 | pi | ProxyJump via pc | Git backup mirror (15 repos) |
+
+### Roaming Devices (Tunnel-Based)
+
+| Device | Tunnel Port | Local Access | User | Persistence |
+|--------|-------------|--------------|------|-------------|
+| **Mac** | 2246 | macair.local | j | LaunchAgent |
+| **Pixelbook Go** | 2244 | go.local | jaded | systemd |
+| **Phone (Termux)** | 2247 | 192.168.1.37:8022 | u0_a499 | Termux:Boot |
+| **Windows PC** | 2245 | 192.168.1.193:22 | joshu | Scheduled Task |
+| **WSL Ubuntu** | 2248 | 192.168.1.193:2222 | joshua | (via PC tunnel) |
 
 ---
 
@@ -348,53 +388,66 @@ ssh -G 192.168.2.126 | grep -i proxy
 
 ## Host Aliases (Short Names)
 
-With the SSH config above, you can use short names:
+### Roaming Devices (Tunnel = Primary)
 
 ```bash
-ssh prox-book5    # → root@192.168.2.250
-ssh prox-tower    # → root@192.168.2.249 (management)
-ssh tower-fast    # → root@192.168.1.249 (2.5GbE)
-ssh omarchy       # → jaded@192.168.2.161 (via ProxyJump)
-ssh vm100         # → jaded@192.168.2.161 (via ProxyJump)
-ssh ubuntu-server # → jaded@192.168.2.126 (via ProxyJump, 1GbE)
-ssh ubuntu        # → jaded@192.168.2.126 (via ProxyJump, 1GbE)
-ssh vm101         # → jaded@192.168.2.126 (via ProxyJump, 1GbE)
+# Pixelbook Go
+ssh go            # → tunnel via book5:2244 (works anywhere)
+ssh go-local      # → go.local (same network only)
+
+# Mac
+ssh mac           # → tunnel via book5:2246 (works anywhere)
+ssh mac-local     # → macair.local (same network only)
+
+# Phone (Termux)
+ssh phone         # → tunnel via book5:2247 (works anywhere)
+ssh phone-local   # → 192.168.1.37:8022 (same network only)
+
+# Windows PC
+ssh pc            # → tunnel via book5:2245 (works anywhere)
+ssh pc-local      # → 192.168.1.193:22 (same network only)
+
+# WSL Ubuntu
+ssh wsl           # → tunnel via book5:2248 (works anywhere)
+ssh wsl-local     # → 192.168.1.193:2222 (same network only)
+```
+
+### Homelab (Direct Access)
+
+```bash
+ssh book5         # → root@192.168.2.250
+ssh tower         # → root@192.168.2.249
+ssh omarchy       # → jaded@192.168.2.161 (via book5)
+ssh ubuntu        # → jaded@192.168.2.126 (via tower)
 ssh pihole        # → jaded@192.168.2.131
-ssh pi            # → jaded@192.168.2.131
-ssh mac           # → j@192.168.2.226
-ssh macair        # → j@192.168.2.226
-ssh etintake      # → joshua@192.168.1.193:2222
-ssh wsl           # → joshua@192.168.1.193:2222
-ssh pc            # → joshua@192.168.1.193:2222
-ssh pi1           # → pi@192.168.1.193:2223 (via PC forward)
-ssh rpi1          # → pi@192.168.1.193:2223 (via PC forward)
-ssh go            # → jaded@localhost:2244 (via reverse tunnel through book5)
-ssh pixelbook     # → jaded@localhost:2244 (alias for go)
-ssh go-local      # → jaded@go.local (direct mDNS, same network only)
+ssh pi1           # → pi@192.168.137.123 (via pc tunnel)
 ```
 
 ---
 
 ## Windows PC (etintake)
 
-**Completed January 7, 2026** | **Full docs**: [homelab/pc.md](homelab/pc.md)
+**Full docs**: [homelab/pc.md](homelab/pc.md)
 
 | Component | Details |
 |-----------|---------|
 | Hostname | etintake |
-| IP | 192.168.1.193 (DHCP) |
+| IP | 192.168.1.193 (when on same network) |
+| Tunnel Port | 2245 (PowerShell), 2248 (WSL) |
 | Users | joshu (PowerShell), joshua (WSL) |
 
 **SSH Access:**
 ```bash
-ssh pc              # PowerShell (port 22)
-ssh wsl             # WSL Ubuntu (port 2222)
-ssh pi1             # Pi1 via ProxyJump
+ssh pc              # Via tunnel (works anywhere)
+ssh pc-local        # Direct (same network only)
+ssh wsl             # Via tunnel (works anywhere)
+ssh wsl-local       # Direct (same network only)
+ssh pi1             # Pi1 via ProxyJump through pc
 ```
 
-**Architecture:** WSL Ubuntu with port forwarding, Twingate connector in Docker.
+**Tunnel Persistence:** Windows Scheduled Task `Start SSH Tunnel to Proxmox` with boot+logon triggers runs `C:\Users\joshu\bin\start-tunnel.ps1` (auto-reconnect loop).
 
-See [homelab/pc.md](homelab/pc.md) for full setup, auto-start config, and troubleshooting.
+See [homelab/pc.md](homelab/pc.md) for full setup details.
 
 ---
 
@@ -425,30 +478,73 @@ See [homelab/pi1.md](homelab/pi1.md) for git mirror details, sync commands, and 
 
 ## Pixelbook Go (CachyOS Hyprland)
 
-**Completed January 12-13, 2026** | **Full docs**: [homelab/go.md](homelab/go.md)
+**Full docs**: [homelab/go.md](homelab/go.md)
 
 | Component | Details |
 |-----------|---------|
 | Hostname | go |
 | Hardware | Google Pixelbook Go (Intel Core m3, 8GB RAM) |
 | OS | CachyOS Linux (Arch-based), Hyprland DE |
-| IP | 192.168.1.244 (local network) |
+| Tunnel Port | 2244 |
 | User | jaded |
 
 **SSH Access:**
 ```bash
-ssh go                # Via reverse tunnel through book5 (works anywhere)
+ssh go                # Via tunnel (works anywhere)
 ssh go-local          # Direct mDNS (same network only)
 ```
 
-**Architecture:** Go uses Twingate **Client** to reach homelab, with a reverse SSH tunnel through book5:2244 for incoming connections (avoids client/connector routing conflicts).
+**Tunnel Persistence:** systemd service maintains tunnel with auto-reconnect. Twingate headless mode (service account) for non-interactive auth.
 
 **Key Features:**
-- zsh + oh-my-zsh + powerlevel10k (Arch-adapted config)
-- Stays awake on AC with lid closed (tunnel remains active)
+- zsh + oh-my-zsh + powerlevel10k
+- Stays awake on AC with lid closed
 - WiFi power save auto-toggles based on AC state
 
-See [homelab/go.md](homelab/go.md) for full setup details, troubleshooting, and configuration files.
+See [homelab/go.md](homelab/go.md) for full setup details.
+
+---
+
+## Phone (Samsung S25 Ultra - Termux)
+
+| Component | Details |
+|-----------|---------|
+| Device | Samsung S25 Ultra |
+| App | Termux (F-Droid) |
+| Tunnel Port | 2247 |
+| User | u0_a499 |
+
+**SSH Access:**
+```bash
+ssh phone             # Via tunnel (works anywhere)
+ssh phone-local       # Direct 192.168.1.37:8022 (same network only)
+```
+
+**Tunnel Persistence:** Termux:Boot runs `~/.termux/boot/start-services` on device boot, which starts sshd and `~/bin/start-tunnel.sh` (auto-reconnect loop).
+
+**Key Features:**
+- zsh + oh-my-zsh + powerlevel10k
+- termux-wake-lock prevents sleep while tunnel runs
+
+---
+
+## Mac (macAir)
+
+| Component | Details |
+|-----------|---------|
+| Hostname | macair |
+| Tunnel Port | 2246 |
+| User | j |
+
+**SSH Access (from other devices):**
+```bash
+ssh mac               # Via tunnel (works anywhere)
+ssh mac-local         # Direct mDNS macair.local (same network only)
+```
+
+**Tunnel Persistence:** LaunchAgent `com.user.mac-reverse-tunnel.plist` with KeepAlive maintains tunnel.
+
+**Note:** Mac is the primary development machine. Other devices use tunnels to reach it.
 
 ---
 

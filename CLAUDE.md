@@ -125,31 +125,25 @@ All projects have hourly automated backups to GitHub.
 
 | Resource | Access |
 |----------|--------|
-| SSH (prox-book5) | `ssh root@192.168.2.250` |
-| SSH (prox-tower) | `ssh root@192.168.2.249` |
-| SSH (VM 101) | `ssh jaded@192.168.2.126` |
-| SSH (PC/PowerShell) | `ssh pc-tunnel` (reverse tunnel via book5:2245) |
-| SSH (PC/WSL) | `ssh wsl` (port 2222, direct - same network only) |
-| SSH (Pi1 @ Elevated) | `ssh pi1` (ProxyJump via pc-tunnel) |
-| SSH (Pixelbook Go) | `ssh go` (reverse tunnel via book5:2244) |
+| SSH (prox-book5) | `ssh book5` |
+| SSH (prox-tower) | `ssh tower` |
+| SSH (VM 101) | `ssh ubuntu` |
+| SSH (Pixelbook Go) | `ssh go` / `ssh go-local` |
+| SSH (Windows PC) | `ssh pc` / `ssh pc-local` |
+| SSH (WSL Ubuntu) | `ssh wsl` / `ssh wsl-local` |
+| SSH (Phone/Termux) | `ssh phone` / `ssh phone-local` |
+| SSH (Mac) | `ssh mac` / `ssh mac-local` |
+| SSH (Pi1 @ Elevated) | `ssh pi1` (via pc) |
 | Samba | `smb://192.168.2.250/Shared` |
 | Twingate | jaded423 network |
 
+**Unified SSH pattern:** `ssh device` = tunnel (works anywhere), `ssh device-local` = direct (same network only). All tunnels go through book5.
+
 **Services on VM 101**: Plex (32400), Jellyfin (8096), Ollama (11434), Frigate (5000), qBittorrent (8080)
 
-**Pixelbook Go**: CachyOS Hyprland laptop (192.168.1.185)
-- Uses reverse SSH tunnel through book5:2244 (Twingate client/connector conflict)
-- zsh + Oh My Zsh + Powerlevel10k, kitty terminal, Hyprland DE
+**Roaming Devices** (Mac, Go, Phone, PC): All maintain reverse SSH tunnels to book5 for cross-device access from any network. Persistence via LaunchAgent (Mac), systemd (Go), Termux:Boot (Phone), Scheduled Task (PC).
 
-**Windows PC**: Desktop at Elevated Trading office
-- Uses reverse SSH tunnel through book5:2245 (same pattern as Go - Twingate client blocks inbound)
-- Scheduled Task "SSH Tunnel to book5" maintains persistent tunnel
-- Direct SSH (`ssh pc`) only works on same network without Twingate client running
-
-**Pi1 @ Elevated**: Git backup mirror (15 repos, 4-hourly sync) - requires PC to be on for internet
-- Now configured with zsh + Oh My Zsh + Powerlevel10k (mirrors Mac terminal)
-- Has doom-ascii installed (`doom` alias) - because it can run DOOM
-- Currently offline (ICS subnet unreachable)
+**Pi1 @ Elevated**: Git backup mirror (15 repos, 4-hourly sync) - requires PC to be on
 
 ---
 

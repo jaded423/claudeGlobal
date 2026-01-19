@@ -8,6 +8,11 @@ This file contains the complete version history of the global Claude Code config
 
                                                                                                                                                                                                                                       ```changelog
                                                                                                                                        ```changelog
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ```changelog
+## 2026-01-19 - Updated Homelab and Roaming Device Access Patterns
+
+Reorganized access methods for homelab devices and introduced tunnel-based shortcuts for roaming devices. Updated documentation to reflect new SSH aliases and tunnel port assignments for improved remote access.
+
 ## 2026-01-19 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp in known_marketplaces.json to reflect the most recent update time for the claude-plugins-official marketplace.
@@ -1557,3 +1562,82 @@ Large context files (1000+ lines) increase hallucination risk and make it harder
 - New Plex library paths: `/media/tower/Movies/`, `/media/tower/Serials/`
 - User still needs to update Plex library paths in web UI
 
+
+## 2026-01-19 - Unified SSH Access for All Roaming Devices
+
+**What changed:**
+- Standardized SSH access pattern for all roaming devices (Mac, Phone, Go, PC)
+- Pattern: `ssh device` = tunnel via book5, `ssh device-local` = direct/mDNS
+- All devices now maintain persistent reverse tunnels to book5
+
+**Tunnel Ports on book5:**
+| Port | Device | User |
+|------|--------|------|
+| 2244 | Go | jaded |
+| 2245 | PC (PowerShell) | joshu |
+| 2246 | Mac | j |
+| 2247 | Phone (Termux) | u0_a499 |
+| 2248 | WSL | joshua |
+
+**Mac Setup:**
+- Created LaunchAgent: `~/Library/LaunchAgents/com.user.mac-reverse-tunnel.plist`
+- Tunnel: `-R 2246:localhost:22 book5`
+- Added `mac-local` entry (macair.local mDNS)
+
+**Phone Setup:**
+- Created tunnel script: `~/bin/start-tunnel.sh` (loops forever with 10s reconnect)
+- Created Termux:Boot script: `~/.termux/boot/start-services`
+- Auto-starts: wake-lock, sshd, tunnel
+- Updated SSH config with mac, mac-local, go, go-local entries
+- Fixed IP to 192.168.1.37 (was 192.168.1.96)
+
+**Go Setup:**
+- Configured Twingate headless mode with service account (no interactive login needed)
+- Service key: `/etc/twingate/service_key.json`
+- Added port 2222 to sshd (`/etc/ssh/sshd_config`) for Twingate resource compatibility
+- Added UFW rule: allow port 2222 from 172.17.0.0/16 (Docker)
+- Updated SSH config with mac, mac-local, phone, phone-local entries
+- SSH tunnel service already existed (port 2244)
+
+**PC Setup:**
+- Created persistent tunnel script: `C:\Users\joshu\bin\start-tunnel.ps1` (loops forever)
+- Now forwards both ports: 2245 (PowerShell) and 2248 (WSL)
+- Updated Scheduled Task "SSH Tunnel to book5":
+  - Runs PowerShell script instead of direct ssh
+  - Triggers: At Startup AND At Logon
+  - No execution time limit
+- Made SSH config consistent: `pc` = tunnel, `pc-local` = direct
+- Added `wsl` (tunnel port 2248) and `wsl-local` entries
+
+**Key Distribution:**
+- Added Go's public key to Phone's authorized_keys
+- Added Phone's public key to Go's authorized_keys
+
+**SSH Config Changes (Mac ~/.ssh/config):**
+- `pc` now uses tunnel (was direct)
+- Added `pc-local` for direct access
+- `wsl` now uses tunnel port 2248
+- Added `wsl-local` for direct WSL access
+- Removed old `pc-tunnel` entry (merged into `pc`)
+- Added `mac-local` entry
+
+**Files modified:**
+- Mac: `~/.ssh/config`, `~/Library/LaunchAgents/com.user.mac-reverse-tunnel.plist`
+- Go: `~/.ssh/config`, `/etc/ssh/sshd_config`, `/etc/twingate/service_key.json`
+- Phone: `~/.ssh/config`, `~/bin/start-tunnel.sh`, `~/.termux/boot/start-services`
+- PC: `C:\Users\joshu\bin\start-tunnel.ps1`, Scheduled Task updated
+
+**Connection Matrix (all working):**
+| From/To | Mac | Go | Phone | PC |
+|---------|-----|----|----|-----|
+| Mac | - | ✅ go/go-local | ✅ phone/phone-local | ✅ pc/pc-local |
+| Go | ✅ mac/mac-local | - | ✅ phone/phone-local | ✅ pc |
+| Phone | ✅ mac (no mDNS) | ✅ go (no mDNS) | - | ✅ pc |
+
+**Why:**
+- Roaming devices (Mac, Phone, Go) move between networks (home 192.168.1.x, home 192.168.2.x, work)
+- Direct IPs don't work across networks
+- Twingate resources don't work well for roaming devices (IP changes)
+- Reverse tunnels through book5 work from anywhere with Twingate access
+
+---

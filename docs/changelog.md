@@ -6,6 +6,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                                                                                                      ```changelog
+## 2026-01-18 - Stats and marketplace update
+
+Updated stats cache with new daily activity and revised token usage metrics for yesterday. Also updated the last updated timestamp for the claude-plugins-official marketplace.
+
 ## 2026-01-18 - Windows PC Reverse Tunnel Setup
 
 Updated documentation to reflect the new reverse SSH tunnel setup for the Windows PC, including scheduled task configuration and access methods. Also updated SSH access cheatsheet and clarified current state vs implementation details in documentation.

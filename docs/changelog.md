@@ -9,6 +9,11 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                                                                                                                       ```changelog
                                                                                                                                        ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ```changelog
+                                                                                                                                                                                                                                                            ```changelog
+## 2026-01-19 - Stats and marketplace updates
+
+Updated statistics cache with new daily activity and model usage data for January 19, 2026. Also updated the last updated timestamp for the claude-plugins-official marketplace.
+
 ## 2026-01-19 - Updated Homelab and Roaming Device Access Patterns
 
 Reorganized access methods for homelab devices and introduced tunnel-based shortcuts for roaming devices. Updated documentation to reflect new SSH aliases and tunnel port assignments for improved remote access.

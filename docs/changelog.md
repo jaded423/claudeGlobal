@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                       ```changelog
+## 2026-01-20 - Updated marketplace timestamp
+
+Updated the lastUpdated timestamp for the claude-plugins-official marketplace to reflect the latest update time.
+
 ## 2026-01-20 - Fixed RustDesk Direct Connection to PC
 
 **What changed:**

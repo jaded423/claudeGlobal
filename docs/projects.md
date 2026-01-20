@@ -120,18 +120,19 @@ Detailed descriptions of all active projects in your workspace.
 ## coa
 **Type**: Python data extraction
 **Status**: Active
-**Location**: `~/projects/coa`
+**Location**: `~/projects/coa` (Mac), `/home/joshua/projects/coa` (WSL)
 **Purpose**: Extract cannabinoid percentages from COA PDFs
-**Last Updated**: 2026-01-19
-**Recent Changes**: Initial creation with category-based extraction (Flower, Pre Rolls, Concentrates)
+**Last Updated**: 2026-01-20
+**Recent Changes**: Added support for 3 additional lab formats (New Bloom Labs, Accurate Test Labs, Cannabis Chem Lab variants), deployed to WSL with automatic execution before inventory_sync
 
 **Features**:
 - Scans COA PDF files from Google Drive shared folder
-- Extracts Delta-9-THC%, Total THC%, THCA% from 5 lab formats
+- Extracts Delta-9-THC%, Total THC%, THCA% from 8 lab formats
 - Writes to category-specific Google Sheets tabs
-- Integrates with inventory_sync.py to populate Label Ready THCA% column
+- Integrates with inventory_sync.py to populate Label Ready and Current Inventory THCA%
+- Deployed on WSL for automated execution (via H: drive mount)
 
-**Relationship**: Works in tandem with `odooReports/inventory` - extracts COA data that inventory_sync.py applies to Label Ready
+**Relationship**: Works in tandem with `odooReports/inventory` - extracts COA data that inventory_sync.py applies to Label Ready and Current Inventory tabs
 
 **Documentation**: See `~/projects/coa/CLAUDE.md`
 
@@ -160,7 +161,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-20
-**Recent Changes:** Updated the timestamp in the photos sync state file to reflect the latest run time.
+**Recent Changes:** Updated the timestamp in photos_sync_state.json to reflect the latest run time of the photo synchronization script.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

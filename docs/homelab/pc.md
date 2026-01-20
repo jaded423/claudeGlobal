@@ -149,7 +149,7 @@ Stop-ScheduledTask -TaskName "SSH Tunnel to book5"
 |---------|----------|---------|
 | Twingate Client | Windows | Outbound homelab access (jaded423 network) |
 | Reverse SSH Tunnel | Scheduled Task | Inbound access via book5:2245 |
-| RustDesk | Windows | Remote desktop access |
+| RustDesk | Windows Service | Remote desktop (direct mode requires service running) |
 | ICS (Internet Connection Sharing) | Ethernet adapter | Internet for Pi1 |
 | Port Forward :2223 | netsh portproxy | SSH to Pi1 |
 
@@ -180,6 +180,21 @@ netsh interface portproxy add v4tov4 listenport=2223 listenaddress=0.0.0.0 conne
 ---
 
 ## Troubleshooting
+
+### RustDesk laggy/grainy
+
+RustDesk service must be running for direct LAN connections. If stopped, it falls back to Azure relay (high latency).
+
+```powershell
+# Check service status
+Get-Service RustDesk
+
+# Start service
+Start-Service RustDesk
+```
+
+Direct connection: Mac → PC:53037 (TCP) + UDP:21119
+Relay connection: Mac → Azure:21117 → PC (adds ~30ms latency)
 
 ### SSH fails after reboot
 

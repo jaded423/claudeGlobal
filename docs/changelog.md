@@ -4,14 +4,38 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-20 - Fixed RustDesk Direct Connection to PC
+
+**What changed:**
+- Fixed RustDesk connecting through Azure relay instead of direct P2P
+- Started RustDesk Windows service on PC (was stopped)
+- Added Windows Firewall rules for RustDesk TCP 21116 and UDP 21119
+- Updated Mac RustDesk peer config with `direct-server = '192.168.1.193'`
+
+**Why:**
+- User reported laggy/grainy RustDesk session
+- Diagnosed: RustDesk was routing through Microsoft Azure relay (40.160.225.24:21117) instead of direct LAN connection
+- Root cause: RustDesk service was stopped on PC, forcing relay mode
+
+**Diagnosis steps:**
+- Checked Mac resource usage (CPU/memory OK, WindowServer at 55%)
+- Found RustDesk TCP connection going to Azure relay, not local PC
+- Discovered Mac and PC on same subnet (192.168.1.x) - direct should work
+- Found UDP 21119 reachable but RustDesk service stopped on PC
+
+**Files modified:**
+- Mac: `/Users/j/Library/Preferences/com.carriez.RustDesk/peers/39604235.toml` - Added `direct-server = '192.168.1.193'`, reset `direct_failures = 0`
+- PC: Windows Firewall - Added "RustDesk TCP Direct" and "RustDesk UDP Direct" rules
+
+**Result:**
+- Direct TCP connection established: Mac:61836 → PC:53037
+- Latency reduced from ~40ms (relay) to ~5ms (direct)
+- Video quality improved (no relay compression)
+
+**Note:** If RustDesk gets laggy again, check `Get-Service RustDesk` on PC - if stopped, run `Start-Service RustDesk`.
+
 ---
 
-                                                                                                                                                                                                                                      ```changelog
-                                                                                                                                       ```changelog
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ```changelog
-                                                                                                                                                                                                                                                            ```changelog
-                                                                                                                                       ```changelog
-                                                                                                                                         ```changelog
 ## 2026-01-20 - Pi1 Headless Configuration Fix
 
 **What changed:**

@@ -58,9 +58,8 @@ Pi → Windows ICS NAT (192.168.137.1) → PC WiFi → Internet
 
 ```ssh-config
 Host pi1 rpi1
-  HostName 192.168.1.193
+  HostName 192.168.137.123
   User pi
-  Port 2223
   ProxyJump pc
   IdentityFile ~/.ssh/id_ed25519
 ```
@@ -68,6 +67,22 @@ Host pi1 rpi1
 ### On Pi (`~/.ssh/authorized_keys`)
 
 Contains Mac's public key for passwordless access.
+
+---
+
+## Headless Configuration
+
+Pi1 runs fully headless with:
+
+| Feature | Method |
+|---------|--------|
+| Auto-login | systemd getty override (`/etc/systemd/system/getty@tty1.service.d/autologin.conf`) |
+| Static IP | NetworkManager with `autoconnect yes` |
+| Boot time | ~2 minutes to SSH-ready |
+
+**Remote reboot:** `ssh pi1 "sudo reboot"`
+
+**Note:** USB power control via PC is not possible (Windows disabling USB hub doesn't cut 5V power rail).
 
 ---
 
@@ -169,6 +184,13 @@ ssh pi1 "ping -c 3 github.com"
 ---
 
 ## Troubleshooting
+
+### Pi not responding after reboot
+
+1. Wait ~2 minutes for full boot
+2. Check Ethernet link from PC: `Get-NetAdapter -Name 'Ethernet 2'`
+3. If link up but no ping: NetworkManager may have lost config
+4. Fix: Connect monitor, run `sudo ip addr add 192.168.137.123/24 dev eth0`
 
 ### No internet / sync failing
 

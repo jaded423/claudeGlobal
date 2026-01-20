@@ -12,6 +12,37 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                                                                                                                                             ```changelog
                                                                                                                                        ```changelog
                                                                                                                                          ```changelog
+## 2026-01-20 - Pi1 Headless Configuration Fix
+
+**What changed:**
+- Fixed Pi1 not responding to SSH after reboot
+- Configured auto-login via systemd getty override
+- Fixed NetworkManager static IP with `autoconnect yes`
+- Fixed Mac SSH config (changed `pc-tunnel` to `pc` - pc-tunnel didn't exist)
+- Investigated USB power control (not viable - Windows can't cut 5V rail)
+
+**Why:**
+- Pi1 was stuck at login prompt after reboot (headless issue)
+- Static IP wasn't persisting because NetworkManager had `autoconnect: no`
+- Duplicate NetworkManager connections were causing confusion
+
+**Files modified:**
+- `~/.ssh/config` - Changed pi1 ProxyJump from `pc-tunnel` to `pc`
+- `~/.claude/docs/homelab/pi1.md` - Added headless config section, updated SSH config example, added troubleshooting
+
+**On Pi1:**
+- `/etc/systemd/system/getty@tty1.service.d/autologin.conf` - Auto-login for pi user
+- NetworkManager eth0 connection - `autoconnect yes`, static IP 192.168.137.123/24
+- Deleted duplicate eth0 NetworkManager connection
+
+**Technical notes:**
+- Password reset done via `init=/bin/sh` in `/boot/firmware/cmdline.txt`
+- Raspberry Pi OS Bookworm uses NetworkManager (not dhcpcd)
+- Boot to SSH-ready takes ~2 minutes on Pi1 Model B+
+- USB power control tested: `Disable-PnpDevice` on Windows disables communication but doesn't cut 5V power
+
+---
+
 ## 2026-01-20 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp for the claude-plugins-official marketplace to reflect the current update time.

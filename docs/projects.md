@@ -90,8 +90,8 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active business automation
 **Location**: `~/projects/odooReports` (Mac source), `/home/joshua/projects/odooReports/` (WSL execution)
 **Purpose**: Automated reporting for Elevated Trading
-**Last Updated**: 2026-01-16
-**Recent Changes**: Deployed PC health monitoring (n8n heartbeats + IFTTT power cycling) - PC now auto-recovers from failures. Twingate headless mode installed.
+**Last Updated**: 2026-01-19
+**Recent Changes**: Added category-based COA THCA% integration - reads from separate tabs (Flower/Pre Rolls/Concentrates) to avoid cross-contamination.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
@@ -116,6 +116,24 @@ Detailed descriptions of all active projects in your workspace.
 - Odoo credentials in `odoo_credentials.json` (gitignored)
 
 **Documentation**: See `~/projects/odooReports/CLAUDE.md`
+
+## coa
+**Type**: Python data extraction
+**Status**: Active
+**Location**: `~/projects/coa`
+**Purpose**: Extract cannabinoid percentages from COA PDFs
+**Last Updated**: 2026-01-19
+**Recent Changes**: Initial creation with category-based extraction (Flower, Pre Rolls, Concentrates)
+
+**Features**:
+- Scans COA PDF files from Google Drive shared folder
+- Extracts Delta-9-THC%, Total THC%, THCA% from 5 lab formats
+- Writes to category-specific Google Sheets tabs
+- Integrates with inventory_sync.py to populate Label Ready THCA% column
+
+**Relationship**: Works in tandem with `odooReports/inventory` - extracts COA data that inventory_sync.py applies to Label Ready
+
+**Documentation**: See `~/projects/coa/CLAUDE.md`
 
 ## odooModules
 **Type**: Odoo 17 module development

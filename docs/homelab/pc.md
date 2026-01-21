@@ -183,7 +183,7 @@ netsh interface portproxy add v4tov4 listenport=2223 listenaddress=0.0.0.0 conne
 
 ### RustDesk laggy/grainy
 
-RustDesk service must be running for direct LAN connections. If stopped, it falls back to Azure relay (high latency).
+RustDesk service must be running AND firewall must allow TCP 53037 for direct LAN connections. If either is misconfigured, it falls back to Azure relay (high latency, grainy video).
 
 ```powershell
 # Check service status
@@ -191,10 +191,22 @@ Get-Service RustDesk
 
 # Start service
 Start-Service RustDesk
+
+# Verify firewall rule for direct connections exists
+Get-NetFirewallRule -DisplayName '*RustDesk*53037*'
+
+# If missing, create it:
+New-NetFirewallRule -DisplayName 'RustDesk Direct TCP 53037' -Direction Inbound -Protocol TCP -LocalPort 53037 -Action Allow -Profile Any
+```
+
+**Verify from Mac** (during active session):
+```bash
+netstat -an | grep 192.168.1.193  # Should show direct connection
+netstat -an | grep 21117          # If this shows instead, you're relayed
 ```
 
 Direct connection: Mac → PC:53037 (TCP) + UDP:21119
-Relay connection: Mac → Azure:21117 → PC (adds ~30ms latency)
+Relay connection: Mac → Azure:21117 → PC (adds ~30ms latency, grainy)
 
 ### SSH fails after reboot
 

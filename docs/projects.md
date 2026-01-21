@@ -90,8 +90,8 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active business automation
 **Location**: `~/projects/odooReports` (Mac source), `/home/joshua/projects/odooReports/` (WSL execution)
 **Purpose**: Automated reporting for Elevated Trading
-**Last Updated**: 2026-01-20
-**Recent Changes**: Added Strategic Co-Pack Pricing report - 2025 line items by strategic customer to Google Sheets with batch API optimization.
+**Last Updated**: 2026-01-21
+**Recent Changes**: Added Justin's Co-Pack Pricing report - filters by sales rep (user_id=6) and Co-Packing product category; 114 customers, 1,380 line items to Google Sheets.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
@@ -102,7 +102,9 @@ Detailed descriptions of all active projects in your workspace.
   - Joe's: All Joe Gibson customers (65 paying, 20 sample) → joshua, joe
 - **Manufacturing Report**: Weekly production with profit analysis (Excel) - Mondays 6 AM
 - **Buying Patterns Report**: Pounds vs partials analysis (Excel) - manual run only
-- **Strategic Co-Pack Pricing**: 2025 co-pack line items by strategic customer (Google Sheets) - manual run
+- **Co-Pack Pricing Reports** (Google Sheets, manual run):
+  - **Strategic**: team_id=5 customers, UoM filtering (40 customers, 208 line items)
+  - **Justin's**: user_id=6 (Justin Sandone) customers, Co-Packing category (114 customers, 1,380 line items)
 
 **Key Features**:
 - Gmail OAuth integration for email delivery
@@ -162,7 +164,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-21
-**Recent Changes:** Added new cannabis strain media files including 4 PNG images and 4 MOV videos, plus updated Rosin documentation with a new 5.6MB JPEG file.
+**Recent Changes:** Updated photos sync state with new timestamp and added 5 new photo entries while removing 10 video entries from the sync state.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

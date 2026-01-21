@@ -91,7 +91,7 @@ Detailed descriptions of all active projects in your workspace.
 **Location**: `~/projects/odooReports` (Mac source), `/home/joshua/projects/odooReports/` (WSL execution)
 **Purpose**: Automated reporting for Elevated Trading
 **Last Updated**: 2026-01-21
-**Recent Changes**: Added Justin's Co-Pack Pricing report - filters by sales rep (user_id=6) and Co-Packing product category; 114 customers, 1,380 line items to Google Sheets.
+**Recent Changes**: Inventory sync Label Ready sheet now uses two-column layout (Flower+Concentrates left, Pre-Rolls right); run.sh shows live output via tee.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
@@ -164,7 +164,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-21
-**Recent Changes:** Updated the crawler's last run timestamp in photos_sync_state.json to reflect the latest execution time.
+**Recent Changes:** Updated the last_run timestamp in the photos sync state file to reflect the latest crawler execution.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

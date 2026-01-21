@@ -90,8 +90,8 @@ Detailed descriptions of all active projects in your workspace.
 **Status**: Active business automation
 **Location**: `~/projects/odooReports` (Mac source), `/home/joshua/projects/odooReports/` (WSL execution)
 **Purpose**: Automated reporting for Elevated Trading
-**Last Updated**: 2026-01-19
-**Recent Changes**: Added category-based COA THCA% integration - reads from separate tabs (Flower/Pre Rolls/Concentrates) to avoid cross-contamination.
+**Last Updated**: 2026-01-20
+**Recent Changes**: Added Strategic Co-Pack Pricing report - 2025 line items by strategic customer to Google Sheets with batch API optimization.
 
 **Reports**:
 - **AR/AP Report**: Accounts Receivable/Payable aging (PDF + Excel) - daily 9 AM weekdays
@@ -102,6 +102,7 @@ Detailed descriptions of all active projects in your workspace.
   - Joe's: All Joe Gibson customers (65 paying, 20 sample) → joshua, joe
 - **Manufacturing Report**: Weekly production with profit analysis (Excel) - Mondays 6 AM
 - **Buying Patterns Report**: Pounds vs partials analysis (Excel) - manual run only
+- **Strategic Co-Pack Pricing**: 2025 co-pack line items by strategic customer (Google Sheets) - manual run
 
 **Key Features**:
 - Gmail OAuth integration for email delivery

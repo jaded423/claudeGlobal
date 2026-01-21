@@ -5,6 +5,11 @@ This file contains the complete version history of the global Claude Code config
 ---
 
                                                                                                                                        ```changelog
+                                                                                                                                                                                                                                                                                                                                                  ```changelog
+## 2026-01-21 - Plugin and CLI Enhancements
+
+Added history-based autocomplete and search to installed plugins list, plus support for pinning plugins to specific git commits. Fixed several regressions and memory issues in bash mode and marketplace navigation.
+
 ## 2026-01-20 - Updated marketplace timestamp
 
 Updated the lastUpdated timestamp for the claude-plugins-official marketplace to reflect the latest update time.

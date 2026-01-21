@@ -196,3 +196,6 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2026-01-20T16:04:35-06:00,scripts,118,602,226,1.9,qwen-gon-jinn-hybrid
 2026-01-20T17:05:13-06:00,odooReports,299,499,219,.7,qwen-gon-jinn-hybrid
 2026-01-20T17:08:07-06:00,scripts,169,602,204,1.2,qwen-gon-jinn-hybrid
+2026-01-21T10:04:57-06:00,.claude,286,1684,570,2.0,qwen-gon-jinn-hybrid
+2026-01-21T10:06:03-06:00,odooReports,62,1663,397,6.7,qwen-gon-jinn-hybrid
+2026-01-21T10:07:42-06:00,scripts,93,2835,856,9.5,qwen-gon-jinn-hybrid

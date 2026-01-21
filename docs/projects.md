@@ -161,8 +161,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooModules/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2026-01-20
-**Recent Changes:** Updated the photos synchronization state file with a new timestamp to indicate the latest run time.
+**Last Updated:** 2026-01-21
+**Recent Changes:** Added new cannabis strain media files including 4 PNG images and 4 MOV videos, plus updated Rosin documentation with a new 5.6MB JPEG file.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

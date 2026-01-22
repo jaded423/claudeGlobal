@@ -8,6 +8,7 @@ todos/
 projects/
 history.jsonl  # Now in dedicated claudeHistory repo
 statsig/
+plugins/  # Machine-specific runtime state (marketplace timestamps, caches, installs)
 
 # Local settings overrides
 settings.local.json

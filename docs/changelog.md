@@ -8,6 +8,11 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                                                                                                                                                                                                                                   ```changelog
                                                                                                                                                                                                        ```changelog
                                                                                                                                           ```changelog
+                                                                                                                                                                                                                                                                                                                                                                                                                            ```changelog
+## 2026-01-22 - Plugin State and Cache Cleanup
+
+Removed cached plugin data, install counts, and marketplace metadata files. Updated `.gitignore` to exclude the `plugins/` directory from version control.
+
 ## 2026-01-22 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp for the claude-plugins-official marketplace to reflect the most recent update time.

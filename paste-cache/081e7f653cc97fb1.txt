@@ -1,0 +1,14 @@
+~/docker/gitea                                         jaded@ubuntu-serv 15:55:11
+> docker compose up -d
+[+] up 6/7
+[+] up 9/9itea/gitea:latest [⣿⣿⣿⣿⣿⣿] 71.68MB / 71.68MB Pulling               4.3s
+ ✔ Image gitea/gitea:latest Pulled                                           4.3s
+   ✔ 1e28ddfd071d           Pull complete                                    2.0s
+   ✔ 7745b4b4dde0           Pull complete                                    2.8s
+   ✔ f058bbedd5e2           Pull complete                                    0.6s
+   ✔ 00c791ec6dc7           Pull complete                                    0.4s
+   ✔ 3f0e581333b9           Pull complete                                    0.3s
+   ✔ 56dd84257573           Download complete                                0.0s
+ ✔ Network gitea_default    Created                                          0.1s
+ ✘ Container gitea          Error response from daemon: invalid volume specification: '/home/jaded/docker/gitea/data:data:rw': invalid mount config for type "bind": invalid mount path: 'data' mount path must be absolute 2.5s
+Error response from daemon: invalid volume specification: '/home/jaded/docker/gitea/data:data:rw': invalid mount config for type "bind": invalid mount path: 'data' mount path must be absolute

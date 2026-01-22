@@ -10,6 +10,11 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                           ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                             ```changelog
                                                                                                                                                                                                                                                                                                                                                   ```changelog
+                                                                                                                                                                                                                               ```changelog
+## 2026-01-22 - VSCode Plugin and Session Management Updates
+
+Updated changelog with new task management system, VSCode plugin support, and fixes for session resumption and context warnings. Also added support for processors without AVX instructions.
+
 ## 2026-01-22 - Updated marketplace timestamp and added paste cache
 
 Updated the lastUpdated timestamp in known_marketplaces.json to reflect the latest plugin marketplace update. Added a new paste-cache file containing output from the lpass2pass.sh script, likely related to password management or credential import.

@@ -164,7 +164,7 @@ Detailed descriptions of all active projects in your workspace.
 
 ## scripts
 **Last Updated:** 2026-01-21
-**Recent Changes:** Updated photo sync to use `rclone sync` instead of `rclone copy` for both photos and videos, ensuring more accurate synchronization. The sync state file was also updated to reflect the new last run time.
+**Recent Changes:** Updated crawler scripts to use `rclone sync` for true mirror behavior and added missing cron automation for Google Photos synchronization.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

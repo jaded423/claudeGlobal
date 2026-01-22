@@ -1,0 +1,32 @@
+╰─❯ echo $PATH | tr ':' '\n' | cat -n                      ─╯
+     1    /Users/j/.local/bin
+     2    /Users/j/scripts/bin
+     3    /opt/homebrew/opt/postgresql@18/bin
+     4    /Users/j/.rbenv/shims
+     5    /Users/j/.rbenv/bin
+     6    /usr/local/bin
+     7    /opt/homebrew/bin
+     8    /Library/Frameworks/Python.framework/Versions/3.14/bin
+     9    /opt/homebrew/sbin
+    10    /Library/Frameworks/Python.framework/Versions/3.13/bin
+    11    /System/Cryptexes/App/usr/bin
+    12    /usr/bin
+    13    /bin
+    14    /usr/sbin
+    15    /sbin
+    16    /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin
+    17    /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin
+    18    /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
+    19    /opt/pmk/env/global/bin
+    20    /Library/Apple/usr/bin
+    21    /Applications/VMware Fusion.app/Contents/Public
+    22    /Applications/iTerm.app/Contents/Resources/utilities
+    23    /Users/j/go/bin
+╭─ ~                                              23:22:49 ─╮
+╰─❯ echo $PATH | tr ':' '\n'                               ─╯
+/Users/j/.local/bin
+/Users/j/scripts/bin
+/opt/homebrew/opt/postgresql@18/bin
+/Users/j/.rbenv/shims
+/Users/j/.rbenv/bin
+/usr/local/bin

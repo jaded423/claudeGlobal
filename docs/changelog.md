@@ -7,6 +7,11 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                                                                                                                                                                                                                                                                    ```changelog
                                                                                                                                                                                                                                                                      ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ```changelog
+                                                                                                                                          ```changelog
+## 2026-01-23 - Updated marketplace last updated timestamp
+
+Updated the lastUpdated timestamp for the claude-plugins-official marketplace from 2026-01-23T16:48:59.048Z to 2026-01-23T17:39:32.971Z in known_marketplaces.json.
+
 ## 2026-01-23 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp for the claude-plugins-official marketplace to reflect the latest update time.

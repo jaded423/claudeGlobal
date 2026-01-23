@@ -5,6 +5,11 @@ This file contains the complete version history of the global Claude Code config
 ---
 
                                                                                                                                                                                                                                                                                                                                                                    ```changelog
+                                                                                                                                                                                                                                                                     ```changelog
+## 2026-01-23 - Stats and marketplace update
+
+Updated stats cache with new daily activity and model usage data for January 22, 2026. Also updated the last updated timestamp for the claude-plugins-official marketplace.
+
 ## 2026-01-22 - Telemetry Data Cleanup
 
 Removed two telemetry files containing failed event data related to the tengu_native_auto_updater_start event. These files tracked CLI sessions that experienced issues during auto-updater startup.

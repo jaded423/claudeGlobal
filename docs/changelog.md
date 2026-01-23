@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                                                                                                                                                                                                                                   ```changelog
+## 2026-01-22 - Telemetry Data Cleanup
+
+Removed two telemetry files containing failed event data related to the tengu_native_auto_updater_start event. These files tracked CLI sessions that experienced issues during auto-updater startup.
+
 ## 2026-01-22 - Ubuntu Server: Docker Reorganization & Gitea Self-Hosted Git
 
 **What changed:**

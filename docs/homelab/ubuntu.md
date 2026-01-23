@@ -73,13 +73,17 @@ sudo mount -a
 
 | Container | Port | Compose Location | Purpose |
 |-----------|------|------------------|---------|
-| plex | 32400 | ~/docker/ | Media server |
+| plex | 32400 | ~/docker/plex/ | Media server |
 | jellyfin | 8096 | ~/docker/ | Media server (backup) |
 | qbittorrent | 8080 | ~/docker/ | Torrent client (Web UI) |
-| frigate | 5000 | ~/frigate/ | NVR - 2 cameras |
-| open-webui | 3000 | ~/open-webui/ | Ollama chat interface |
-| mosquitto | 1883 | ~/frigate/ | MQTT broker |
+| frigate | 5000 | ~/docker/frigate/ | NVR - 2 cameras |
+| mosquitto | 1883 | ~/docker/frigate/ | MQTT broker |
+| open-webui | 3000 | ~/docker/open-webui/ | Ollama chat interface |
+| odoo | 8069 | ~/docker/odoo/ | Business ERP |
+| odoo-db | - | ~/docker/odoo/ | PostgreSQL for Odoo |
+| gitea | 3001 (web), 2223 (ssh) | ~/docker/gitea/ | Self-hosted Git server |
 | clamav | - | ~/docker/ | Antivirus scanning |
+| portainer | 9000 | (docker run) | Docker management UI |
 
 ```bash
 # Check all containers
@@ -112,12 +116,34 @@ Ollama chat interface at http://192.168.2.126:3000
 
 ```bash
 # Upgrade
-cd ~/open-webui
+cd ~/docker/open-webui
 docker compose pull
 docker compose up -d
 
 # Check logs
 docker logs -f open-webui
+```
+
+---
+
+### Gitea (Self-Hosted Git)
+
+Private Git server at http://192.168.2.126:3001
+
+```bash
+# Manage
+cd ~/docker/gitea
+docker compose up -d
+docker compose logs -f
+
+# Clone via SSH (from Mac)
+git clone ssh://git@192.168.2.126:2223/jaded/repo-name.git
+
+# Create repo via API
+curl -X POST "http://localhost:3001/api/v1/user/repos" \
+  -H "Content-Type: application/json" \
+  -u 'user:pass' \
+  -d '{"name":"repo-name","private":true}'
 ```
 
 ---
@@ -153,7 +179,7 @@ nvidia-smi
 
 **Storage**: HDD via NFS (async mode, ~130 MB/s)
 **Recording**: Continuous 24/7, 30-day retention
-**Config**: `~/frigate/docker-compose.yml`
+**Config**: `~/docker/frigate/docker-compose.yml`
 
 | Camera | IP | Resolution | Codec |
 |--------|-----|------------|-------|
@@ -167,7 +193,7 @@ nvidia-smi
 docker logs frigate
 
 # Restart
-cd ~/frigate && docker compose restart frigate
+cd ~/docker/frigate && docker compose restart frigate
 
 # Web UI
 http://192.168.2.126:5000
@@ -233,6 +259,37 @@ User: `jaded` (passwordless sudo)
 
 ---
 
+## Docker Compose Organization
+
+All compose files are organized under `~/docker/`:
+
+```
+~/docker/
+├── frigate/
+│   ├── docker-compose.yml
+│   ├── .env
+│   ├── config/
+│   └── mosquitto/
+├── gitea/
+│   ├── docker-compose.yaml
+│   └── data/
+├── odoo/
+│   └── docker-compose.yml
+├── open-webui/
+│   └── docker-compose.yml
+└── plex/
+    └── docker-compose.yml
+```
+
+```bash
+# Manage any service
+cd ~/docker/<service> && docker compose up -d
+cd ~/docker/<service> && docker compose logs -f
+cd ~/docker/<service> && docker compose restart
+```
+
+---
+
 ## Quick Commands
 
 ```bash
@@ -250,9 +307,6 @@ mount | grep nfs
 
 # Ollama models
 ollama list
-
-# Restart all docker services
-cd ~/docker && docker compose restart
 ```
 
 ---

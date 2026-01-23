@@ -4,13 +4,79 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
-                                                                                                                                       ```changelog
-                                                                                                                                                                                                                                                                                                                                                  ```changelog
-                                                                                                                                                                                                       ```changelog
-                                                                                                                                          ```changelog
-                                                                                                                                                                                                                                                                                                                                                                                                                            ```changelog
-                                                                                                                                                                                                                                                                                                                                                  ```changelog
-                                                                                                                                                                                                                               ```changelog
+## 2026-01-22 - Ubuntu Server: Docker Reorganization & Gitea Self-Hosted Git
+
+**What changed:**
+- Reorganized all Docker Compose files into `~/docker/` subdirectories
+- Installed Gitea (self-hosted Git server) via Docker Compose
+- Created first self-hosted repository (pass-store) for password backup
+- Configured SSH key authentication for Git push from Mac
+
+**Docker compose reorganization:**
+- `~/docker/docker-compose.yml` → `~/docker/plex/docker-compose.yml`
+- `~/odoo/docker-compose.yml` → `~/docker/odoo/docker-compose.yml`
+- `~/open-webui/docker-compose.yml` → `~/docker/open-webui/docker-compose.yml`
+- `~/frigate/*` → `~/docker/frigate/` (entire directory including config, .env, mosquitto)
+- Created `~/docker/gitea/docker-compose.yaml` (new)
+
+**Gitea setup:**
+- Web UI: http://192.168.2.126:3001
+- SSH: port 2223 (mapped to container port 22)
+- Admin user: jaded
+- First repo: pass-store (private, for encrypted password backup)
+
+**Why:**
+- Scattered compose files were hard to find and manage
+- Wanted self-hosted Git for private repos (password store backup)
+- Learning Docker and self-hosted services
+
+**Files modified (on ubuntu-serv):**
+- `~/docker/gitea/docker-compose.yaml` - New Gitea config
+- `~/docker/*/docker-compose.yml` - Moved from scattered locations
+
+**Files modified (on Mac):**
+- `~/.claude/docs/homelab/ubuntu.md` - Updated service table, added Gitea section, documented docker organization
+
+**Technical notes:**
+- Gitea API can create repos: `curl -X POST "http://localhost:3001/api/v1/user/repos" -u 'user:pass' -d '{"name":"repo","private":true}'`
+- SSH key must be added to Gitea for push access (Settings → SSH Keys)
+- Port mapping: host:container (e.g., 3001:3000 means access via 3001, Gitea listens on 3000)
+
+---
+
+## 2026-01-22 - Mac: LastPass to Pass Migration
+
+**What changed:**
+- Migrated 43 passwords from LastPass CLI to pass (standard unix password manager)
+- Created GPG key for pass encryption
+- Reorganized pass folders (Elevated Trading → elevated, etc.)
+- Pushed encrypted password store to self-hosted Gitea
+
+**Migration process:**
+1. Installed pass-import via homebrew
+2. Created GPG key: `gpg --full-generate-key` (RSA 4096, jaded423@gmail.com)
+3. Initialized pass: `pass init "jaded423@gmail.com"`
+4. Exported from LastPass: `lpass export > /tmp/lastpass.csv`
+5. Imported to pass: `pimport pass lastpass /tmp/lastpass.csv -o ~/.password-store`
+6. Renamed folders for easier typing
+
+**Pass folder structure:**
+- `elevated/` - Elevated Trading passwords
+- `dax/` - Dax Distro passwords
+- `personal/` - Personal passwords
+
+**Why:**
+- Wanted local-first password management
+- GPG encryption (not cloud-dependent)
+- Git-backed for version control and backup
+
+**Technical notes:**
+- `pass -c "path"` copies to clipboard, auto-clears after 45 seconds
+- `pass show/edit` require full path from store root, not filesystem path
+- Filesystem `mv/rm` work normally but bypass git; use `pass mv/rm` to auto-commit
+
+---
+
 ## 2026-01-22 - VSCode Plugin and Session Management Updates
 
 Updated changelog with new task management system, VSCode plugin support, and fixes for session resumption and context warnings. Also added support for processors without AVX instructions.

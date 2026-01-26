@@ -1,0 +1,17 @@
+We are trying to solve the process for 1099 reps on the Dax side to easily input orders. Thoughts are an email to a centralized distro group for us to input manually, but we also are thinking about a simple form fill site (ex: google forms) that would map to OrderCircle via their APIs. This keeps these 1099 reps out of the software, but gives them ability to input orders on their own. 
+
+
+
+Considerations:
+
+Keep 1099 reps out of the OrderCircle software
+Simplify and automate as much of this as possible so we aren't creating a bottleneck to import orders manually
+1099 reps will need customer order emails and shipping emails when marked shipped to manage their customers easily
+I've already reached out to Hasan asking about linking a rep to all customer emails so I will provide you with the response once he comes back
+
+
+OrderCircle APIs:
+
+The APIs are available in the Platinum subscription tier (we are on the mid-tier right now)
+If you can find the documentation for the APIs or ask Hasan for the documentation, we can gauge if this is a viable path before upgrading subscription
+We might be able to access the higher tier for a trial period to do some testing - please ask Hasan if we can do this if you think this will work

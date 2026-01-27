@@ -1,6 +1,6 @@
 # Home Lab Documentation
 
-**Last Updated:** January 17, 2026
+**Last Updated:** January 26, 2026
 **Cluster:** 2-node Proxmox "home-cluster" with QDevice quorum
 
 ---
@@ -253,6 +253,7 @@ See [pi1.md](homelab/pi1.md) for details.
 
 | Date | Change |
 |------|--------|
+| 2026-01-26 | Disabled Twingate on omarchy (routing loop fix), PC heartbeat via book5 relay, n8n v2.1 with reboot limits |
 | 2026-01-16 | PC health monitoring: n8n heartbeats, IFTTT power cycle, Twingate headless |
 | 2026-01-13 | Reorganized homelab docs into per-node files |
 | 2026-01-12-13 | Pixelbook Go: CachyOS Hyprland, reverse tunnel, power management |

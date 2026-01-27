@@ -39,12 +39,16 @@ ssh jaded@192.168.2.161
 
 | Interface | IP | Purpose |
 |-----------|-----|---------|
-| eth0 | 192.168.2.161 | Management, desktop use |
+| ens18 | 192.168.2.161 | Management, desktop use |
 | Gateway | 192.168.2.1 | Router |
+
+**Twingate:** DISABLED (was causing routing loop - VM couldn't reach host book5)
 
 ```
 Mac → Twingate → book5 → ProxyJump → omarchy:22
 ```
+
+**Note:** SSH uses conditional ProxyJump - tries direct first, falls back to book5.
 
 ---
 
@@ -154,6 +158,26 @@ docker logs ollama
  └───────────┘      └─────────────┘      └─────────────┘
 ```
 
+### PC Health Monitor Workflow (v2.1)
+
+**Active workflow** monitoring Windows PC heartbeat:
+
+| Feature | Details |
+|---------|---------|
+| Check interval | Every 5 minutes |
+| Warning threshold | 10-30 min stale |
+| Critical threshold | >30 min stale |
+| Max reboots | 2 attempts |
+| Cooldown | 15 min after each reboot |
+| Power control | IFTTT → Tapo smart plug |
+
+**State files** (in n8n container `/home/node/.n8n/`):
+- `pc_heartbeat.txt` - Unix timestamp from PC
+- `pc_reboot_count.txt` - Reboot attempt counter
+- `pc_last_reboot.txt` - Timestamp of last reboot
+
+**PC sends heartbeat via:** `ssh book5 "curl -s -X POST http://192.168.2.161:5678/webhook/pc-heartbeat"`
+
 ### Setup Status
 
 **Completed**:
@@ -161,13 +185,13 @@ docker logs ollama
 - [x] n8n container running
 - [x] Ollama container running
 - [x] Llama 3.1 8B model installed
+- [x] PC Health Monitor v2.1 workflow
+- [x] IFTTT power cycle integration
 
 **Remaining**:
-- [ ] n8n initial setup (create account)
-- [ ] Email integration (Gmail SMTP/IMAP)
-- [ ] Tapo P105 smart plug integration
-- [ ] SSH keys (n8n → prox-tower)
-- [ ] Build health check workflow
+- [ ] Email integration (Gmail SMTP/IMAP) for notifications
+- [ ] SSH keys (n8n → prox-tower) for Tower monitoring
+- [ ] Build prox-tower health check workflow
 
 ### Configuration Files
 
@@ -200,13 +224,17 @@ docker logs ollama
 ### On Mac (`~/.ssh/config`)
 
 ```ssh-config
+# Conditional ProxyJump - tries direct first, falls back to book5
 Host 192.168.2.161 omarchy vm100
   HostName 192.168.2.161
   User jaded
-  ProxyJump 192.168.2.250
   IdentityFile ~/.ssh/id_ed25519
   ServerAliveInterval 60
   ServerAliveCountMax 3
+
+# ProxyJump only if direct connection fails (no Twingate)
+Match host 192.168.2.161,omarchy,vm100 exec "! nc -z -w 1 192.168.2.161 22 2>/dev/null"
+  ProxyJump 192.168.2.250
 ```
 
 ### On Omarchy

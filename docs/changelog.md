@@ -12,6 +12,57 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                         ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ```changelog
+## 2026-01-26 - Twingate Routing Fixes & PC Health Monitor v2.1
+
+**What changed:**
+
+1. **Proxmox UI WebSocket Issues**
+   - Diagnosed Twingate routing causing WebSocket failures
+   - Solution: Use direct IP (192.168.2.250) when on local network instead of Twingate alias (prox.lab)
+
+2. **SSH Config: Conditional ProxyJump for Omarchy**
+   - Added `Match exec` rule to `~/.ssh/config` for omarchy
+   - Tries direct connection first (via Twingate), falls back to ProxyJump through book5
+   - Pattern: `Match host ... exec "! nc -z -w 1 192.168.2.161 22 2>/dev/null"`
+
+3. **Disabled Twingate on Omarchy VM**
+   - Twingate inside omarchy was causing routing loop (VM couldn't reach its own host)
+   - Routes for local IPs (192.168.2.x) were going through sdwan0 instead of direct ens18
+   - Fix: `sudo systemctl stop twingate && sudo systemctl disable twingate`
+   - Access now via ProxyJump through book5 only
+
+4. **PC Heartbeat Rerouted Through book5**
+   - Old: PC → Twingate → omarchy:5678 (broken - empty HTTP responses)
+   - New: PC → SSH to book5 → curl omarchy:5678
+   - Created `C:\Users\joshu\heartbeat.ps1` with SSH relay
+   - Updated Windows scheduled task to run script every 2 minutes
+
+5. **PC Health Monitor Workflow v2.1**
+   - Added reboot counter (max 2 attempts before switching to alerts only)
+   - Added 15-minute cooldown after each reboot to allow PC to boot
+   - Added recovery notification when PC comes back online
+   - New state files: `pc_reboot_count.txt`, `pc_last_reboot.txt`
+   - New IFTTT triggers: `pc_reboot_notification`, `pc_max_reboots_exceeded`, `pc_recovered`
+
+**Why:**
+- PC was power cycling every 5 minutes because heartbeat monitor went down during Twingate issues
+- Twingate's HTTP handling through pihole connector was unreliable for WebSockets and some HTTP requests
+- Needed safeguards against infinite power cycling
+
+**Files modified:**
+- `~/.ssh/config` - Added conditional ProxyJump for omarchy with Match exec
+- `C:\Users\joshu\heartbeat.ps1` (on PC) - New heartbeat script via book5
+- `/Users/j/pc-health-monitor-v2.json` - Workflow with reboot counter
+- `/Users/j/pc-health-monitor-v2.1.json` - Workflow with 15-min cooldown (final version)
+
+**Technical notes:**
+- Twingate inside a VM that hosts Twingate connectors creates routing loops
+- The pihole Twingate connector works for TCP but has issues with HTTP response handling
+- SSH `Match exec` with `nc -z` provides elegant conditional ProxyJump
+- n8n Wait nodes don't block other scheduled executions - need file-based cooldown tracking
+
+---
+
 ## 2026-01-26 - Updated marketplace last updated timestamp
 
 Updated the lastUpdated timestamp in known_marketplaces.json to reflect the latest sync time.

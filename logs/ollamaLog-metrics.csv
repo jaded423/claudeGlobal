@@ -225,3 +225,7 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2026-01-27T09:02:08-06:00,.claude,109,1826,746,7.1,qwen-gon-jinn-hybrid
 2026-01-27T09:03:57-06:00,coa,98,5551,915,10.1,qwen-gon-jinn-hybrid
 2026-01-27T09:05:25-06:00,coaDax,76,2970,695,9.9,qwen-gon-jinn-hybrid
+2026-01-27T12:01:52-06:00,.claude,89,1012,380,4.4,qwen-gon-jinn-hybrid
+2026-01-27T12:06:27-06:00,coa,262,7284,915,3.5,qwen-gon-jinn-hybrid
+2026-01-27T12:08:42-06:00,coaDax,124,2972,676,5.8,qwen-gon-jinn-hybrid
+2026-01-27T12:11:28-06:00,odooReports,153,4224,910,6.2,qwen-gon-jinn-hybrid

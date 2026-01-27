@@ -115,7 +115,7 @@ See **[docs/projects.md](docs/projects.md)** for details.
 | Home Lab | Proxmox cluster (192.168.2.250) |
 | loom | Loom → SOP pipeline |
 
-All projects have hourly automated backups to GitHub.
+All projects have automated backups to GitHub (every 4 hours).
 
 ---
 

@@ -4,6 +4,26 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-27 - Git Backup Schedule Changed to 4-Hourly
+
+Modified git backup LaunchAgent from hourly to 4-hour intervals, aligning with Pi1 backup mirror schedule. Updated 3 files to reflect new backup timing and configuration.
+
+## 2026-01-27 - Git Backup Schedule Changed to 4-Hourly
+
+**What changed:**
+- Modified git backup LaunchAgent from hourly to 4-hour intervals
+- Backup now runs at fixed times: 0:00, 4:00, 8:00, 12:00, 16:00, 20:00
+- Changed from `StartCalendarInterval` (minute: 0) to array of specific hours
+
+**Why:**
+- Hourly backups were more frequent than needed
+- Aligns with Pi1 backup mirror schedule (also 4-hourly)
+
+**Files modified:**
+- `~/Library/LaunchAgents/com.user.gitbackup.plist` - Changed schedule interval
+
+---
+
                                                                                                                                                                                                                                                                                                                                                                    ```changelog
                                                                                                                                                                                                                                                                      ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          ```changelog

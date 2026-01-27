@@ -4,6 +4,82 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+## 2026-01-27 - SSH Tunnel Task Improvements & WSL Auto-Mount Cron
+
+Improved reliability of SSH tunnel startup after reboot with 30-second delay and 5 retry logic. Added WSL auto-mount cron job to ensure H:/I: drives are available before scripts run.
+
+## 2026-01-27 - SSH Tunnel Task Improvements & WSL Auto-Mount Cron
+
+**What changed:**
+
+1. **SSH Tunnel scheduled task hardened**
+   - Added 30-second startup delay (allows network/Twingate to initialize)
+   - Added restart on failure: 5 retries, 1 minute apart
+   - Task now reliably starts after reboot
+
+2. **WSL auto-mount cron job**
+   - Created `/usr/local/bin/ensure-mounts.sh` - mounts H:/I: if not mounted
+   - Added `/etc/cron.d/ensure-mounts` - runs every 5 minutes as root
+   - Logs to `/var/log/ensure-mounts.log`
+
+3. **Fixed WSL cron service**
+   - Removed stale `/var/run/crond.pid` lock file that was preventing cron from starting
+
+**Why:**
+- SSH tunnel wasn't starting reliably after PC reboot
+- Twingate client needs ~70 seconds after boot to stabilize routing
+- Drives need to mount after boot but before scripts run
+
+**Files modified:**
+- Windows: "SSH Tunnel to book5" scheduled task - added delay and restart settings
+- WSL: `/usr/local/bin/ensure-mounts.sh` - new auto-mount script
+- WSL: `/etc/cron.d/ensure-mounts` - new cron job
+- `~/.claude/docs/homelab/pc.md` - documented new configurations
+
+**Technical notes:**
+- Boot test results: SSH available ~32 seconds after power on, ~70 sec instability window while Twingate stabilizes, then stable
+- Tunnel script (`start-tunnel.ps1`) has infinite while loop with 10s reconnect delay
+- SSH keepalive: `ServerAliveInterval=60`, `ServerAliveCountMax=3` = 3 min dead connection detection
+
+---
+
+## 2026-01-27 - WSL SSH Boot Fix & inventory_sync.py Odoo Attributes
+
+**What changed:**
+
+1. **WSL fstab `nofail` fix**
+   - Added `nofail` option to H: and I: drive mounts in `/etc/fstab`
+   - Root cause: Google Drive mounts failing at boot left `/var/run/nologin`, blocking SSH
+   - Result: WSL boots cleanly, SSH available within ~33 seconds of power on
+
+2. **inventory_sync.py: Odoo product attributes**
+   - Added new columns to Current Inventory sheet: I/H/S, Nose Profile, Color Profile, Nose, Structure, Trim, Frost, Color
+   - Fetches from Odoo product.template attributes (IDs 22, 23, 28-32) and `ihs` field
+   - Only updates if Odoo has data (preserves existing manual entries)
+   - Removed duplicate `fetch_product_attributes` function, consolidated to `get_product_attributes`
+
+3. **inventory_sync.py: WSL mount check**
+   - Added `ensure_wsl_mounts()` function at start of main()
+   - Detects WSL via `/proc/version`, mounts H:/I: if not already mounted
+   - No-op on Mac (development/testing environment)
+
+**Why:**
+- WSL was not auto-starting SSH after PC reboot - required manual intervention
+- User needed quality attribute data from Odoo displayed in inventory sheet
+- Scripts need H:/I: drives mounted but `nofail` means they may not mount at boot
+
+**Files modified:**
+- WSL `/etc/fstab` - Added `nofail` to drive mounts
+- `inventory/inventory_sync.py` - Added imports, `ensure_wsl_mounts()`, attribute column support
+- `~/.claude/docs/homelab/pc.md` - Documented root cause and fix
+
+**Technical notes:**
+- Boot test: PC power on → SSH available in 33 seconds (automated IFTTT test)
+- Attribute IDs: 22=Nose Profile, 23=Color Profile, 28=Nose, 29=Structure, 30=Trim, 31=Frost, 32=Color
+- I/H/S codes from Odoo: i→I, ih→I-H, h→H, sh→S-H, s→S
+
+---
+
 ## 2026-01-27 - Git Backup Schedule Changed to 4-Hourly
 
 Modified git backup LaunchAgent from hourly to 4-hour intervals, aligning with Pi1 backup mirror schedule. Updated 3 files to reflect new backup timing and configuration.

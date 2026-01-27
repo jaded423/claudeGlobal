@@ -126,9 +126,13 @@ Mac → Twingate → book5 → localhost:2245 → PC:22
 ```
 
 **Scheduled Task**: "SSH Tunnel to book5"
-- Runs at logon, background (no window)
-- Auto-restarts on failure
+- Triggers: System startup (30s delay) + At logon
+- Restart on failure: 5 retries, 1 minute apart
+- Script: `C:\Users\joshu\bin\start-tunnel.ps1` (infinite reconnect loop, 10s between attempts)
+- SSH keepalive: 60s interval, disconnects after 3 failures (dead connection detection)
 - Key: `C:\Users\joshu\.ssh\id_ed25519`
+
+**Boot behavior**: ~70 second window after boot where Twingate stabilizes. Tunnel auto-reconnects.
 
 ```powershell
 # Check status
@@ -154,6 +158,7 @@ Stop-ScheduledTask -TaskName "SSH Tunnel to book5"
 | Port Forward :2223 | netsh portproxy | SSH to Pi1 |
 | COA Sync | Scheduled Task | Daily 6 AM - extracts COA data from Google Drive |
 | Google Drive | H: and I: | H:=joshua@elevatedtrading.com, I:=joshua@daxdistro.com |
+| Auto-Mount Cron | WSL cron.d | Every 5 min - mounts H:/I: if not mounted |
 
 ### Twingate Connector
 
@@ -219,6 +224,11 @@ sudo /usr/local/bin/fix-wsl-ssh
 
 ### "System is booting up" error
 
+**Root cause**: fstab mount failures (H:/I: drives not ready) leave `/var/run/nologin` in place.
+
+**Permanent fix**: Use `nofail` in fstab (see WSL Google Drive Mounts section).
+
+**Immediate fix** (if it happens):
 ```bash
 sudo rm -f /run/nologin /etc/nologin
 ```
@@ -306,11 +316,51 @@ Get-Content C:\scripts\coa_sync.log -Tail 50
 
 **fstab entries** (`/etc/fstab`):
 ```
-H: /mnt/h drvfs defaults 0 0
-I: /mnt/i drvfs defaults 0 0
+H: /mnt/h drvfs defaults,nofail 0 0
+I: /mnt/i drvfs defaults,nofail 0 0
 ```
 
+**Important**: The `nofail` option is critical - without it, WSL boot fails if Google Drive isn't ready, leaving `/var/run/nologin` in place and blocking SSH logins.
+
 **Note**: Mount points created but not usable for COA extraction due to permission issues with Google Drive's virtual file system. Production COA extraction runs on Windows Python instead.
+
+### Auto-Mount Cron Job
+
+**Script**: `/usr/local/bin/ensure-mounts.sh`
+**Cron**: `/etc/cron.d/ensure-mounts` - runs every 5 minutes as root
+**Log**: `/var/log/ensure-mounts.log`
+
+Automatically mounts H: and I: if not already mounted. Ensures drives are available even if they weren't ready at boot.
+
+```bash
+# Check mount status
+mountpoint /mnt/h && mountpoint /mnt/i
+
+# View log
+tail /var/log/ensure-mounts.log
+
+# Manual run
+sudo /usr/local/bin/ensure-mounts.sh
+```
+
+### Mount-on-Demand for Scripts
+
+Scripts can also ensure mounts directly:
+
+```python
+# Python: ensure_wsl_mounts() in inventory_sync.py
+import subprocess
+for drive, mp in [("H:", "/mnt/h"), ("I:", "/mnt/i")]:
+    result = subprocess.run(["mountpoint", "-q", mp], capture_output=True)
+    if result.returncode != 0:
+        subprocess.run(["sudo", "mount", "-t", "drvfs", drive, mp])
+```
+
+```bash
+# Bash: Add to script start
+mountpoint -q /mnt/h || sudo mount -t drvfs H: /mnt/h
+mountpoint -q /mnt/i || sudo mount -t drvfs I: /mnt/i
+```
 
 ---
 

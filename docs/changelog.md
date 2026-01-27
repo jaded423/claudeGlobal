@@ -12,6 +12,10 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                         ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ```changelog
+## 2026-01-27 - Patch Release 2.1.20
+
+This release includes significant improvements to task management, agent behavior, and UI interactions, along with numerous bug fixes related to session handling, tool responses, and text rendering. It also introduces new features like PR status indicators, external editor shortcuts, and enhanced marketplace support.
+
 ## 2026-01-26 - Windows PC Python & COA Automation Setup
 
 **What changed:**

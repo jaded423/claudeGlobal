@@ -152,6 +152,8 @@ Stop-ScheduledTask -TaskName "SSH Tunnel to book5"
 | RustDesk | Windows Service | Remote desktop (direct mode requires service running) |
 | ICS (Internet Connection Sharing) | Ethernet adapter | Internet for Pi1 |
 | Port Forward :2223 | netsh portproxy | SSH to Pi1 |
+| COA Sync | Scheduled Task | Daily 6 AM - extracts COA data from Google Drive |
+| Google Drive | H: and I: | H:=joshua@elevatedtrading.com, I:=joshua@daxdistro.com |
 
 ### Twingate Connector
 
@@ -246,6 +248,69 @@ Update Twingate resource in admin console, or set DHCP reservation on router.
    ```powershell
    netsh interface portproxy show v4tov4
    ```
+
+---
+
+## Python & Automation Scripts
+
+**Python**: 3.12 installed via winget (`C:\Users\joshu\AppData\Local\Programs\Python\Python312`)
+
+**Scripts Directory**: `C:\scripts\`
+
+```
+C:\scripts\
+├── gdrive_crawler.ps1      # Forces Google Drive to download PDFs locally
+├── run_coa_sync.ps1        # Master script: crawler → Elevated COA → Dax COA
+├── coa_sync.log            # Combined log file
+├── coa\                    # Elevated Trading COA extraction
+│   ├── extract_coa_data.py
+│   ├── credentials.json
+│   ├── sheets_token.json
+│   └── logs\
+└── coaDax\                 # Dax Distro COA extraction
+    ├── extract_coa_data.py
+    ├── credentials.json
+    ├── token.json
+    └── logs\
+```
+
+### COA Sync Scheduled Task
+
+**Name**: "COA Sync"
+**Schedule**: Daily at 6:00 AM
+**Command**: `powershell -ExecutionPolicy Bypass -File C:\scripts\run_coa_sync.ps1`
+
+```powershell
+# Check status
+schtasks /query /tn "COA Sync" /fo LIST /v
+
+# Run manually
+schtasks /run /tn "COA Sync"
+
+# View log
+Get-Content C:\scripts\coa_sync.log -Tail 50
+```
+
+### Google Drive Paths
+
+| Drive | Account | Key Paths |
+|-------|---------|-----------|
+| H: | joshua@elevatedtrading.com | `H:\Shared drives\Elevated Trading, LLC\COA's\` |
+| I: | joshua@daxdistro.com | `I:\.shortcut-targets-by-id\...\1 - THCa Flower COAs` |
+
+**Note**: WSL cannot access Google Drive virtual folders due to drvfs permission restrictions. The crawler script reads first byte of each PDF to force local download, then Windows Python extracts data.
+
+---
+
+## WSL Google Drive Mounts
+
+**fstab entries** (`/etc/fstab`):
+```
+H: /mnt/h drvfs defaults 0 0
+I: /mnt/i drvfs defaults 0 0
+```
+
+**Note**: Mount points created but not usable for COA extraction due to permission issues with Google Drive's virtual file system. Production COA extraction runs on Windows Python instead.
 
 ---
 

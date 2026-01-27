@@ -123,21 +123,40 @@ Detailed descriptions of all active projects in your workspace.
 ## coa
 **Type**: Python data extraction
 **Status**: Active
-**Location**: `~/projects/coa` (Mac), `/home/joshua/projects/coa` (WSL)
+**Location**: `~/projects/coa` (Mac), `C:\scripts\coa` (Windows PC)
 **Purpose**: Extract cannabinoid percentages from COA PDFs
-**Last Updated**: 2026-01-20
-**Recent Changes**: Added support for 3 additional lab formats (New Bloom Labs, Accurate Test Labs, Cannabis Chem Lab variants), deployed to WSL with automatic execution before inventory_sync
+**Last Updated**: 2026-01-26
+**Recent Changes**: Migrated production to Windows Python (WSL drvfs cannot access Google Drive virtual folders); added crawler script to force file downloads; runs via Windows Scheduled Task at 6 AM
 
 **Features**:
 - Scans COA PDF files from Google Drive shared folder
 - Extracts Delta-9-THC%, Total THC%, THCA% from 8 lab formats
 - Writes to category-specific Google Sheets tabs
 - Integrates with inventory_sync.py to populate Label Ready and Current Inventory THCA%
-- Deployed on WSL for automated execution (via H: drive mount)
+- Production runs natively on Windows Python 3.12 (not WSL)
 
 **Relationship**: Works in tandem with `odooReports/inventory` - extracts COA data that inventory_sync.py applies to Label Ready and Current Inventory tabs
 
 **Documentation**: See `~/projects/coa/CLAUDE.md`
+
+## coaDax
+**Type**: Python data extraction
+**Status**: Active
+**Location**: `~/projects/coaDax` (Mac), `C:\scripts\coaDax` (Windows PC)
+**Purpose**: Extract cannabinoid percentages from Dax Distro COA PDFs
+**Last Updated**: 2026-01-26
+**Recent Changes**: Initial deployment to Windows PC; runs via Windows Scheduled Task at 6 AM alongside Elevated COA
+
+**Features**:
+- Scans COA PDF files from Dax Distro Google Drive (joshua@daxdistro.com)
+- Extracts Delta-9-THC%, Total THC%, THCA%, Total CBD%, Total Cannabinoids%
+- Supports Cannabis Chem Lab and Pinnacle Analytics formats
+- Writes to Google Sheet: `1nrEIUTctodtzPJKdT9VV7m7QqI4yuSJCIxzwegNUcek`
+- Production runs natively on Windows Python 3.12 via `C:\scripts\run_coa_sync.ps1`
+
+**Note**: Uses Google Drive shortcut path (`I:\.shortcut-targets-by-id\...`) which requires crawler script to force downloads
+
+**Documentation**: See `~/projects/coaDax/CLAUDE.md`
 
 ## odooModules
 **Type**: Odoo 17 module development

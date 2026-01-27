@@ -12,6 +12,29 @@ This file contains the complete version history of the global Claude Code config
                                                                                                                         ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ```changelog
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ```changelog
+## 2026-01-26 - Windows PC Python & COA Automation Setup
+
+**What changed:**
+- Installed Python 3.12 on Windows PC via winget
+- Created `C:\scripts\` directory structure for automation
+- Created `gdrive_crawler.ps1` - forces Google Drive to download PDFs locally
+- Created `run_coa_sync.ps1` - master script for COA extraction
+- Deployed Elevated COA extractor (`C:\scripts\coa\`)
+- Deployed Dax COA extractor (`C:\scripts\coaDax\`)
+- Created Windows Scheduled Task "COA Sync" (daily 6:00 AM)
+- Added Google Drive I: to WSL fstab (joshua@daxdistro.com)
+
+**Why:**
+- WSL drvfs cannot access Google Drive virtual folders (permission denied)
+- Google Drive `.shortcut-targets-by-id` paths and Shared drives show as execute-only (d--x--x--x)
+- Windows Python can access files after crawler forces download
+
+**Files modified:**
+- `~/.claude/docs/homelab/pc.md` - Added Python, Scripts, COA Sync, and Google Drive sections
+- WSL `/etc/fstab` - Added I: mount
+
+---
+
 ## 2026-01-26 - Twingate Routing Fixes & PC Health Monitor v2.1
 
 **What changed:**

@@ -1,0 +1,38 @@
+To integrate Google Apps Script with n8n to run Python code, you must use a Webhook to trigger an n8n workflow from the Apps Script, and then use the n8n Code node (Python) or Execute Command node to run the Python code. 
+Part 1: Configure the n8n Webhook 
+Create a New Workflow in your n8n instance.
+Add a Webhook Trigger Node as the starting point of your workflow.
+Configure the Webhook settings (e.g., HTTP Method to POST).
+Save the Webhook URL provided by n8n. This URL is the endpoint that your Google Apps Script will call.
+Keep the workflow active to ensure it can be triggered. 
+Part 2: Add Python Code Execution to the Workflow 
+Choose one of the following methods within the n8n workflow:
+Using the Code Node:
+Add a Code node after the Webhook node.
+In the node configuration, set the language to Python.
+Write your Python script within the code editor. The n8n documentation provides guidance on the available standard libraries and built-in methods you can use within the sandboxed environment.
+Using the Execute Command Node (for self-hosted instances):
+If you have a self-hosted n8n instance with Python installed and configured on the host machine, you can use the Execute Command node.
+In this node, specify the shell command to run your Python script (e.g., python /path/to/your/script.py).
+Ensure the n8n user has the necessary permissions to access the script and any virtual environments or required libraries. 
+Part 3: Trigger the n8n Webhook from Google Apps Script 
+Open your Google Apps Script project or the associated Google Workspace application (e.g., Google Sheets).
+Add code to call the n8n webhook using the UrlFetchApp service. You can send data from the Apps Script to n8n in the body of the HTTP request.Example Google Apps Script function to call the webhook:
+javascript
+function triggerN8nWorkflow() {
+  var webhookUrl = "YOUR_N8N_WEBHOOK_URL"; // Replace with your actual webhook URL
+  var options = {
+    'method' : 'post',
+    'contentType': 'application/json',
+    // Example data to send to n8n
+    'payload' : JSON.stringify({'key': 'value', 'anotherKey': 'anotherValue'}) 
+  };
+
+  try {
+    var response = UrlFetchApp.fetch(webhookUrl, options);
+    Logger.log(response.getContentText());
+  } catch (e) {
+    Logger.log("Error triggering n8n workflow: " + e.message);
+  }
+}
+Set up a trigger in the Apps Script project (e.g., onFormSubmit or a time-based trigger) that runs the triggerN8nWorkflow function when the desired event occurs. 

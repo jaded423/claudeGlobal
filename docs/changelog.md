@@ -4,6 +4,11 @@ This file contains the complete version history of the global Claude Code config
 
 ---
 
+                                                                                                                                                                                                       ```changelog
+## 2026-01-28 - Google Apps Script + n8n Python Integration Guide
+
+Added a new guide for integrating Google Apps Script with n8n to execute Python code using webhooks and n8n's Code or Execute Command nodes.
+
 ## 2026-01-27 - SSH Tunnel Task Improvements & WSL Auto-Mount Cron
 
 Improved reliability of SSH tunnel startup after reboot with 30-second delay and 5 retry logic. Added WSL auto-mount cron job to ensure H:/I: drives are available before scripts run.

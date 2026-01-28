@@ -233,3 +233,4 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2026-01-27T16:13:59-06:00,coa,512,7523,N/A,N/A,qwen-gon-jinn-hybrid
 2026-01-27T16:18:27-06:00,coaDax,255,2972,752,3.4,qwen-gon-jinn-hybrid
 2026-01-27T16:20:35-06:00,odooReports,114,1015,312,2.9,qwen-gon-jinn-hybrid
+2026-01-28T16:01:32-06:00,.claude,68,1157,341,5.5,qwen-gon-jinn-hybrid

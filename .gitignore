@@ -9,6 +9,8 @@ projects/
 history.jsonl  # Now in dedicated claudeHistory repo
 statsig/
 plugins/  # Machine-specific runtime state (marketplace timestamps, caches, installs)
+logs/  # Metrics and usage logs
+cache/  # Cached data
 
 # Local settings overrides
 settings.local.json

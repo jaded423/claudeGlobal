@@ -364,6 +364,175 @@ mountpoint -q /mnt/i || sudo mount -t drvfs I: /mnt/i
 
 ---
 
+## COA Script Sync System (Mac ↔ WSL)
+
+### Overview
+
+The COA extraction scripts (`extract_coa_data.py`) run on both Mac and WSL, but have different file paths for Google Drive access. To enable easy syncing of code changes while keeping machine-specific paths separate, we use a **local_config.py** pattern.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        SOURCE OF TRUTH: Mac                          │
+│                                                                      │
+│  ~/projects/coa/                    ~/projects/coaDax/               │
+│  ├── extract_coa_data.py  ←─────────────────────────────────────┐   │
+│  ├── local_config.py      (Mac paths, gitignored)               │   │
+│  └── local_config.py.example (template, tracked)                │   │
+│                                                                  │   │
+└──────────────────────────────────────────────────────────────────┼───┘
+                                                                   │
+                              SCP/Copy                             │
+                                                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                           WSL (PC)                                   │
+│                                                                      │
+│  ~/projects/coa/                    ~/projects/coaDax/               │
+│  ├── extract_coa_data.py  (synced from Mac)                         │
+│  ├── local_config.py      (WSL paths, created locally)              │
+│  └── local_config.py.example                                        │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### How It Works
+
+1. **Main script** (`extract_coa_data.py`) imports paths from `local_config.py`
+2. **local_config.py** is gitignored - each machine has its own version
+3. **local_config.py.example** is tracked - serves as template for new machines
+4. When code changes, only `extract_coa_data.py` needs to be copied
+
+### Files Structure
+
+| File | Tracked? | Purpose |
+|------|----------|---------|
+| `extract_coa_data.py` | Yes | Main script (synced between machines) |
+| `local_config.py` | **No** | Machine-specific paths (never synced) |
+| `local_config.py.example` | Yes | Template for creating local_config.py |
+
+### Machine-Specific Paths
+
+#### coa/ (Elevated Trading COA)
+
+| Variable | Mac | WSL |
+|----------|-----|-----|
+| `COA_BASE` | `/Users/j/Library/CloudStorage/GoogleDrive-joshua@elevatedtrading.com/Shared drives/Elevated Trading, LLC/COA's` | `/mnt/h/Shared drives/Elevated Trading, LLC/COA's` |
+| `CREDENTIALS_PATH` | `~/projects/odooReports/AR_AP/credentials.json` | `~/projects/odooReports/AR_AP/credentials.json` |
+| `TOKEN_PATH` | `~/projects/odooReports/inventory/sheets_token.json` | `~/projects/odooReports/inventory/sheets_token.json` |
+
+#### coaDax/ (Dax Distro COA)
+
+| Variable | Mac | WSL |
+|----------|-----|-----|
+| `COA_FOLDER` | `/Users/j/joshua@daxdistro.com - Google Drive/My Drive/1 - THCa Flower COAs` | `/mnt/i/.shortcut-targets-by-id/1v9wlV4MbLRypk-PwGZNzI6KYrKN9qnpX/1 - THCa Flower COAs` |
+
+### Syncing Scripts from Mac to WSL
+
+When you update the COA extraction logic on Mac, sync to WSL:
+
+```bash
+# From Mac - sync both COA scripts to WSL
+scp ~/projects/coa/extract_coa_data.py wsl:~/projects/coa/
+scp ~/projects/coaDax/extract_coa_data.py wsl:~/projects/coaDax/
+
+# Or use a single command for both:
+scp ~/projects/coa/extract_coa_data.py wsl:~/projects/coa/ && \
+scp ~/projects/coaDax/extract_coa_data.py wsl:~/projects/coaDax/
+```
+
+**Important**: Only copy `extract_coa_data.py`, NOT `local_config.py`.
+
+### Setting Up WSL (First Time)
+
+If WSL doesn't have `local_config.py` yet:
+
+```bash
+# SSH to WSL
+ssh wsl
+
+# For coa/
+cd ~/projects/coa
+cp local_config.py.example local_config.py
+nano local_config.py  # Edit paths for WSL
+
+# For coaDax/
+cd ~/projects/coaDax
+cp local_config.py.example local_config.py
+nano local_config.py  # Edit paths for WSL
+```
+
+#### WSL local_config.py for coa/
+
+```python
+from pathlib import Path
+
+COA_BASE = Path("/mnt/h/Shared drives/Elevated Trading, LLC/COA's")
+CREDENTIALS_PATH = Path.home() / "projects" / "odooReports" / "AR_AP" / "credentials.json"
+TOKEN_PATH = Path.home() / "projects" / "odooReports" / "inventory" / "sheets_token.json"
+```
+
+#### WSL local_config.py for coaDax/
+
+```python
+from pathlib import Path
+
+COA_FOLDER = Path("/mnt/i/.shortcut-targets-by-id/1v9wlV4MbLRypk-PwGZNzI6KYrKN9qnpX/1 - THCa Flower COAs")
+```
+
+### Verifying the Setup
+
+```bash
+# On WSL - test coa config
+cd ~/projects/coa
+python3 -c "from local_config import COA_BASE; print(COA_BASE); print(COA_BASE.exists())"
+
+# On WSL - test coaDax config
+cd ~/projects/coaDax
+python3 -c "from local_config import COA_FOLDER; print(COA_FOLDER); print(COA_FOLDER.exists())"
+```
+
+### Troubleshooting
+
+#### "local_config.py not found" Error
+
+```bash
+# Create from template
+cp local_config.py.example local_config.py
+# Edit with correct paths
+nano local_config.py
+```
+
+#### "Path does not exist" Error
+
+1. Check Google Drive is mounted: `mountpoint /mnt/h && mountpoint /mnt/i`
+2. Mount if needed: `sudo mount -t drvfs H: /mnt/h`
+3. Verify path exists: `ls -la /mnt/h/Shared\ drives/`
+
+#### Script Works on Mac but Not WSL
+
+1. Verify `local_config.py` exists on WSL
+2. Check paths are correct for WSL (not Mac paths)
+3. Ensure Google Drive mounts are accessible
+
+### Best Practices
+
+1. **Always develop on Mac first** - test changes before syncing
+2. **Only sync extract_coa_data.py** - never overwrite local_config.py
+3. **Check paths after syncing** - run the verification commands
+4. **Keep local_config.py.example updated** - if you add new config variables, update the template
+
+### Related Files
+
+| Location | Purpose |
+|----------|---------|
+| `~/projects/coa/` | Elevated Trading COA extraction |
+| `~/projects/coaDax/` | Dax Distro COA extraction |
+| `~/projects/odooReports/inventory/` | Inventory sync (also runs on WSL) |
+| `C:\scripts\` | Windows-native COA scripts (legacy) |
+
+---
+
 ## Related Docs
 
 - [pi1.md](pi1.md) - Pi1 git backup mirror (connected via ICS)

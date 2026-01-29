@@ -108,6 +108,8 @@ See **[docs/projects.md](docs/projects.md)** for details.
 | nvimConfig | Neovim config (→ `~/.config/nvim`) |
 | zshConfig | ZSH config (→ `~/.zshrc`) |
 | odooReports | Business automation |
+| coa | Elevated Trading COA extraction (Mac ↔ WSL sync) |
+| coaDax | Dax Distro COA extraction (Mac ↔ WSL sync) |
 | scripts | Backup system, automation |
 | Elevated Vault | Obsidian knowledge base |
 | n8nDev/n8nProd | n8n workflow automation |
@@ -156,6 +158,7 @@ All projects have automated backups to GitHub (every 4 hours).
 - **LaunchAgents**: 3 background jobs (backup, email, claude auto)
 - **Crontab**: Odoo reports, claude auto reset
 - **Gmail OAuth**: Credentials in `~/projects/odooReports/AR_AP/`
+- **COA Scripts (Mac ↔ WSL)**: Uses `local_config.py` pattern for cross-machine sync. See [docs/homelab/pc.md](docs/homelab/pc.md#coa-script-sync-system-mac--wsl)
 
 ---
 

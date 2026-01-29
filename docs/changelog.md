@@ -5,6 +5,10 @@ This file contains the complete version history of the global Claude Code config
 ---
 
                                                                                                                                                                                                        ```changelog
+## 2026-01-29 - Last Updated known_marketplaces.json Timestamp
+
+Updated "lastUpdated" timestamp in plugins/known_marketplaces.json.
+
 ## 2026-01-29 - CLI and Plugin Updates
 
 Updated changelog with fixes for proxy connectivity, spinner verbs, and terminal rendering performance. Also updated plugin marketplace metadata and statistics cache with new data from yesterday's usage.

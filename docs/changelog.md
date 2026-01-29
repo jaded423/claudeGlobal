@@ -5,6 +5,14 @@ This file contains the complete version history of the global Claude Code config
 ---
 
                                                                                                                                                                                                        ```changelog
+## 2026-01-29 - CLI and Plugin Updates
+
+Updated changelog with fixes for proxy connectivity, spinner verbs, and terminal rendering performance. Also updated plugin marketplace metadata and statistics cache with new data from yesterday's usage.
+
+## 2026-01-29 - CLI and Plugin Updates
+
+Updated changelog with fixes for proxy connectivity, spinner verbs, and terminal rendering performance. Also updated plugin marketplace metadata and statistics cache with new data from yesterday's usage.
+
 ## 2026-01-28 - Google Apps Script + n8n Python Integration Guide
 
 Added a new guide for integrating Google Apps Script with n8n to execute Python code using webhooks and n8n's Code or Execute Command nodes.

@@ -182,8 +182,8 @@ Detailed descriptions of all active projects in your workspace.
 **Documentation**: See `~/projects/odooModules/CLAUDE.md`
 
 ## scripts
-**Last Updated:** 2026-01-21
-**Recent Changes:** Updated crawler scripts to use `rclone sync` for true mirror behavior and added missing cron automation for Google Photos synchronization.
+**Last Updated:** 2026-01-29
+**Recent Changes:**    **Recent Changes:** Updated Ollama model configuration in `bin/ollamaLog`.
 
 **Type**: Automation scripts collection
 **Status**: Critical automation infrastructure

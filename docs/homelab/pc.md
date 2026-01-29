@@ -156,9 +156,9 @@ Stop-ScheduledTask -TaskName "SSH Tunnel to book5"
 | RustDesk | Windows Service | Remote desktop (direct mode requires service running) |
 | ICS (Internet Connection Sharing) | Ethernet adapter | Internet for Pi1 |
 | Port Forward :2223 | netsh portproxy | SSH to Pi1 |
-| COA Sync | Scheduled Task | Daily 6 AM - extracts COA data from Google Drive |
+| Full Sync | WSL Cron | Every 15 min - crawler + COA extraction + inventory sync |
+| StartGoogleDrive | Scheduled Task | On-demand - starts Google Drive (triggered by sync script) |
 | Google Drive | H: and I: | H:=joshua@elevatedtrading.com, I:=joshua@daxdistro.com |
-| Auto-Mount Cron | WSL cron.d | Every 5 min - mounts H:/I: if not mounted |
 
 ### Twingate Connector
 
@@ -530,6 +530,112 @@ nano local_config.py
 | `~/projects/coaDax/` | Dax Distro COA extraction |
 | `~/projects/odooReports/inventory/` | Inventory sync (also runs on WSL) |
 | `C:\scripts\` | Windows-native COA scripts (legacy) |
+
+---
+
+## Automated Full Sync (WSL)
+
+### Overview
+
+The full sync system runs every 15 minutes via cron, executing:
+1. **Crawler** - Forces Google Drive to download COA PDFs locally
+2. **COA Extraction** - Extracts cannabinoid data from PDFs to Google Sheets
+3. **Inventory Sync** - Syncs Odoo inventory data to Google Sheets
+
+### Main Script
+
+**Location**: `~/projects/run_full_sync.sh`
+
+```bash
+# Manual run
+~/projects/run_full_sync.sh
+
+# Check cron schedule
+crontab -l | grep run_full_sync
+```
+
+### Google Drive Auto-Start
+
+The sync script automatically starts Google Drive if it's not running, using a Windows scheduled task (required because GUI apps cannot be started from WSL/SSH non-interactive sessions).
+
+**Windows Scheduled Task**: `StartGoogleDrive`
+
+```powershell
+# View task
+schtasks /query /tn "StartGoogleDrive"
+
+# Manual trigger (from Windows)
+schtasks /run /tn "StartGoogleDrive"
+
+# From WSL
+/mnt/c/Windows/System32/schtasks.exe /run /tn "StartGoogleDrive"
+```
+
+**Task Configuration**:
+- **Task Name**: StartGoogleDrive
+- **Action**: Run `C:\scripts\start-gdrive.bat`
+- **Trigger**: On-demand only (no schedule)
+- **Batch File**: `start "" "C:\Program Files\Google\Drive File Stream\launch.bat"`
+
+**Why Scheduled Task?**
+- WSL and SSH sessions run in non-interactive context
+- GUI applications (like Google Drive) require interactive Windows session
+- Scheduled tasks run in user's interactive session, allowing GUI apps to start
+
+### Sync Script Behavior
+
+1. **Check Google Drive**: Uses `tasklist.exe` to find `GoogleDriveFS.exe`
+2. **Auto-Start if Needed**: Triggers scheduled task, waits 30 seconds, retries up to 3 times
+3. **Mount Drives**: Ensures `/mnt/h` (Elevated) and `/mnt/i` (Dax) are mounted
+4. **Run Crawler**: Reads first byte of each PDF to force download from cloud
+5. **Extract COA Data**: Runs `extract_coa_data.py` for Elevated
+6. **Inventory Sync**: Runs `inventory_sync.py`
+7. **Report Timing**: Shows duration of each step
+
+### Typical Timing
+
+| Step | Duration |
+|------|----------|
+| Crawler | ~15 seconds |
+| COA Extraction | ~55 seconds |
+| Inventory Sync | ~10 seconds |
+| **Total** | **~1:20** |
+
+### Cron Schedule
+
+```bash
+# Every 15 minutes
+*/15 * * * * /home/joshua/projects/run_full_sync.sh >> /tmp/full_sync.log 2>&1
+```
+
+### Troubleshooting
+
+**Google Drive won't start**:
+```bash
+# Check if task exists
+/mnt/c/Windows/System32/schtasks.exe /query /tn "StartGoogleDrive"
+
+# Check batch file
+cat /mnt/c/scripts/start-gdrive.bat
+
+# Should contain:
+# start "" "C:\Program Files\Google\Drive File Stream\launch.bat"
+```
+
+**Mounts failing**:
+```bash
+# Check if Google Drive is running first
+/mnt/c/Windows/System32/tasklist.exe | grep -i GoogleDriveFS
+
+# Then check mount points
+mountpoint /mnt/h && echo "H: mounted" || echo "H: not mounted"
+mountpoint /mnt/i && echo "I: mounted" || echo "I: not mounted"
+```
+
+**View sync logs**:
+```bash
+tail -f /tmp/full_sync.log
+```
 
 ---
 

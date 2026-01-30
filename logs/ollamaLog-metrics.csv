@@ -253,3 +253,6 @@ timestamp,project,duration_sec,prompt_tokens,generated_tokens,tok_per_sec,model
 2026-01-29T21:42:21-06:00,coa,3648,2823,490,9.7,8Kwen-Instruct
 2026-01-30T00:07:34-06:00,coa,250,2867,556,9.5,8Kwen-Instruct
 2026-01-30T04:10:56-06:00,coa,229,2918,553,9.7,8Kwen-Instruct
+2026-01-30T12:01:40-06:00,.claude,89,2021,678,8.1,8Kwen-Instruct
+2026-01-30T12:02:45-06:00,coa,57,2968,514,9.5,8Kwen-Instruct
+2026-01-30T12:03:18-06:00,odooReports,26,949,180,8.6,8Kwen-Instruct

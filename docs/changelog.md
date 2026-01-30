@@ -5,6 +5,10 @@ This file contains the complete version history of the global Claude Code config
 ---
 
                                                                                                                                                                                                        ```changelog
+## 2026-01-30 - [Update known_marketplaces.json timestamp]
+
+Updated `known_marketplaces.json` with a new timestamp.
+
 ## 2026-01-30 - Updated Stats Cache
 
 Updated `stats-cache.json` with today's activity data.
